@@ -56,9 +56,8 @@ Shared timeout values in `test-constants.js`:
 
 ## Coverage
 
-- **25 tests total** covering ~90% of application functionality
+- **24 tests total** covering ~90% of application functionality
 - **Tab operations**: 11 tests
 - **Terminal I/O**: 6 tests
 - **Split-pane layout**: 4 tests
 - **App launch**: 3 tests
-- **Smoke test**: 1 test

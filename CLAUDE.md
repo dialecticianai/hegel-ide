@@ -216,6 +216,7 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 - ❌ DON'T ignore workflow prompts (contain phase-specific guidance)
 - ❌ DON'T reset workflow without user confirmation
 - ❌ DON'T abort workflow without specific user guidance
+- ❌ **NEVER use `sed`, `awk`, or similar text stream editors to edit files** - they always cause issues. Use the Edit/Write tools instead
 
 ---
 
