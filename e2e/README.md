@@ -39,6 +39,22 @@ Run specific test file:
 npx playwright test e2e/tabs.spec.js
 ```
 
+## TDD Approach
+
+**During feature development:**
+- Run only the related e2e tests for faster feedback cycles
+- Example: If working on terminal features, run `npx playwright test e2e/terminal.spec.js`
+- This speeds up iteration velocity during active development
+
+**Before committing/merging:**
+- Run the full test suite with `npm test` to ensure no regressions
+- Verify all tests pass to maintain integration integrity
+
+**Benefits:**
+- Faster development cycles (targeted tests run in seconds vs full suite)
+- Catch related issues immediately during development
+- Full regression coverage before changes land
+
 ## Test Constants
 
 Shared timeout values in `test-constants.js`:
@@ -55,8 +71,8 @@ Shared timeout values in `test-constants.js`:
 
 ## Coverage
 
-- **24 tests total** covering ~90% of application functionality
-- **Tab operations**: 11 tests
-- **Terminal I/O**: 6 tests
-- **Split-pane layout**: 4 tests
-- **App launch**: 3 tests
+Test suite covers core application functionality:
+- **Tab operations**: Add, close, switch, overflow behavior
+- **Terminal I/O**: Command execution, multi-terminal support
+- **Split-pane layout**: Panel structure, resize, project discovery
+- **App launch**: Window initialization, title, content visibility
