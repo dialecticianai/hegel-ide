@@ -1,6 +1,6 @@
 # Toy 1: Electron Shell + Alpine.js + Terminal – Learnings
 
-Duration: ~1 hour | Status: Complete | Estimate: 1-2 hours
+Duration: 13 minutes | Status: Complete | Estimate: 1-2 hours
 
 ---
 
@@ -90,8 +90,7 @@ Duration: ~1 hour | Status: Complete | Estimate: 1-2 hours
 
 ### Estimate Calibration
 - **Estimated**: 1-2 hours
-- **Actual**: ~1 hour (including rebuild troubleshooting)
-- **Assessment**: Accurate for foundation work, but validation gap means claimed features untested
+- **Actual**: 13 minutes
 
 ---
 

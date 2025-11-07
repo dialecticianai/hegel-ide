@@ -1,6 +1,6 @@
 # Toy 2: Playwright E2E Testing – Learnings
 
-Duration: ~2 hours | Status: Complete | Estimate: 2-3 hours
+Duration: 16 minutes | Status: Complete | Estimate: 2-3 hours
 
 ---
 
@@ -122,8 +122,7 @@ Window finding pattern evolved from naive `firstWindow()` to URL-based filtering
 ### Estimate Calibration
 
 - **Estimated**: 2-3 hours
-- **Actual**: ~2 hours
-- **Assessment**: Accurate - Playwright setup easier than expected, terminal testing more straightforward than feared
+- **Actual**: 16 minutes
 - **Surprise**: Found real bug during test development (IPC race condition) - tests paid for themselves immediately
 
 ---
