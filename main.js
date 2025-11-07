@@ -33,7 +33,9 @@ function createWindow() {
 
   // Forward bash output to renderer via IPC
   ptyProcess.onData((data) => {
-    mainWindow.webContents.send('terminal-output', data);
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('terminal-output', data);
+    }
   });
 
   // Handle terminal input from renderer
