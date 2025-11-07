@@ -9,7 +9,6 @@ e2e/
 ├── test-constants.js       Shared timeout constants for consistent test timing
 │
 ├── app.spec.js             Application launch and window content tests
-├── smoke.spec.js           Basic smoke test for app startup
 │
 ├── tabs.spec.js            Tab management tests (add, close, switch, overflow)
 │                           - Default tabs (Projects, Terminal 1)
