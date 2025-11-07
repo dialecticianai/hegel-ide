@@ -38,17 +38,31 @@ These are people who:
 
 **Core insight**: If you can't see the code, you can't micro-manage it. Forced abstraction is a feature.
 
+**UI Layout**:
+- **Right panel**: Integrated terminal running Claude Code (AI pair programming interface)
+- **Left panel**: Markdown browser/viewer with no-code review system (document-driven workflow)
+
+Work at the document and orchestration level. Code exists, you can run it and verify it works, but you don't stare at syntax.
+
 **Key capabilities**:
 - **Workflow orchestration** (via Hegel) - Work at the problem level, not the code level
+- **Document-driven development** - SPEC.md, PLAN.md, ARCHITECTURE.md drive the workflow
+- **No-code review system** - Review and annotate documents, not pull requests
 - **Execution without inspection** - Run, test, verify outcomes; code is an implementation detail
 - **First-principles problem decomposition** - Break down "impossible" problems into achievable workflows
 - **AI as systems engineer, not code generator** - Orchestrate solutions, don't write functions
 
 **What we're NOT doing**:
-- ❌ Building a code editor or viewer
-- ❌ Syntax highlighting, autocomplete, or any traditional IDE features
-- ❌ Making it easy to "peek" at the implementation
+- ❌ Building a traditional code editor (no file tree + syntax highlighting for .py/.rs/.js files)
+- ❌ Syntax highlighting, autocomplete, or traditional IDE features for code
+- ❌ Making it easy to "peek" at implementation files during normal workflow
 - ❌ Optimizing for problems current tools already solve
+
+**What we ARE doing**:
+- ✅ Terminal integration (for Claude Code interaction and command execution)
+- ✅ Markdown viewing/browsing (for document-driven workflows)
+- ✅ No-code review UI (annotate and approve documents, not code)
+- ✅ Workflow state visualization (via Hegel backend)
 
 ---
 

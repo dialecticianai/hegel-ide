@@ -2,6 +2,14 @@
 
 Electron-based no-code IDE for AI-first development. No code editor by design - work at the orchestration level.
 
+## Vision
+
+**Two-panel layout:**
+- **Right panel**: Integrated terminal running Claude Code (AI pair programming)
+- **Left panel**: Markdown browser/viewer with no-code review system (document-driven workflow)
+
+The terminal work is foundational but "off-vision" - the left panel (Markdown + review) is the primary differentiator.
+
 ## Current Status
 
 Basic Electron shell with integrated terminal. Alpine.js for lightweight UI reactivity.

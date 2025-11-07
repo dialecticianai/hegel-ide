@@ -1,4 +1,21 @@
+# Hegel IDE Project
+
+This project is **hegel-ide**, a subproject of the Hegel ecosystem. See [README.md](./README.md) for project-specific details.
+
+**What is hegel-ide?** An Electron-based no-code IDE for AI-first development. No code editor by design - work at the orchestration level.
+
+## Relationship to `hegel` CLI
+
+**Two roles for `hegel` in this project:**
+
+1. **For AI agents working on this codebase:** Use `hegel` for workflow orchestration (see sections below)
+2. **For this application's runtime:** This IDE uses `hegel` as its backend "database driver" - querying projects, workflow state, and metrics via commands like `hegel pm discover list --json`
+
+---
+
 # Using Hegel for Workflow Orchestration
+
+The sections below document how AI agents should use the `hegel` CLI tool for structured development.
 
 **Hegel** orchestrates Dialectic-Driven Development through state-based workflows. Use it for structured development cycles, command guardrails, AST-aware code transformations, and metrics collection.
 
