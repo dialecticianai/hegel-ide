@@ -45,6 +45,26 @@ npm test              # Run Playwright E2E tests
 - **Multi-terminal IPC**: Renderer ↔ main process communication routes I/O by terminalId
 - **E2E test suite**: 25 tests covering tabs, terminals, projects, and layout (~30s execution time)
 
+## Usage
+
+**Left Panel - Project Tabs:**
+- Projects tab (non-closeable) displays discovered Hegel projects
+- Click any project name to open a detail tab showing metrics, workflow state, and activity
+- Project detail tabs include "Refresh" button to fetch fresh data
+- Click "×" on project tabs to close them
+- Reopening a project uses cached data for instant display
+
+**Right Panel - Terminal Tabs:**
+- Terminal 1 (non-closeable) auto-launches on startup
+- Click "+" button to create additional terminal tabs (Terminal 2, Terminal 3, etc.)
+- Each terminal has independent bash session with separate command history
+- Click "×" on additional terminals to close them (Terminal 1 cannot be closed)
+- Click tab headers to switch between terminals
+
+**Split Pane:**
+- Drag divider to resize panels (saved to localStorage)
+- Panel widths persist across app restarts
+
 ## Code Structure
 
 ```
