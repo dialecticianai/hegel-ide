@@ -5,7 +5,7 @@ const os = require('os');
 const { spawn } = require('child_process');
 
 let mainWindow;
-let ptyProcess;
+let ptyProcesses = new Map(); // Map of terminalId -> ptyProcess
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -22,9 +22,9 @@ function createWindow() {
   // Open DevTools for debugging
   mainWindow.webContents.openDevTools();
 
-  // Spawn bash process
+  // Spawn initial terminal (term-1)
   const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
-  ptyProcess = pty.spawn(shell, [], {
+  const term1 = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 80,
     rows: 24,
@@ -32,21 +32,29 @@ function createWindow() {
     env: process.env
   });
 
-  // Forward bash output to renderer via IPC
-  ptyProcess.onData((data) => {
+  ptyProcesses.set('term-1', term1);
+
+  // Forward bash output to renderer via IPC (with terminalId)
+  term1.onData((data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('terminal-output', data);
+      mainWindow.webContents.send('terminal-output', { terminalId: 'term-1', data });
     }
   });
 
-  // Handle terminal input from renderer
-  ipcMain.on('terminal-input', (event, data) => {
-    ptyProcess.write(data);
+  // Handle terminal input from renderer (route by terminalId)
+  ipcMain.on('terminal-input', (event, { terminalId, data }) => {
+    const ptyProc = ptyProcesses.get(terminalId);
+    if (ptyProc) {
+      ptyProc.write(data);
+    }
   });
 
-  // Handle terminal resize from renderer
-  ipcMain.on('terminal-resize', (event, { cols, rows }) => {
-    ptyProcess.resize(cols, rows);
+  // Handle terminal resize from renderer (route by terminalId)
+  ipcMain.on('terminal-resize', (event, { terminalId, cols, rows }) => {
+    const ptyProc = ptyProcesses.get(terminalId);
+    if (ptyProc) {
+      ptyProc.resize(cols, rows);
+    }
   });
 
   // Handle project discovery request
@@ -85,10 +93,88 @@ function createWindow() {
     });
   });
 
-  mainWindow.on('closed', function () {
-    if (ptyProcess) {
-      ptyProcess.kill();
+  // Handle project detail request
+  ipcMain.handle('get-project-details', async (event, { projectName }) => {
+    return new Promise((resolve, reject) => {
+      const hegel = spawn('hegel', ['pm', 'discover', 'show', projectName, '--json']);
+      let stdout = '';
+      let stderr = '';
+
+      hegel.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      hegel.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      hegel.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`hegel command failed: ${stderr}`));
+          return;
+        }
+
+        try {
+          const output = JSON.parse(stdout);
+          resolve(output);
+        } catch (error) {
+          reject(new Error(`Failed to parse hegel output: ${error.message}`));
+        }
+      });
+
+      hegel.on('error', (error) => {
+        reject(new Error(`Failed to spawn hegel: ${error.message}`));
+      });
+    });
+  });
+
+  // Handle create-terminal request
+  ipcMain.handle('create-terminal', async (event, { terminalId }) => {
+    try {
+      const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+      const ptyProc = pty.spawn(shell, [], {
+        name: 'xterm-color',
+        cols: 80,
+        rows: 24,
+        cwd: process.cwd(),
+        env: process.env
+      });
+
+      ptyProcesses.set(terminalId, ptyProc);
+
+      // Forward output to renderer
+      ptyProc.onData((data) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('terminal-output', { terminalId, data });
+        }
+      });
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
     }
+  });
+
+  // Handle close-terminal request
+  ipcMain.handle('close-terminal', async (event, { terminalId }) => {
+    try {
+      const ptyProc = ptyProcesses.get(terminalId);
+      if (ptyProc) {
+        ptyProc.kill();
+        ptyProcesses.delete(terminalId);
+      }
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  });
+
+  mainWindow.on('closed', function () {
+    // Kill all pty processes
+    for (const [terminalId, ptyProc] of ptyProcesses) {
+      ptyProc.kill();
+    }
+    ptyProcesses.clear();
     mainWindow = null;
   });
 }
