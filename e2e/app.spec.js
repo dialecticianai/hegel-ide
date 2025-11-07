@@ -49,10 +49,13 @@ test.describe('Application Launch', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    // Verify main content is visible (h1 element)
-    const heading = await mainWindow.locator('h1');
+    // Wait for Alpine to initialize
+    await mainWindow.waitForTimeout(500);
+
+    // Verify split-pane content is visible
+    const heading = await mainWindow.locator('h2');
     expect(await heading.isVisible()).toBe(true);
-    expect(await heading.textContent()).toBe('Hegel IDE');
+    expect(await heading.textContent()).toBe('Markdown Browser');
 
     await electronApp.close();
   });

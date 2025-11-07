@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const pty = require('node-pty');
 const os = require('os');
+const { spawn } = require('child_process');
 
 let mainWindow;
 let ptyProcess;
@@ -46,6 +47,42 @@ function createWindow() {
   // Handle terminal resize from renderer
   ipcMain.on('terminal-resize', (event, { cols, rows }) => {
     ptyProcess.resize(cols, rows);
+  });
+
+  // Handle project discovery request
+  ipcMain.handle('get-projects', async () => {
+    return new Promise((resolve, reject) => {
+      const hegel = spawn('hegel', ['pm', 'discover', 'list', '--json']);
+      let stdout = '';
+      let stderr = '';
+
+      hegel.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      hegel.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      hegel.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`hegel command failed: ${stderr}`));
+          return;
+        }
+
+        try {
+          const output = JSON.parse(stdout);
+          const projectNames = output.projects.map(p => p.name);
+          resolve(projectNames);
+        } catch (error) {
+          reject(new Error(`Failed to parse hegel output: ${error.message}`));
+        }
+      });
+
+      hegel.on('error', (error) => {
+        reject(new Error(`Failed to spawn hegel: ${error.message}`));
+      });
+    });
   });
 
   mainWindow.on('closed', function () {
