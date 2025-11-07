@@ -23,18 +23,17 @@
     }
 
     .split-pane {
-      overflow: auto;
-      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      background: #1e1e1e;
     }
 
     .left-pane {
-      background: #1e1e1e;
+      overflow: hidden;
     }
 
     .right-pane {
-      background: #1e1e1e;
-      display: flex;
-      flex-direction: column;
+      overflow: hidden;
     }
 
     .divider {
@@ -78,6 +77,102 @@
       padding: 10px;
       border-radius: 4px;
     }
+
+    /* Tab bar styles */
+    .tab-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #252526;
+      border-bottom: 1px solid #444;
+      padding: 4px 8px;
+      flex-shrink: 0;
+    }
+
+    .tabs-list {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      flex: 1;
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: #2d2d2d;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      background: #1e1e1e;
+      border-bottom: 2px solid #0e639c;
+    }
+
+    .close-tab {
+      background: none;
+      border: none;
+      color: #858585;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+      margin-left: 4px;
+    }
+
+    .close-tab:hover {
+      color: #f48771;
+    }
+
+    .add-tab {
+      background: #2d2d2d;
+      border: none;
+      color: #d4d4d4;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 12px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .add-tab:hover {
+      background: #3e3e3e;
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+    }
+
+    .terminal-container {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    .refresh-button {
+      background: #0e639c;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .refresh-button:hover:not(:disabled) {
+      background: #1177bb;
+    }
+
+    .refresh-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   </style>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="renderer.js"></script>
@@ -87,22 +182,64 @@
   <div id="app" x-data="splitPane" class="split-container">
     <!-- Left Panel: Markdown Browser -->
     <div class="split-pane left-pane" :style="{ width: leftPanelPercent + '%' }">
-      <h2>Markdown Browser</h2>
-      <p>Discovered Projects:</p>
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tabs-list">
+          <template x-for="tab in leftTabs" :key="tab.id">
+            <div class="tab"
+                 :class="{ 'active': activeLeftTab === tab.id }"
+                 @click="switchLeftTab(tab.id)">
+              <span x-text="tab.label"></span>
+              <button x-show="tab.closeable"
+                      class="close-tab"
+                      @click.stop="closeLeftTab(tab.id)">×</button>
+            </div>
+          </template>
+        </div>
+        <button class="add-tab" @click="addProjectTab">+</button>
+      </div>
 
-      <template x-if="projectsLoading">
-        <p>Loading projects...</p>
-      </template>
+      <!-- Tab Content Area -->
+      <div class="tab-content">
+        <!-- Projects tab content -->
+        <div x-show="activeLeftTab === 'projects'">
+          <h2>Markdown Browser</h2>
+          <p>Discovered Projects:</p>
 
-      <template x-if="projectsError">
-        <p class="error" x-text="projectsError"></p>
-      </template>
+          <template x-if="projectsLoading">
+            <p>Loading projects...</p>
+          </template>
 
-      <ul class="projects-list" x-show="!projectsLoading && !projectsError">
-        <template x-for="project in projects" :key="project">
-          <li x-text="project"></li>
+          <template x-if="projectsError">
+            <p class="error" x-text="projectsError"></p>
+          </template>
+
+          <ul class="projects-list" x-show="!projectsLoading && !projectsError">
+            <template x-for="project in projects" :key="project">
+              <li @click="openProjectTab(project)"
+                  style="cursor: pointer;"
+                  x-text="project"></li>
+            </template>
+          </ul>
+        </div>
+
+        <!-- Project detail tabs content -->
+        <template x-for="tab in leftTabs.filter(t => t.type === 'project-detail')" :key="tab.id">
+          <div x-show="activeLeftTab === tab.id">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h2 x-text="tab.label"></h2>
+              <button @click="refreshProjectDetails(tab.projectName)"
+                      :disabled="projectDetails[tab.projectName]?.loading"
+                      class="refresh-button">
+                <span x-text="projectDetails[tab.projectName]?.loading ? 'Loading...' : 'Refresh'"></span>
+              </button>
+            </div>
+            <div x-show="projectDetails[tab.projectName]?.loading">Loading project details...</div>
+            <div x-show="projectDetails[tab.projectName]?.error" class="error" x-text="projectDetails[tab.projectName]?.error"></div>
+            <pre x-show="projectDetails[tab.projectName]?.data" x-text="JSON.stringify(projectDetails[tab.projectName]?.data, null, 2)"></pre>
+          </div>
         </template>
-      </ul>
+      </div>
     </div>
 
     <!-- Draggable Divider -->
@@ -113,7 +250,31 @@
 
     <!-- Right Panel: Terminal -->
     <div class="split-pane right-pane" :style="{ width: (100 - leftPanelPercent) + '%' }">
-      <div id="terminal-container"></div>
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tabs-list">
+          <template x-for="tab in rightTabs" :key="tab.id">
+            <div class="tab"
+                 :class="{ 'active': activeRightTab === tab.id }"
+                 @click="switchRightTab(tab.id)">
+              <span x-text="tab.label"></span>
+              <button x-show="tab.closeable"
+                      class="close-tab"
+                      @click.stop="closeRightTab(tab.id)">×</button>
+            </div>
+          </template>
+        </div>
+        <button class="add-tab" @click="addTerminalTab">+</button>
+      </div>
+
+      <!-- Terminal Content Area -->
+      <div class="tab-content">
+        <template x-for="tab in rightTabs" :key="tab.id">
+          <div x-show="activeRightTab === tab.id"
+               :id="'terminal-container-' + tab.terminalId"
+               class="terminal-container"></div>
+        </template>
+      </div>
     </div>
   </div>
 </body>
