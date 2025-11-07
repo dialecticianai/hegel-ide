@@ -12,7 +12,7 @@ The terminal work is foundational but "off-vision" - the left panel (Markdown + 
 
 ## Current Status
 
-Basic Electron shell with integrated terminal. Alpine.js for lightweight UI reactivity.
+Split-pane Electron application with draggable layout. Left panel displays discovered Hegel projects, right panel provides integrated terminal. Alpine.js handles reactive UI state and localStorage persistence.
 
 ## Setup
 
