@@ -303,9 +303,8 @@ test.describe('Markdown Link Navigation', () => {
     await indexTab.click();
     await mainWindow.waitForTimeout(200);
 
-    // Click link in index.md to page-b.md
-    const markdownContent = await mainWindow.locator('.markdown-content');
-    const linkToB = await markdownContent.locator('a[href="page-b.md"]');
+    // Click link in index.md to page-b.md (only visible content)
+    const linkToB = await mainWindow.locator('.markdown-content:visible a[href="page-b.md"]');
     await linkToB.click();
 
     await mainWindow.waitForTimeout(TAB_CREATE);
@@ -317,8 +316,8 @@ test.describe('Markdown Link Navigation', () => {
 
     // Middle tab should be page-b (active)
     const middleTab = await allTabs.nth(1);
-    const middleTabText = await middleTab.textContent();
-    expect(middleTabText.trim()).toBe('page-b×');
+    const middleTabText = await middleTab.locator('span').first().textContent();
+    expect(middleTabText.trim()).toBe('page-b');
 
     const hasActiveClass = await middleTab.evaluate(el => el.classList.contains('active'));
     expect(hasActiveClass).toBe(true);
