@@ -175,6 +175,140 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    /* Markdown content styling with theme support */
+    .markdown-content {
+      line-height: 1.6;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+
+    .markdown-content h1,
+    .markdown-content h2,
+    .markdown-content h3,
+    .markdown-content h4,
+    .markdown-content h5,
+    .markdown-content h6 {
+      margin-top: 24px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .markdown-content h1 { font-size: 2em; }
+    .markdown-content h2 { font-size: 1.5em; }
+    .markdown-content h3 { font-size: 1.25em; }
+
+    .markdown-content p {
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    .markdown-content ul,
+    .markdown-content ol {
+      margin-top: 0;
+      margin-bottom: 16px;
+      padding-left: 2em;
+    }
+
+    .markdown-content code {
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-size: 85%;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .markdown-content pre {
+      padding: 16px;
+      overflow: auto;
+      line-height: 1.45;
+      border-radius: 3px;
+      margin-bottom: 16px;
+    }
+
+    .markdown-content pre code {
+      padding: 0;
+      background: transparent;
+    }
+
+    .markdown-content a {
+      text-decoration: none;
+    }
+
+    .markdown-content a:hover {
+      text-decoration: underline;
+    }
+
+    .readme-missing {
+      color: #858585;
+      font-style: italic;
+    }
+
+    /* Dark mode theme */
+    @media (prefers-color-scheme: dark) {
+      .markdown-content {
+        color: #d4d4d4;
+      }
+
+      .markdown-content h1,
+      .markdown-content h2,
+      .markdown-content h3,
+      .markdown-content h4,
+      .markdown-content h5,
+      .markdown-content h6 {
+        color: #4ec9b0;
+      }
+
+      .markdown-content code {
+        background: #2d2d2d;
+        color: #d4d4d4;
+      }
+
+      .markdown-content pre {
+        background: #2d2d2d;
+      }
+
+      .markdown-content a {
+        color: #4fc1ff;
+      }
+
+      .markdown-content a:hover {
+        color: #6fddff;
+      }
+    }
+
+    /* Light mode theme */
+    @media (prefers-color-scheme: light) {
+      .markdown-content {
+        color: #1e1e1e;
+      }
+
+      .markdown-content h1,
+      .markdown-content h2,
+      .markdown-content h3,
+      .markdown-content h4,
+      .markdown-content h5,
+      .markdown-content h6 {
+        color: #005a9e;
+      }
+
+      .markdown-content code {
+        background: #f3f3f3;
+        color: #1e1e1e;
+      }
+
+      .markdown-content pre {
+        background: #f3f3f3;
+      }
+
+      .markdown-content a {
+        color: #0066cc;
+      }
+
+      .markdown-content a:hover {
+        color: #0088ff;
+      }
+    }
   </style>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script src="renderer.js"></script>
