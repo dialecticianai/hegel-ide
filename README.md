@@ -70,6 +70,13 @@ npm test              # Run Playwright E2E tests
 - Drag divider to resize panels (saved to localStorage)
 - Panel widths persist across app restarts
 
+**Theme System:**
+- Theme dropdown in Projects tab header (left of "Toggle DevTools" button)
+- Four themes available: Auto (system preference), Dark, Light, Synthwave
+- Auto mode dynamically tracks system dark/light preference changes
+- Theme selection persists across app restarts
+- Synthwave theme features vibrant 80s-inspired colors and gradient effects
+
 ## Code Structure
 
 ```
