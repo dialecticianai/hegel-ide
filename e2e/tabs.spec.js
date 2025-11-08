@@ -244,8 +244,8 @@ test.describe('Tab Management', () => {
     await firstProject.click();
     await mainWindow.waitForTimeout(1500);
 
-    // Verify refresh button exists
-    const refreshBtn = await mainWindow.locator('.refresh-button');
+    // Verify refresh button exists (in active tab)
+    const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab');
     expect(await refreshBtn.isVisible()).toBe(true);
 
     await electronApp.close();
@@ -333,6 +333,204 @@ test.describe('Tab Management', () => {
     // Verify add button visible
     const addBtn = await mainWindow.locator('.left-pane .add-tab');
     expect(await addBtn.isVisible()).toBe(true);
+
+    await electronApp.close();
+  });
+
+  test('can open Settings tab via ⚙️ button', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(500);
+
+    // Click ⚙️ button in Projects tab
+    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Verify Settings tab appears
+    const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
+    expect(await settingsTab.isVisible()).toBe(true);
+
+    // Verify Settings tab is active
+    const hasActiveClass = await settingsTab.evaluate(el => el.classList.contains('active'));
+    expect(hasActiveClass).toBe(true);
+
+    // Verify Settings tab is at position 1 (after Projects)
+    const allTabs = await mainWindow.locator('.left-pane .tab').all();
+    const settingsTabIndex = await Promise.all(allTabs.map(async (tab, idx) => {
+      const text = await tab.textContent();
+      return text.includes('Settings') ? idx : -1;
+    }));
+    const settingsIndex = settingsTabIndex.find(i => i !== -1);
+    expect(settingsIndex).toBe(1);
+
+    await electronApp.close();
+  });
+
+  test('Settings tab is closeable', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(500);
+
+    // Open Settings tab
+    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Verify Settings tab has close button
+    const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
+    const closeBtn = settingsTab.locator('.close-tab');
+    expect(await closeBtn.isVisible()).toBe(true);
+
+    // Close Settings tab
+    await closeBtn.click();
+    await mainWindow.waitForTimeout(TAB_CLOSE);
+
+    // Verify Settings tab is gone
+    expect(await settingsTab.isVisible()).toBe(false);
+
+    // Verify Projects tab is active
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    const hasActiveClass = await projectsTab.evaluate(el => el.classList.contains('active'));
+    expect(hasActiveClass).toBe(true);
+
+    await electronApp.close();
+  });
+
+  test('Settings tab positions at index 1 when reopened', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(PROJECT_LOAD);
+
+    // Open Settings tab
+    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Close Settings tab
+    const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
+    const closeBtn = settingsTab.locator('.close-tab');
+    await closeBtn.click();
+    await mainWindow.waitForTimeout(TAB_CLOSE);
+
+    // Open a project detail tab (should be at index 1)
+    const firstProject = await mainWindow.locator('.projects-list li').first();
+    await firstProject.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Switch back to Projects tab to access ⚙️ button
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(500);
+
+    // Re-open Settings tab
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Verify Settings tab is at position 1
+    const allTabs = await mainWindow.locator('.left-pane .tab').all();
+    const tabLabels = await Promise.all(allTabs.map(t => t.textContent()));
+    expect(tabLabels[0]).toContain('Projects');
+    expect(tabLabels[1]).toContain('Settings');
+
+    await electronApp.close();
+  });
+
+  test('clicking ⚙️ when Settings open does not duplicate tab', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(500);
+
+    // Open Settings tab
+    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Switch to Projects tab to make ⚙️ button visible
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(500);
+
+    // Click ⚙️ button again
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(500);
+
+    // Verify only one Settings tab exists
+    const settingsTabs = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' }).all();
+    expect(settingsTabs.length).toBe(1);
+
+    // Verify Settings tab is active again
+    const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
+    const hasActiveClass = await settingsTab.evaluate(el => el.classList.contains('active'));
+    expect(hasActiveClass).toBe(true);
+
+    await electronApp.close();
+  });
+
+  test('Settings tab contains theme selector and dev tools button', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(500);
+
+    // Open Settings tab
+    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Verify theme selector exists in Settings content
+    const themeSelector = await mainWindow.locator('.left-pane .theme-selector');
+    expect(await themeSelector.isVisible()).toBe(true);
+
+    // Verify theme selector has all options
+    const options = await themeSelector.locator('option').allTextContents();
+    expect(options).toContain('Auto');
+    expect(options).toContain('Dark');
+    expect(options).toContain('Light');
+    expect(options).toContain('Synthwave');
+
+    // Verify dev tools button exists
+    const devToolsBtn = await mainWindow.locator('.left-pane .devtools-button');
+    expect(await devToolsBtn.isVisible()).toBe(true);
 
     await electronApp.close();
   });

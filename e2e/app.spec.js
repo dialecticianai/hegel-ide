@@ -53,7 +53,7 @@ test.describe('Application Launch', () => {
     await mainWindow.waitForTimeout(500);
 
     // Verify split-pane content is visible
-    const heading = await mainWindow.locator('h2');
+    const heading = await mainWindow.locator('.left-pane h2').filter({ hasText: 'Projects' });
     expect(await heading.isVisible()).toBe(true);
     expect(await heading.textContent()).toBe('Projects');
 

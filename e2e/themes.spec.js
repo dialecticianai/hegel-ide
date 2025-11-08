@@ -1,8 +1,8 @@
 const { test, expect, _electron: electron } = require('@playwright/test');
-const { ALPINE_INIT } = require('./test-constants');
+const { ALPINE_INIT, TAB_CREATE } = require('./test-constants');
 
 test.describe('Theme System', () => {
-  test('theme dropdown is visible in Projects tab', async () => {
+  test('theme dropdown is visible in Settings tab', async () => {
     const electronApp = await electron.launch({
       args: ['.']
     });
@@ -10,6 +10,11 @@ test.describe('Theme System', () => {
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+
+    // Open Settings tab
+    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
 
     // Find theme dropdown
     const themeSelector = window.locator('.theme-selector');
@@ -26,6 +31,11 @@ test.describe('Theme System', () => {
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+
+    // Open Settings tab
+    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
 
     // Check all options are present
     const themeSelector = window.locator('.theme-selector');
@@ -47,6 +57,11 @@ test.describe('Theme System', () => {
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+
+    // Open Settings tab
+    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
 
     // Select synthwave theme
     const themeSelector = window.locator('.theme-selector');
@@ -84,6 +99,11 @@ test.describe('Theme System', () => {
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
 
+    // Open Settings tab
+    let settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
+
     // Set theme to light
     const themeSelector = window.locator('.theme-selector');
     await themeSelector.selectOption('light');
@@ -99,6 +119,11 @@ test.describe('Theme System', () => {
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+
+    // Open Settings tab again after reload
+    settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
 
     // Verify light theme persisted
     bodyClasses = await window.evaluate(() => {
@@ -131,6 +156,11 @@ test.describe('Theme System', () => {
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+
+    // Open Settings tab
+    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    await settingsButton.click();
+    await window.waitForTimeout(TAB_CREATE);
 
     // Check default selection
     const selectedValue = await window.locator('.theme-selector').inputValue();

@@ -12,7 +12,7 @@ The terminal work is foundational but "off-vision" - the left panel (Markdown + 
 
 ## Current Status
 
-Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering and link navigation. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support). Link navigation allows browsing between markdown files with tab management. Application-wide theming system with auto/dark/light/synthwave modes.
+Split-pane Electron application with tab-based interface. Left panel supports Projects list tab, closeable Settings tab, and closeable project detail tabs with markdown rendering and link navigation. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support). Link navigation allows browsing between markdown files with tab management. Application-wide theming system with auto/dark/light/synthwave modes accessible via Settings tab.
 
 ## Setup
 
@@ -38,6 +38,7 @@ npm test              # Run Playwright E2E tests
 - **Split-pane layout**: Draggable divider between left panel (markdown browser) and right panel (terminals)
 - **Tab system**: Each panel supports multiple tabs with add/close functionality
 - **Project discovery**: Left panel Projects tab shows discovered Hegel projects via `hegel pm discover list`
+- **Settings tab**: Closeable Settings tab (opened via ⚙️ button in Projects tab) contains theme selector and dev tools toggle
 - **Project details**: Click projects to open detail tabs showing metrics and README.md content
 - **Markdown rendering**: README.md files rendered with theme-aware styling
 - **Markdown link navigation**: Click markdown links to navigate between files in tab system (regular click navigates, Cmd+click opens new tab)
@@ -47,12 +48,13 @@ npm test              # Run Playwright E2E tests
 - **Data caching**: Project details cached with refresh button for fresh data
 - **State persistence**: Split position and theme preference saved to localStorage
 - **Multi-terminal IPC**: Renderer ↔ main process communication routes I/O by terminalId
-- **E2E test suite**: 33 tests covering tabs, terminals, projects, markdown rendering, themes, and layout (~40s execution time)
+- **E2E test suite**: 46 tests covering tabs, terminals, projects, markdown rendering, themes, settings, and layout (~56s execution time)
 
 ## Usage
 
 **Left Panel - Project Tabs:**
 - Projects tab (non-closeable) displays discovered Hegel projects
+- Click ⚙️ button in Projects tab to open Settings tab
 - Click any project name to open a detail tab showing JSON metrics and README.md (if present)
 - README.md rendered as HTML with theme-aware styling (responds to system dark/light mode)
 - Click markdown links to navigate: regular click navigates current tab, Cmd/Ctrl+click opens new tab
@@ -62,6 +64,14 @@ npm test              # Run Playwright E2E tests
 - Project detail tabs include "Refresh" button to fetch fresh data (both metrics and README)
 - Click "×" on project tabs to close them
 - Reopening a project uses cached data for instant display
+
+**Settings Tab:**
+- Click ⚙️ button in Projects tab to open Settings
+- Settings tab always opens at position 1 (right of Projects tab)
+- Contains theme selector dropdown (Auto, Dark, Light, Synthwave)
+- Contains "Toggle DevTools" button for debugging
+- Click "×" to close Settings tab
+- Re-opening Settings after close positions it at index 1 again
 
 **Right Panel - Terminal Tabs:**
 - Terminal 1 (non-closeable) auto-launches on startup
@@ -75,7 +85,7 @@ npm test              # Run Playwright E2E tests
 - Panel widths persist across app restarts
 
 **Theme System:**
-- Theme dropdown in Projects tab header (left of "Toggle DevTools" button)
+- Theme dropdown in Settings tab (open via ⚙️ button in Projects tab)
 - Four themes available: Auto (system preference), Dark, Light, Synthwave
 - Auto mode dynamically tracks system dark/light preference changes
 - Theme selection persists across app restarts
@@ -101,6 +111,7 @@ hegel-ide/
 │   └── feat/               Execution mode feature specs and plans
 │       ├── markdown_links/            Markdown link navigation with tab management
 │       ├── project_readme_render/    Markdown browser Phase 1
+│       ├── settings_tab/              Settings tab with theme selector and dev tools
 │       ├── split_pane_layout/
 │       ├── ui_tabs/
 │       └── ui_themes/
@@ -113,11 +124,11 @@ hegel-ide/
 
 ## Testing
 
-- **Playwright E2E tests**: 33 tests covering tabs, terminals, projects, markdown rendering, themes, split-pane, and app launch
+- **Playwright E2E tests**: 46 tests covering tabs, terminals, projects, markdown rendering, themes, settings, split-pane, and app launch
 - **Vitest unit tests**: 41 tests covering frontend modules (split-pane, tabs, terminals, projects, markdown, themes)
-- **Test execution**: E2E ~40 seconds via `npm test`, unit tests <1 second via `npm run test:unit`
+- **Test execution**: E2E ~56 seconds via `npm test`, unit tests <1 second via `npm run test:unit`
 - **Test organization**: Shared timeout constants in test-constants.js for consistency
-- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering, theme system)
+- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering, theme system, Settings tab)
 
 ## Known Limitations
 

@@ -48,17 +48,7 @@
         <div x-show="activeLeftTab === 'projects'" class="tab-content-padded">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
             <h2 style="margin: 0;">Projects</h2>
-            <div style="display: flex; gap: 8px; align-items: center;">
-              <select x-model="currentTheme" @change="setTheme(currentTheme)" class="theme-selector">
-                <option value="auto">Auto</option>
-                <option value="dark">Dark</option>
-                <option value="light">Light</option>
-                <option value="synthwave">Synthwave</option>
-              </select>
-              <button @click="toggleDevTools" class="devtools-button">
-                Toggle DevTools
-              </button>
-            </div>
+            <button @click="openSettingsTab" class="settings-button">⚙️</button>
           </div>
 
           <template x-if="projectsLoading">
@@ -76,6 +66,27 @@
                   x-text="project"></li>
             </template>
           </ul>
+        </div>
+
+        <!-- Settings tab content -->
+        <div x-show="activeLeftTab === 'settings'" class="tab-content-padded">
+          <h2>Settings</h2>
+          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+            <div>
+              <label style="display: block; margin-bottom: 8px;">Theme</label>
+              <select x-model="currentTheme" @change="setTheme(currentTheme)" class="theme-selector">
+                <option value="auto">Auto</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="synthwave">Synthwave</option>
+              </select>
+            </div>
+            <div>
+              <button @click="toggleDevTools" class="devtools-button">
+                Toggle DevTools
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- Project detail tabs content -->

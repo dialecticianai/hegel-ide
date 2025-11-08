@@ -133,8 +133,8 @@ test.describe('README Rendering', () => {
     expect(await markdownContent.isVisible()).toBe(true);
     const initialHTML = await markdownContent.innerHTML();
 
-    // Click refresh button
-    const refreshButton = await mainWindow.locator('.refresh-button');
+    // Click refresh button (in active tab)
+    const refreshButton = await mainWindow.locator('.tab.active .refresh-tab');
     await refreshButton.click();
 
     // Wait for refresh to complete
