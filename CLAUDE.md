@@ -4,6 +4,36 @@ This project is **hegel-ide**, a subproject of the Hegel ecosystem. See [README.
 
 **What is hegel-ide?** An Electron-based no-code IDE for AI-first development. No code editor by design - work at the orchestration level.
 
+## UI Design Principles
+
+**Core aesthetic:** Minimal and unobtrusive, but maximally informative.
+
+**Information density:**
+- Use cryptic abbreviations liberally (i/o/e/p, not "input tokens"/"output tokens")
+- Always provide concise explanatory tooltips (via `title` attribute)
+- Path compression ($HOME replacement, ellipsis overflow with full path on hover)
+- Abbreviated numbers (143k, not 143578) for metrics
+- Time ago format ("2 hours ago", not ISO timestamps) for recency
+
+**Visual hierarchy:**
+- Cards go edge-to-edge (no side padding) for clean alignment
+- Use theme system CSS variables (`var(--text-primary)`, `var(--bg-secondary)`, etc.)
+- Monospace fonts for data values, system fonts for labels
+- Pipe separators (`|`) for compact horizontal layouts
+- Minimal margins between related elements
+
+**Interactivity:**
+- Tooltips for everything that's abbreviated or compressed
+- Help cursor (`cursor: help`) on items with tooltips
+- Icons in tabs (⟳ for refresh, × for close) to save space
+- Spinning animations for loading states
+
+**Examples:**
+- Good: `143k i | 147k o | 748 e | 233 p` with tooltips
+- Bad: `Input Tokens: 143,578 | Output Tokens: 147,696 | Events: 748 | Phases: 233`
+- Good: `$HOME/Code/proj` (truncated, hover shows full path)
+- Bad: `/Users/username/Code/github.com/org/project`
+
 ## Relationship to `hegel` CLI
 
 **Two roles for `hegel` in this project:**
