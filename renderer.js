@@ -26,6 +26,7 @@ document.addEventListener('alpine:init', () => {
     // Terminal and project tracking
     terminals: {},
     projectDetails: {},
+    fileContents: {}, // Store file contents by key: projectName:filePath
     nextTerminalNumber: 2,
 
     // Initialize component
@@ -207,6 +208,95 @@ document.addEventListener('alpine:init', () => {
       await this.fetchProjectReadme(projectName);
     },
 
+    // File tab operations
+    openFileTab(projectName, filePath, hash = null) {
+      const fileKey = `${projectName}:${filePath}`;
+
+      // Check if tab already exists showing this file
+      const existingTab = this.leftTabs.find(t =>
+        t.projectName === projectName && t.filePath === filePath
+      );
+
+      if (existingTab) {
+        this.switchLeftTab(existingTab.id);
+        if (hash) {
+          this.scrollToHash(existingTab.id, hash);
+        }
+        return;
+      }
+
+      // Create new tab
+      const fileName = filePath.split('/').pop();
+      const tabId = `file-${projectName}-${filePath.replace(/\//g, '-')}`;
+      const newTab = {
+        id: tabId,
+        type: 'file',
+        label: fileName,
+        closeable: true,
+        projectName: projectName,
+        filePath: filePath
+      };
+
+      this.leftTabs.push(newTab);
+      this.switchLeftTab(tabId);
+
+      // Fetch file content if not cached
+      if (!this.fileContents[fileKey]) {
+        this.fetchFileContent(projectName, filePath).then(() => {
+          if (hash) {
+            this.scrollToHash(tabId, hash);
+          }
+        });
+      } else if (hash) {
+        this.scrollToHash(tabId, hash);
+      }
+    },
+
+    async fetchFileContent(projectName, filePath) {
+      const fileKey = `${projectName}:${filePath}`;
+
+      try {
+        this.fileContents[fileKey] = {
+          content: null,
+          loading: true,
+          error: null
+        };
+
+        const result = await this.fetchProjectFile(projectName, filePath);
+
+        if (result) {
+          this.fileContents[fileKey] = {
+            content: result.content,
+            loading: false,
+            error: result.error
+          };
+        }
+      } catch (error) {
+        this.fileContents[fileKey] = {
+          content: null,
+          loading: false,
+          error: error.message || 'Failed to load file'
+        };
+      }
+    },
+
+    scrollToHash(tabId, hash) {
+      // Wait for Alpine to render the content
+      this.$nextTick(() => {
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      });
+    },
+
+    getFileContent(projectName, filePath) {
+      const fileKey = `${projectName}:${filePath}`;
+      return this.fileContents[fileKey];
+    },
+
     async toggleDevTools() {
       try {
         await ipcRenderer.invoke('toggle-devtools');
@@ -218,6 +308,88 @@ document.addEventListener('alpine:init', () => {
     renderMarkdown(content) {
       if (!content) return '';
       return marked.parse(content);
+    },
+
+    handleMarkdownClick(event, tabId, projectName) {
+      // Check if clicked element is a link or inside a link
+      let target = event.target;
+      while (target && target.tagName !== 'A') {
+        target = target.parentElement;
+        if (!target || target === event.currentTarget) return;
+      }
+
+      const href = target.getAttribute('href');
+      if (!href) return;
+
+      // Only handle relative markdown links (not http://, https://, mailto:, etc.)
+      if (href.match(/^[a-z]+:/i)) return;
+
+      // Check if it's a markdown file
+      if (!href.match(/\.md(#.*)?$/i)) return;
+
+      // Prevent default navigation
+      event.preventDefault();
+
+      // Extract file path and hash
+      const [filePath, ...hashParts] = href.split('#');
+      const hash = hashParts.length > 0 ? hashParts.join('#') : null;
+
+      // Determine if we should open in a new tab based on modifier keys
+      // Standard browser behavior:
+      // - Cmd+Click (Mac) or Ctrl+Click (Windows/Linux) = new tab
+      // - Middle click = new tab
+      // - Shift+Click = new window (we'll treat as new tab)
+      const openInNewTab = event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1;
+
+      if (openInNewTab) {
+        // Just open the new file in a new tab
+        this.openFileTab(projectName, filePath, hash);
+      } else {
+        // Navigate: open new file at current tab position, then close current tab
+        const targetTabId = `file-${projectName}-${filePath.replace(/\//g, '-')}`;
+        const existingTab = this.leftTabs.find(t => t.id === targetTabId);
+
+        if (existingTab) {
+          // File already open, just switch to it and close current tab
+          this.switchLeftTab(existingTab.id);
+          this.closeLeftTab(tabId);
+          if (hash) {
+            this.scrollToHash(existingTab.id, hash);
+          }
+        } else {
+          // Find position of current tab
+          const currentIndex = this.leftTabs.findIndex(t => t.id === tabId);
+
+          // Create new tab at same position
+          const fileName = filePath.split('/').pop();
+          const newTab = {
+            id: targetTabId,
+            type: 'file',
+            label: fileName,
+            closeable: true,
+            projectName: projectName,
+            filePath: filePath
+          };
+
+          this.leftTabs.splice(currentIndex, 0, newTab);
+          this.switchLeftTab(targetTabId);
+
+          // Fetch file content
+          const fileKey = `${projectName}:${filePath}`;
+          if (!this.fileContents[fileKey]) {
+            this.fetchFileContent(projectName, filePath).then(() => {
+              if (hash) {
+                this.scrollToHash(targetTabId, hash);
+              }
+            });
+          } else if (hash) {
+            this.scrollToHash(targetTabId, hash);
+          }
+
+          // Close old tab (now at currentIndex + 1)
+          this.closeLeftTab(tabId);
+        }
+      }
     },
 
     async addTerminalTab() {

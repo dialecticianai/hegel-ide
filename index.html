@@ -90,12 +90,33 @@
             <!-- README section -->
             <div x-show="projectDetails[tab.projectName]?.data" style="margin-top: 30px;">
               <template x-if="projectDetails[tab.projectName]?.readme">
-                <div class="markdown-content" x-html="renderMarkdown(projectDetails[tab.projectName].readme)"></div>
+                <div class="markdown-content"
+                     x-html="renderMarkdown(projectDetails[tab.projectName].readme)"
+                     @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
               </template>
               <template x-if="!projectDetails[tab.projectName]?.readme && !projectDetails[tab.projectName]?.loading">
                 <div class="readme-missing">Project missing README.md</div>
               </template>
             </div>
+          </div>
+        </template>
+
+        <!-- File tabs content -->
+        <template x-for="tab in leftTabs.filter(t => t.type === 'file')" :key="tab.id">
+          <div x-show="activeLeftTab === tab.id">
+            <h2 x-text="tab.filePath"></h2>
+            <template x-if="fileContents[`${tab.projectName}:${tab.filePath}`]">
+              <div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.loading">Loading file...</div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"
+                     class="error"
+                     x-text="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"></div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.content"
+                     class="markdown-content"
+                     x-html="renderMarkdown(fileContents[`${tab.projectName}:${tab.filePath}`]?.content)"
+                     @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
+              </div>
+            </template>
           </div>
         </template>
       </div>

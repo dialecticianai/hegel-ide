@@ -12,7 +12,7 @@ The terminal work is foundational but "off-vision" - the left panel (Markdown + 
 
 ## Current Status
 
-Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support). Application-wide theming system with auto/dark/light/synthwave modes.
+Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering and link navigation. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support). Link navigation allows browsing between markdown files with tab management. Application-wide theming system with auto/dark/light/synthwave modes.
 
 ## Setup
 
@@ -40,6 +40,7 @@ npm test              # Run Playwright E2E tests
 - **Project discovery**: Left panel Projects tab shows discovered Hegel projects via `hegel pm discover list`
 - **Project details**: Click projects to open detail tabs showing metrics and README.md content
 - **Markdown rendering**: README.md files rendered with theme-aware styling
+- **Markdown link navigation**: Click markdown links to navigate between files in tab system (regular click navigates, Cmd+click opens new tab)
 - **Theme system**: Application-wide theming with auto/dark/light/synthwave modes, localStorage persistence, system preference tracking
 - **Multi-terminal**: Right panel supports multiple independent bash sessions in separate tabs
 - **Terminal 1**: Non-closeable default terminal, additional terminals are closeable
@@ -54,6 +55,9 @@ npm test              # Run Playwright E2E tests
 - Projects tab (non-closeable) displays discovered Hegel projects
 - Click any project name to open a detail tab showing JSON metrics and README.md (if present)
 - README.md rendered as HTML with theme-aware styling (responds to system dark/light mode)
+- Click markdown links to navigate: regular click navigates current tab, Cmd/Ctrl+click opens new tab
+- Same file can only be open once (clicking link to already-open file switches to that tab)
+- External links (http://, https://) open in system browser
 - Missing README.md shows "Project missing README.md" message below metrics
 - Project detail tabs include "Refresh" button to fetch fresh data (both metrics and README)
 - Click "×" on project tabs to close them
@@ -95,6 +99,7 @@ hegel-ide/
 ├── .ddd/                   Document-Driven Development artifacts
 │   ├── toys/               Discovery mode experiments (toy1: terminal, toy2: playwright)
 │   └── feat/               Execution mode feature specs and plans
+│       ├── markdown_links/            Markdown link navigation with tab management
 │       ├── project_readme_render/    Markdown browser Phase 1
 │       ├── split_pane_layout/
 │       ├── ui_tabs/

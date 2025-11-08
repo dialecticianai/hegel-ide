@@ -6,14 +6,20 @@ Playwright E2E test suite for Hegel IDE. Tests cover application launch, tab ope
 
 ```
 e2e/
-├── test-constants.js           Shared timeout constants for consistent test timing
-├── app.spec.js                 Application launch and window content tests
-├── tabs.spec.js                Tab management (add, close, switch, overflow, project tabs)
-├── terminal.spec.js            Terminal presence, rendering, and I/O command tests
-├── split-pane.spec.js          Split-pane layout, divider, and project list tests
-├── readme-rendering.spec.js    README markdown rendering and refresh functionality tests
-├── themes.spec.js              Theme system (dropdown, switching, persistence, auto mode)
-└── alpine.spec.js.bak          Archived Alpine reactivity test (test component removed)
+├── test-constants.js              Shared timeout constants for consistent test timing
+├── app.spec.js                    Application launch and window content tests
+├── tabs.spec.js                   Tab management (add, close, switch, overflow, project tabs)
+├── terminal.spec.js               Terminal presence, rendering, and I/O command tests
+├── split-pane.spec.js             Split-pane layout, divider, and project list tests
+├── readme-rendering.spec.js       README markdown rendering and refresh functionality tests
+├── markdown-links.spec.js         Markdown link navigation and tab behavior tests
+├── markdown-links-debug.spec.js   Debug test for markdown link click handler investigation
+├── markdown-links-minimal.spec.js Minimal repro test for Alpine event binding issue
+├── themes.spec.js                 Theme system (dropdown, switching, persistence, auto mode)
+├── alpine.spec.js.bak             Archived Alpine reactivity test (test component removed)
+│
+└── fixtures/                      Test fixture data
+    └── markdown-links/            Markdown files for link navigation tests (index.md, page-a.md, page-b.md, page-c.md)
 ```
 
 ## Test Execution
@@ -67,3 +73,4 @@ Test suite covers core application functionality:
 - **App launch**: Window initialization, title, content visibility
 - **Theme system**: Theme dropdown, switching, persistence, auto mode
 - **README rendering**: Markdown display, formatting, refresh
+- **Markdown link navigation**: Regular click navigation, modifier click new tabs, file deduplication, external link passthrough
