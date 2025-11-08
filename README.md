@@ -12,7 +12,7 @@ The terminal work is foundational but "off-vision" - the left panel (Markdown + 
 
 ## Current Status
 
-Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence.
+Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support).
 
 ## Setup
 
@@ -27,9 +27,10 @@ npm test              # Run Playwright E2E tests
 
 - **Electron**: Cross-platform app shell
 - **Alpine.js**: Lightweight reactive UI (CDN-loaded, no build step)
+- **marked**: Markdown-to-HTML conversion with GFM support
 - **xterm.js (@xterm/xterm)**: Terminal emulator
 - **node-pty**: Bash process spawning and I/O
-- **IPC**: Simple send/receive for terminal communication (nodeIntegration enabled, contextIsolation disabled)
+- **IPC**: Simple send/receive for terminal/file communication (nodeIntegration enabled, contextIsolation disabled)
 - **Playwright**: E2E testing for Electron apps
 
 ## Current Features
@@ -37,20 +38,23 @@ npm test              # Run Playwright E2E tests
 - **Split-pane layout**: Draggable divider between left panel (markdown browser) and right panel (terminals)
 - **Tab system**: Each panel supports multiple tabs with add/close functionality
 - **Project discovery**: Left panel Projects tab shows discovered Hegel projects via `hegel pm discover list`
-- **Project details**: Click projects to open detail tabs showing metrics via `hegel pm discover show`
+- **Project details**: Click projects to open detail tabs showing metrics and README.md content
+- **Markdown rendering**: README.md files rendered with theme-aware styling (dark/light mode via system preference)
 - **Multi-terminal**: Right panel supports multiple independent bash sessions in separate tabs
 - **Terminal 1**: Non-closeable default terminal, additional terminals are closeable
 - **Data caching**: Project details cached with refresh button for fresh data
 - **State persistence**: Split position saved to localStorage
 - **Multi-terminal IPC**: Renderer ↔ main process communication routes I/O by terminalId
-- **E2E test suite**: 25 tests covering tabs, terminals, projects, and layout (~30s execution time)
+- **E2E test suite**: 28 tests covering tabs, terminals, projects, markdown rendering, and layout (~40s execution time)
 
 ## Usage
 
 **Left Panel - Project Tabs:**
 - Projects tab (non-closeable) displays discovered Hegel projects
-- Click any project name to open a detail tab showing metrics, workflow state, and activity
-- Project detail tabs include "Refresh" button to fetch fresh data
+- Click any project name to open a detail tab showing JSON metrics and README.md (if present)
+- README.md rendered as HTML with theme-aware styling (responds to system dark/light mode)
+- Missing README.md shows "Project missing README.md" message below metrics
+- Project detail tabs include "Refresh" button to fetch fresh data (both metrics and README)
 - Click "×" on project tabs to close them
 - Reopening a project uses cached data for instant display
 
@@ -92,10 +96,10 @@ hegel-ide/
 
 ## Testing
 
-- **Playwright E2E tests**: 25 tests covering tabs, terminals, projects, split-pane, and app launch
-- **Test execution**: ~30 seconds, runs via `npm test`
+- **Playwright E2E tests**: 28 tests covering tabs, terminals, projects, markdown rendering, split-pane, and app launch
+- **Test execution**: ~40 seconds, runs via `npm test`
 - **Test organization**: Shared timeout constants in test-constants.js for consistency
-- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details)
+- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering)
 
 ## Known Limitations
 
@@ -108,6 +112,7 @@ hegel-ide/
 - `electron` - Application platform
 - `@xterm/xterm`, `@xterm/addon-fit` - Terminal UI
 - `node-pty` - Pseudoterminal for bash
+- `marked` - Markdown to HTML conversion
 - `alpinejs` - Loaded via CDN
 - `@playwright/test` - E2E testing framework
 - `@electron/rebuild` - Native module compilation for Electron
