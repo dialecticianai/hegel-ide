@@ -1,5 +1,6 @@
 # Hegel local state (do not commit)
 .hegel/
+HANDOFF.md
 
 # Node.js
 node_modules/
