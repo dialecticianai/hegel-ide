@@ -191,6 +191,10 @@ hegel top                           # Monitor metrics
 
 ### Advancing Workflow
 
+**CRITICAL:** Do not run `hegel next` when there are unstaged changes, except:
+- SPEC phase → commits defer to PLAN phase
+- CODE_REVIEW phase (execution mode) → commits defer to README phase
+
 ```bash
 hegel next              # Completed current phase (infers happy-path claim)
 hegel restart           # Return to SPEC phase
@@ -246,6 +250,7 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 - ❌ DON'T ignore workflow prompts (contain phase-specific guidance)
 - ❌ DON'T reset workflow without user confirmation
 - ❌ DON'T abort workflow without specific user guidance
+- ❌ **NEVER run `hegel next` with unstaged changes** (except SPEC→PLAN and CODE_REVIEW→README where commits defer)
 - ❌ **NEVER use `sed`, `awk`, or similar text stream editors to edit files** - they always cause issues. Use the Edit/Write tools instead
 
 ---
