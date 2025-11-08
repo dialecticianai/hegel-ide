@@ -1,6 +1,7 @@
 const { Terminal } = require('@xterm/xterm');
 const { FitAddon } = require('@xterm/addon-fit');
 const { ipcRenderer } = require('electron');
+const { marked } = require('marked');
 
 // Alpine.js component for split-pane
 document.addEventListener('alpine:init', () => {
@@ -212,6 +213,11 @@ document.addEventListener('alpine:init', () => {
       } catch (error) {
         console.error('Failed to toggle dev tools:', error);
       }
+    },
+
+    renderMarkdown(content) {
+      if (!content) return '';
+      return marked.parse(content);
     },
 
     async addTerminalTab() {

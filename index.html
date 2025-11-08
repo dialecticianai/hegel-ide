@@ -377,6 +377,16 @@
             <div x-show="projectDetails[tab.projectName]?.loading">Loading project details...</div>
             <div x-show="projectDetails[tab.projectName]?.error" class="error" x-text="projectDetails[tab.projectName]?.error"></div>
             <pre x-show="projectDetails[tab.projectName]?.data" x-text="JSON.stringify(projectDetails[tab.projectName]?.data, null, 2)"></pre>
+
+            <!-- README section -->
+            <div x-show="projectDetails[tab.projectName]?.data" style="margin-top: 30px;">
+              <template x-if="projectDetails[tab.projectName]?.readme">
+                <div class="markdown-content" x-html="renderMarkdown(projectDetails[tab.projectName].readme)"></div>
+              </template>
+              <template x-if="!projectDetails[tab.projectName]?.readme && !projectDetails[tab.projectName]?.loading">
+                <div class="readme-missing">Project missing README.md</div>
+              </template>
+            </div>
           </div>
         </template>
       </div>
