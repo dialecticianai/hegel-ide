@@ -157,7 +157,7 @@
       border-radius: 4px;
     }
 
-    .refresh-button {
+    .refresh-button, .devtools-button {
       background: #0e639c;
       border: none;
       color: #fff;
@@ -167,7 +167,7 @@
       font-size: 14px;
     }
 
-    .refresh-button:hover:not(:disabled) {
+    .refresh-button:hover:not(:disabled), .devtools-button:hover {
       background: #1177bb;
     }
 
@@ -223,6 +223,10 @@
                   x-text="project"></li>
             </template>
           </ul>
+
+          <button @click="toggleDevTools" class="devtools-button" style="margin-top: 20px;">
+            Toggle Developer Tools
+          </button>
         </div>
 
         <!-- Project detail tabs content -->

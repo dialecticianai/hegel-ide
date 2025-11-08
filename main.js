@@ -19,9 +19,6 @@ function createWindow() {
 
   mainWindow.loadFile('index.html');
 
-  // Open DevTools for debugging
-  mainWindow.webContents.openDevTools();
-
   // Spawn initial terminal (term-1)
   const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
   const term1 = pty.spawn(shell, [], {
@@ -167,6 +164,16 @@ function createWindow() {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  });
+
+  // Handle toggle-devtools request
+  ipcMain.handle('toggle-devtools', async () => {
+    if (mainWindow.webContents.isDevToolsOpened()) {
+      mainWindow.webContents.closeDevTools();
+    } else {
+      mainWindow.webContents.openDevTools();
+    }
+    return { success: true };
   });
 
   mainWindow.on('closed', function () {

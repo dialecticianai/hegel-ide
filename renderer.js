@@ -167,6 +167,14 @@ document.addEventListener('alpine:init', () => {
       this.fetchProjectDetails(projectName);
     },
 
+    async toggleDevTools() {
+      try {
+        await ipcRenderer.invoke('toggle-devtools');
+      } catch (error) {
+        console.error('Failed to toggle dev tools:', error);
+      }
+    },
+
     async addTerminalTab() {
       const terminalId = 'term-' + this.nextTerminalNumber;
       const tabId = terminalId;
