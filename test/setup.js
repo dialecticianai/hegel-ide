@@ -64,5 +64,20 @@ global.Alpine = {
 // Mock document
 global.document = {
   addEventListener: vi.fn(),
-  getElementById: vi.fn()
+  getElementById: vi.fn(),
+  body: {
+    classList: {
+      add: vi.fn(),
+      remove: vi.fn(),
+      contains: vi.fn()
+    }
+  }
 };
+
+// Mock matchMedia for system preference detection
+global.window.matchMedia = vi.fn((query) => ({
+  matches: false,
+  media: query,
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn()
+}));

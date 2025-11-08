@@ -1,9 +1,104 @@
+/* Theme definitions using CSS custom properties */
+
+/* Dark theme */
+body.theme-dark {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #252526;
+  --bg-hover: #3e3e3e;
+  --bg-terminal: #000;
+
+  --text-primary: #d4d4d4;
+  --text-secondary: #858585;
+  --text-muted: #858585;
+
+  --accent-primary: #4ec9b0;
+  --accent-blue: #0e639c;
+  --accent-blue-hover: #1177bb;
+  --accent-link: #4fc1ff;
+  --accent-link-hover: #6fddff;
+
+  --border-color: #444;
+  --border-active: #0e639c;
+  --divider-color: #444;
+  --divider-dragging: #0e639c;
+  --error-color: #f48771;
+
+  --button-primary: #0e639c;
+  --button-primary-hover: #1177bb;
+  --button-text: #fff;
+}
+
+/* Light theme */
+body.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f3f3f3;
+  --bg-tertiary: #e8e8e8;
+  --bg-hover: #e0e0e0;
+  --bg-terminal: #000;
+
+  --text-primary: #1e1e1e;
+  --text-secondary: #5a5a5a;
+  --text-muted: #858585;
+
+  --accent-primary: #005a9e;
+  --accent-blue: #0066cc;
+  --accent-blue-hover: #0088ff;
+  --accent-link: #0066cc;
+  --accent-link-hover: #0088ff;
+
+  --border-color: #d0d0d0;
+  --border-active: #0066cc;
+  --divider-color: #d0d0d0;
+  --divider-dragging: #0066cc;
+  --error-color: #d32f2f;
+
+  --button-primary: #0066cc;
+  --button-primary-hover: #0088ff;
+  --button-text: #fff;
+}
+
+/* Synthwave theme - Tokyo Night inspired with vibrant 80s accents */
+body.theme-synthwave {
+  --bg-primary: #1a1b26;
+  --bg-secondary: #24283b;
+  --bg-tertiary: #1f2335;
+  --bg-hover: #2f3549;
+  --bg-terminal: #000;
+
+  --text-primary: #a9b1d6;
+  --text-secondary: #787c99;
+  --text-muted: #565f89;
+
+  --accent-primary: #bb9af7;
+  --accent-blue: #7dcfff;
+  --accent-blue-hover: #9ddcff;
+  --accent-pink: #ff007c;
+  --accent-cyan: #2ac3de;
+  --accent-link: #7dcfff;
+  --accent-link-hover: #9ddcff;
+
+  --border-color: #3b4261;
+  --border-active: #bb9af7;
+  --divider-color: #3b4261;
+  --divider-dragging: #bb9af7;
+  --error-color: #f7768e;
+
+  --button-primary: #bb9af7;
+  --button-primary-hover: #c9b1ff;
+  --button-text: #1a1b26;
+
+  /* Gradient borders for synthwave flair */
+  --gradient-border: linear-gradient(135deg, #bb9af7 0%, #7dcfff 50%, #ff007c 100%);
+}
+
+/* Base styles */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   overflow: hidden;
 }
 
@@ -18,7 +113,7 @@ body {
 .split-pane {
   display: flex;
   flex-direction: column;
-  background: #1e1e1e;
+  background: var(--bg-primary);
 }
 
 .left-pane {
@@ -31,18 +126,24 @@ body {
 
 .divider {
   width: 4px;
-  background: #444;
+  background: var(--divider-color);
   cursor: col-resize;
   flex-shrink: 0;
 }
 
 .divider.dragging {
-  background: #0e639c;
+  background: var(--divider-dragging);
+}
+
+/* Synthwave gradient border on divider */
+body.theme-synthwave .divider {
+  background: var(--gradient-border);
+  background-size: 100% 100%;
 }
 
 /* Left panel content */
 h2 {
-  color: #4ec9b0;
+  color: var(--accent-primary);
   margin-top: 0;
 }
 
@@ -54,19 +155,19 @@ h2 {
 .projects-list li {
   padding: 8px;
   margin: 4px 0;
-  background: #2d2d2d;
+  background: var(--bg-secondary);
   border-radius: 4px;
 }
 
 .error {
-  color: #f48771;
+  color: var(--error-color);
 }
 
 /* Terminal container */
 #terminal-container {
   flex: 1;
   width: 100%;
-  background: #000;
+  background: var(--bg-terminal);
   border-radius: 4px;
 }
 
@@ -75,8 +176,8 @@ h2 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #252526;
-  border-bottom: 1px solid #444;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
   padding: 4px 8px;
   flex-shrink: 0;
 }
@@ -93,21 +194,37 @@ h2 {
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
-  background: #2d2d2d;
+  background: var(--bg-secondary);
   border-radius: 4px 4px 0 0;
   cursor: pointer;
   white-space: nowrap;
 }
 
 .tab.active {
-  background: #1e1e1e;
-  border-bottom: 2px solid #0e639c;
+  background: var(--bg-primary);
+  border-bottom: 2px solid var(--border-active);
+}
+
+/* Synthwave gradient border on active tab */
+body.theme-synthwave .tab.active {
+  border-bottom: none;
+  position: relative;
+}
+
+body.theme-synthwave .tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gradient-border);
 }
 
 .close-tab {
   background: none;
   border: none;
-  color: #858585;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 18px;
   padding: 0;
@@ -115,13 +232,13 @@ h2 {
 }
 
 .close-tab:hover {
-  color: #f48771;
+  color: var(--error-color);
 }
 
 .add-tab {
-  background: #2d2d2d;
+  background: var(--bg-secondary);
   border: none;
-  color: #d4d4d4;
+  color: var(--text-primary);
   cursor: pointer;
   font-size: 18px;
   padding: 4px 12px;
@@ -130,7 +247,7 @@ h2 {
 }
 
 .add-tab:hover {
-  background: #3e3e3e;
+  background: var(--bg-hover);
 }
 
 .tab-content {
@@ -146,22 +263,22 @@ h2 {
 .terminal-container {
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--bg-terminal);
   border-radius: 4px;
 }
 
-.refresh-button, .devtools-button {
-  background: #0e639c;
+.refresh-button, .devtools-button, .theme-selector {
+  background: var(--button-primary);
   border: none;
-  color: #fff;
+  color: var(--button-text);
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 4px;
   font-size: 14px;
 }
 
-.refresh-button:hover:not(:disabled), .devtools-button:hover {
-  background: #1177bb;
+.refresh-button:hover:not(:disabled), .devtools-button:hover, .theme-selector:hover {
+  background: var(--button-primary-hover);
 }
 
 .refresh-button:disabled {
@@ -169,11 +286,22 @@ h2 {
   cursor: not-allowed;
 }
 
+/* Synthwave gradient border on buttons */
+body.theme-synthwave .refresh-button,
+body.theme-synthwave .devtools-button {
+  position: relative;
+  border: 2px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  background-image: linear-gradient(var(--bg-primary), var(--bg-primary)), var(--gradient-border);
+}
+
 /* Markdown content styling with theme support */
 .markdown-content {
   line-height: 1.6;
   max-width: 100%;
   overflow-wrap: break-word;
+  color: var(--text-primary);
 }
 
 .markdown-content h1,
@@ -186,6 +314,7 @@ h2 {
   margin-bottom: 16px;
   font-weight: 600;
   line-height: 1.25;
+  color: var(--accent-primary);
 }
 
 .markdown-content h1 { font-size: 2em; }
@@ -209,6 +338,8 @@ h2 {
   border-radius: 3px;
   font-size: 85%;
   font-family: 'Courier New', Courier, monospace;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .markdown-content pre {
@@ -217,6 +348,7 @@ h2 {
   line-height: 1.45;
   border-radius: 3px;
   margin-bottom: 16px;
+  background: var(--bg-secondary);
 }
 
 .markdown-content pre code {
@@ -226,79 +358,15 @@ h2 {
 
 .markdown-content a {
   text-decoration: none;
+  color: var(--accent-link);
 }
 
 .markdown-content a:hover {
   text-decoration: underline;
+  color: var(--accent-link-hover);
 }
 
 .readme-missing {
-  color: #858585;
+  color: var(--text-secondary);
   font-style: italic;
-}
-
-/* Dark mode theme */
-@media (prefers-color-scheme: dark) {
-  .markdown-content {
-    color: #d4d4d4;
-  }
-
-  .markdown-content h1,
-  .markdown-content h2,
-  .markdown-content h3,
-  .markdown-content h4,
-  .markdown-content h5,
-  .markdown-content h6 {
-    color: #4ec9b0;
-  }
-
-  .markdown-content code {
-    background: #2d2d2d;
-    color: #d4d4d4;
-  }
-
-  .markdown-content pre {
-    background: #2d2d2d;
-  }
-
-  .markdown-content a {
-    color: #4fc1ff;
-  }
-
-  .markdown-content a:hover {
-    color: #6fddff;
-  }
-}
-
-/* Light mode theme */
-@media (prefers-color-scheme: light) {
-  .markdown-content {
-    color: #1e1e1e;
-  }
-
-  .markdown-content h1,
-  .markdown-content h2,
-  .markdown-content h3,
-  .markdown-content h4,
-  .markdown-content h5,
-  .markdown-content h6 {
-    color: #005a9e;
-  }
-
-  .markdown-content code {
-    background: #f3f3f3;
-    color: #1e1e1e;
-  }
-
-  .markdown-content pre {
-    background: #f3f3f3;
-  }
-
-  .markdown-content a {
-    color: #0066cc;
-  }
-
-  .markdown-content a:hover {
-    color: #0088ff;
-  }
 }

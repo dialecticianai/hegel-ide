@@ -11,6 +11,7 @@
   <script src="lib/terminals.js"></script>
   <script src="lib/projects.js"></script>
   <script src="lib/markdown.js"></script>
+  <script src="lib/themes.js"></script>
   <script src="lib/app.js"></script>
 </head>
 <body>
@@ -41,9 +42,17 @@
         <div x-show="activeLeftTab === 'projects'">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
             <h2 style="margin: 0;">Projects</h2>
-            <button @click="toggleDevTools" class="devtools-button">
-              Toggle DevTools
-            </button>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <select x-model="currentTheme" @change="setTheme(currentTheme)" class="theme-selector">
+                <option value="auto">Auto</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="synthwave">Synthwave</option>
+              </select>
+              <button @click="toggleDevTools" class="devtools-button">
+                Toggle DevTools
+              </button>
+            </div>
           </div>
 
           <template x-if="projectsLoading">
