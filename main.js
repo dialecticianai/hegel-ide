@@ -3,6 +3,7 @@ const path = require('path');
 const pty = require('node-pty');
 const os = require('os');
 const { spawn } = require('child_process');
+const fs = require('fs').promises;
 
 let mainWindow;
 let ptyProcesses = new Map(); // Map of terminalId -> ptyProcess
@@ -174,6 +175,18 @@ function createWindow() {
       mainWindow.webContents.openDevTools();
     }
     return { success: true };
+  });
+
+  // Handle get-project-readme request
+  ipcMain.handle('get-project-readme', async (event, { projectPath }) => {
+    try {
+      const readmePath = path.join(projectPath, 'README.md');
+      const content = await fs.readFile(readmePath, 'utf-8');
+      return { content };
+    } catch (error) {
+      // All failures treated as missing file
+      return { error: error.message };
+    }
   });
 
   mainWindow.on('closed', function () {
