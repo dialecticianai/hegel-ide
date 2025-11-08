@@ -2,7 +2,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './e2e',
-  timeout: 30000,
+  timeout: 10000,
   use: {
     // Point to our installed electron binary
     electronPath: require('electron')

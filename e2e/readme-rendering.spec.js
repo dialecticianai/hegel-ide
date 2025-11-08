@@ -109,6 +109,7 @@ test.describe('README Rendering', () => {
   });
 
   test('refresh button updates README content', async () => {
+    test.setTimeout(15000); // Needs extra time for double project load
     const electronApp = await electron.launch({
       args: ['.']
     });

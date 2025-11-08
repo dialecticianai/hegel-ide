@@ -1,5 +1,5 @@
 const { test, expect, _electron: electron } = require('@playwright/test');
-const { ALPINE_INIT, TERMINAL_READY, TERMINAL_EXEC, TERMINAL_EXEC_FAST } = require('./test-constants');
+const { ALPINE_INIT, TERMINAL_READY, TERMINAL_EXEC, TERMINAL_EXEC_FAST, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Terminal Presence', () => {
   test('terminal container exists', async () => {
@@ -113,7 +113,7 @@ test.describe('Terminal I/O', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(600);
+    await mainWindow.waitForTimeout(TERMINAL_READY);
 
     const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
     await terminalContainer.click();
@@ -121,7 +121,7 @@ test.describe('Terminal I/O', () => {
     await mainWindow.keyboard.type('pwd');
     await mainWindow.keyboard.press('Enter');
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(TERMINAL_EXEC);
 
     const xtermScreen = await mainWindow.locator('.xterm-screen');
     const content = await xtermScreen.textContent();
@@ -143,7 +143,7 @@ test.describe('Terminal I/O', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(600);
+    await mainWindow.waitForTimeout(TERMINAL_READY);
 
     const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
     await terminalContainer.click();
@@ -207,7 +207,7 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
-    await mainWindow.waitForTimeout(200);
+    await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Verify "Open Terminal" button appears
     const openTerminalButton = await mainWindow.locator('.open-terminal-button');
@@ -234,7 +234,7 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
-    await mainWindow.waitForTimeout(200);
+    await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Click "Open Terminal" button
     const openTerminalButton = await mainWindow.locator('.open-terminal-button');
@@ -270,7 +270,7 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
-    await mainWindow.waitForTimeout(200);
+    await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Reopen terminal
     const openTerminalButton = await mainWindow.locator('.open-terminal-button');

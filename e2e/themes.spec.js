@@ -12,7 +12,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
@@ -33,7 +33,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
@@ -59,7 +59,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
@@ -100,7 +100,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    let settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    let settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
@@ -121,7 +121,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab again after reload
-    settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
@@ -158,7 +158,7 @@ test.describe('Theme System', () => {
     await window.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await window.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await window.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 

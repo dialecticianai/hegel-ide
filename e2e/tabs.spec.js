@@ -26,9 +26,9 @@ test.describe('Tab Management', () => {
     // Verify right panel Terminal 1 tab
     const terminal1Tab = await mainWindow.locator('.right-pane .tab').filter({ hasText: 'Terminal 1' });
     expect(await terminal1Tab.isVisible()).toBe(true);
-    // Non-closeable - close button should not be visible
+    // Closeable - close button should be visible
     const terminal1CloseBtn = terminal1Tab.locator('.close-tab');
-    expect(await terminal1CloseBtn.isVisible()).toBe(false);
+    expect(await terminal1CloseBtn.isVisible()).toBe(true);
 
     await electronApp.close();
   });
@@ -44,7 +44,7 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Click Projects tab (should already be active)
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
@@ -95,7 +95,7 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Click add button in right panel
     const addButton = await mainWindow.locator('.right-pane .add-tab');
@@ -130,12 +130,12 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Add Terminal 2
     const addButton = await mainWindow.locator('.right-pane .add-tab');
     await addButton.click();
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Verify Terminal 2 exists
     let terminal2Tab = await mainWindow.locator('.right-pane .tab').filter({ hasText: 'Terminal 2' });
@@ -159,27 +159,6 @@ test.describe('Tab Management', () => {
     await electronApp.close();
   });
 
-  test('cannot close Terminal 1 (non-closeable)', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(500);
-
-    // Verify Terminal 1 has no close button
-    const terminal1Tab = await mainWindow.locator('.right-pane .tab').filter({ hasText: 'Terminal 1' });
-    const closeBtn = terminal1Tab.locator('.close-tab');
-    expect(await closeBtn.isVisible()).toBe(false);
-
-    await electronApp.close();
-  });
-
   test('can open project detail tab', async () => {
     const electronApp = await electron.launch({
       args: ['.']
@@ -192,7 +171,7 @@ test.describe('Tab Management', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Click first project in list
     const firstProject = await mainWindow.locator('.projects-list li').first();
@@ -237,12 +216,12 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(2000);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Click first project
     const firstProject = await mainWindow.locator('.projects-list li').first();
     await firstProject.click();
-    await mainWindow.waitForTimeout(1500);
+    await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Verify refresh button exists (in active tab)
     const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab');
@@ -262,13 +241,13 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(2000);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Open project tab
     const firstProject = await mainWindow.locator('.projects-list li').first();
     const projectName = await firstProject.textContent();
     await firstProject.click();
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Verify project tab exists
     let projectTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: projectName });
@@ -302,7 +281,7 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Verify Projects tab has no close button
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
@@ -323,7 +302,7 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Verify tabs-list has overflow-x: auto CSS
     const tabsList = await mainWindow.locator('.left-pane .tabs-list');
@@ -348,10 +327,10 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
-    // Click ⚙️ button in Projects tab
-    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    // Click Settings icon in Projects tab
+    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
@@ -386,10 +365,10 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
@@ -427,7 +406,7 @@ test.describe('Tab Management', () => {
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Open Settings tab
-    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
@@ -442,10 +421,10 @@ test.describe('Tab Management', () => {
     await firstProject.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Switch back to Projects tab to access ⚙️ button
+    // Switch back to Projects tab to access Settings icon
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Re-open Settings tab
     await settingsButton.click();
@@ -471,21 +450,21 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Switch to Projects tab to make ⚙️ button visible
+    // Switch to Projects tab to make Settings icon visible
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
-    // Click ⚙️ button again
+    // Click Settings icon again
     await settingsButton.click();
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Verify only one Settings tab exists
     const settingsTabs = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' }).all();
@@ -510,10 +489,10 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    await mainWindow.waitForTimeout(500);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Open Settings tab
-    const settingsButton = await mainWindow.locator('.left-pane button').filter({ hasText: '⚙️' });
+    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
     await mainWindow.waitForTimeout(TAB_CREATE);
 
