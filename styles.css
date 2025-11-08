@@ -1,3 +1,32 @@
+/* Font declarations */
+@font-face {
+  font-family: 'DejaVuSansM Nerd Font';
+  src: url('fonts/DejaVuSansMNerdFont-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVuSansM Nerd Font';
+  src: url('fonts/DejaVuSansMNerdFont-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVuSansM Nerd Font Mono';
+  src: url('fonts/DejaVuSansMNerdFontMono-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DejaVuSansM Nerd Font Mono';
+  src: url('fonts/DejaVuSansMNerdFontMono-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
 /* Theme definitions using CSS custom properties */
 
 /* Dark theme */
@@ -58,43 +87,43 @@ body.theme-light {
   --button-text: #fff;
 }
 
-/* Synthwave theme - Tokyo Night inspired with vibrant 80s accents */
+/* Synthwave theme - 80s sunset vibes */
 body.theme-synthwave {
-  --bg-primary: #1a1b26;
-  --bg-secondary: #24283b;
-  --bg-tertiary: #1f2335;
-  --bg-hover: #2f3549;
+  --bg-primary: #1c1c3e;
+  --bg-secondary: #2a2a52;
+  --bg-tertiary: #232348;
+  --bg-hover: #3a3a6a;
   --bg-terminal: #000;
 
-  --text-primary: #a9b1d6;
-  --text-secondary: #787c99;
-  --text-muted: #565f89;
+  --text-primary: #32f0ff;
+  --text-secondary: #8a8ab8;
+  --text-muted: #6a6a9a;
 
-  --accent-primary: #bb9af7;
-  --accent-blue: #7dcfff;
-  --accent-blue-hover: #9ddcff;
-  --accent-pink: #ff007c;
-  --accent-cyan: #2ac3de;
-  --accent-link: #7dcfff;
-  --accent-link-hover: #9ddcff;
+  --accent-primary: #ff8aef;
+  --accent-blue: #32f0ff;
+  --accent-blue-hover: #5ff5ff;
+  --accent-pink: #ff8aef;
+  --accent-cyan: #32f0ff;
+  --accent-link: #32f0ff;
+  --accent-link-hover: #5ff5ff;
 
-  --border-color: #3b4261;
-  --border-active: #bb9af7;
-  --divider-color: #3b4261;
-  --divider-dragging: #bb9af7;
-  --error-color: #f7768e;
+  --border-color: #5a347b;
+  --border-active: #ff8aef;
+  --divider-color: #5a347b;
+  --divider-dragging: #ff8aef;
+  --error-color: #ff8132;
 
-  --button-primary: #bb9af7;
-  --button-primary-hover: #c9b1ff;
-  --button-text: #1a1b26;
+  --button-primary: #5a347b;
+  --button-primary-hover: #7a4a9b;
+  --button-text: #ff8aef;
 
   /* Gradient borders for synthwave flair */
-  --gradient-border: linear-gradient(135deg, #bb9af7 0%, #7dcfff 50%, #ff007c 100%);
+  --gradient-border: linear-gradient(135deg, #ff8aef 0%, #32f0ff 50%, #ff8132 100%);
 }
 
 /* Base styles */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'DejaVuSansM Nerd Font', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   margin: 0;
   padding: 0;
   background: var(--bg-primary);
@@ -296,6 +325,21 @@ body.theme-synthwave .tab.active::after {
   border-radius: 4px;
 }
 
+.settings-icon {
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+
+.settings-icon::before {
+  content: '\f013';
+}
+
+.settings-icon:hover {
+  color: var(--text-primary);
+}
+
 .refresh-button, .devtools-button, .theme-selector {
   background: var(--button-primary);
   border: none;
@@ -317,7 +361,8 @@ body.theme-synthwave .tab.active::after {
 
 /* Synthwave gradient border on buttons */
 body.theme-synthwave .refresh-button,
-body.theme-synthwave .devtools-button {
+body.theme-synthwave .devtools-button,
+body.theme-synthwave .theme-selector {
   position: relative;
   border: 2px solid transparent;
   background-origin: border-box;
@@ -369,7 +414,7 @@ body.theme-synthwave .devtools-button {
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-size: 85%;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'DejaVuSansM Nerd Font Mono', 'Courier New', Courier, monospace;
   background: var(--bg-secondary);
   color: var(--text-primary);
 }
@@ -417,7 +462,7 @@ body.theme-synthwave .devtools-button {
   border: 1px solid var(--border-color);
   margin-bottom: 4px;
   flex-wrap: wrap;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'DejaVuSansM Nerd Font Mono', 'Courier New', Courier, monospace;
   font-size: 0.95em;
   color: var(--text-primary);
 }
@@ -442,7 +487,7 @@ body.theme-synthwave .devtools-button {
   background: var(--bg-tertiary);
   border-radius: 4px;
   border: 1px solid var(--border-color);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'DejaVuSansM Nerd Font Mono', 'Courier New', Courier, monospace;
   font-size: 0.95em;
   color: var(--text-primary);
   flex-wrap: wrap;

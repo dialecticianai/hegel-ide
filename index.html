@@ -48,7 +48,7 @@
         <div x-show="activeLeftTab === 'projects'" class="tab-content-padded">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
             <h2 style="margin: 0;">Projects</h2>
-            <button @click="openSettingsTab" class="settings-button">⚙️</button>
+            <span @click="openSettingsTab" class="settings-icon" title="Settings"></span>
           </div>
 
           <template x-if="projectsLoading">
@@ -82,6 +82,7 @@
               </select>
             </div>
             <div>
+              <label style="display: block; margin-bottom: 8px;">Debug</label>
               <button @click="toggleDevTools" class="devtools-button">
                 Toggle DevTools
               </button>
