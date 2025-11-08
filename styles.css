@@ -221,6 +221,35 @@ body.theme-synthwave .tab.active::after {
   background: var(--gradient-border);
 }
 
+.refresh-tab {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  margin-left: 6px;
+  transition: transform 0.2s;
+}
+
+.refresh-tab:hover:not(:disabled) {
+  color: var(--text-primary);
+}
+
+.refresh-tab:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.refresh-tab.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .close-tab {
   background: none;
   border: none;
@@ -253,11 +282,11 @@ body.theme-synthwave .tab.active::after {
 .tab-content {
   flex: 1;
   overflow: auto;
-  padding: 20px;
+  padding: 0;
 }
 
-.right-pane .tab-content {
-  padding: 0;
+.tab-content-padded {
+  padding: 20px;
 }
 
 .terminal-container {
@@ -317,7 +346,10 @@ body.theme-synthwave .devtools-button {
   color: var(--accent-primary);
 }
 
-.markdown-content h1 { font-size: 2em; }
+.markdown-content h1 {
+  font-size: 2em;
+  margin-top: 12px;
+}
 .markdown-content h2 { font-size: 1.5em; }
 .markdown-content h3 { font-size: 1.25em; }
 
@@ -369,4 +401,62 @@ body.theme-synthwave .devtools-button {
 .readme-missing {
   color: var(--text-secondary);
   font-style: italic;
+}
+
+/* Project details card */
+.project-details-card {
+  font-size: 0.9em;
+}
+
+.project-info-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95em;
+  color: var(--text-primary);
+}
+
+.project-info-row .info-value {
+  cursor: help;
+}
+
+.info-value-path {
+  font-size: 0.85em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.metrics-row {
+  display: flex;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.95em;
+  color: var(--text-primary);
+  flex-wrap: wrap;
+}
+
+.metrics-row span[title] {
+  cursor: help;
+}
+
+.metrics-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.metric-sep {
+  color: var(--text-muted);
 }

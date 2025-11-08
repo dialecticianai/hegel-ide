@@ -27,6 +27,12 @@
                  :class="{ 'active': activeLeftTab === tab.id }"
                  @click="switchLeftTab(tab.id)">
               <span x-text="tab.label"></span>
+              <button x-show="tab.type === 'project-detail'"
+                      class="refresh-tab"
+                      :class="{ 'spinning': projectDetails[tab.projectName]?.loading }"
+                      @click.stop="refreshProjectDetails(tab.projectName)"
+                      :disabled="projectDetails[tab.projectName]?.loading"
+                      title="Refresh project details">⟳</button>
               <button x-show="tab.closeable"
                       class="close-tab"
                       @click.stop="closeLeftTab(tab.id)">×</button>
@@ -39,7 +45,7 @@
       <!-- Tab Content Area -->
       <div class="tab-content">
         <!-- Projects tab content -->
-        <div x-show="activeLeftTab === 'projects'">
+        <div x-show="activeLeftTab === 'projects'" class="tab-content-padded">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
             <h2 style="margin: 0;">Projects</h2>
             <div style="display: flex; gap: 8px; align-items: center;">
@@ -75,20 +81,42 @@
         <!-- Project detail tabs content -->
         <template x-for="tab in leftTabs.filter(t => t.type === 'project-detail')" :key="tab.id">
           <div x-show="activeLeftTab === tab.id">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h2 x-text="tab.label"></h2>
-              <button @click="refreshProjectDetails(tab.projectName)"
-                      :disabled="projectDetails[tab.projectName]?.loading"
-                      class="refresh-button">
-                <span x-text="projectDetails[tab.projectName]?.loading ? 'Loading...' : 'Refresh'"></span>
-              </button>
-            </div>
             <div x-show="projectDetails[tab.projectName]?.loading">Loading project details...</div>
             <div x-show="projectDetails[tab.projectName]?.error" class="error" x-text="projectDetails[tab.projectName]?.error"></div>
-            <pre x-show="projectDetails[tab.projectName]?.data" x-text="JSON.stringify(projectDetails[tab.projectName]?.data, null, 2)"></pre>
+
+            <!-- Project details card -->
+            <div x-show="projectDetails[tab.projectName]?.data" class="project-details-card">
+              <template x-if="projectDetails[tab.projectName]?.data">
+                <div class="project-info-row">
+                  <span class="info-value info-value-path"
+                        x-text="formatPath(projectDetails[tab.projectName].data.project_path)"
+                        :title="'Path: ' + projectDetails[tab.projectName].data.project_path"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Cache size" x-text="formatBytes(projectDetails[tab.projectName].data.hegel_size_bytes)"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Last activity" x-text="formatTimeAgo(projectDetails[tab.projectName].data.last_activity)"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Workflow" x-text="formatWorkflowState(projectDetails[tab.projectName].data.workflow_state)"></span>
+                </div>
+              </template>
+
+              <template x-if="projectDetails[tab.projectName]?.data?.metrics">
+                <div class="metrics-row">
+                  <span class="metrics-label">usage</span>
+                  <span class="metric-sep">|</span>
+                  <span title="input tokens" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_input_tokens) + ' i'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="output tokens" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_output_tokens) + ' o'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="events" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_events) + ' e'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="phases" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.phase_count) + ' p'"></span>
+                </div>
+              </template>
+            </div>
 
             <!-- README section -->
-            <div x-show="projectDetails[tab.projectName]?.data" style="margin-top: 30px;">
+            <div x-show="projectDetails[tab.projectName]?.data" class="tab-content-padded">
               <template x-if="projectDetails[tab.projectName]?.readme">
                 <div class="markdown-content"
                      x-html="renderMarkdown(projectDetails[tab.projectName].readme)"
@@ -103,7 +131,7 @@
 
         <!-- File tabs content -->
         <template x-for="tab in leftTabs.filter(t => t.type === 'file')" :key="tab.id">
-          <div x-show="activeLeftTab === tab.id">
+          <div x-show="activeLeftTab === tab.id" class="tab-content-padded">
             <h2 x-text="tab.filePath"></h2>
             <template x-if="fileContents[`${tab.projectName}:${tab.filePath}`]">
               <div>
