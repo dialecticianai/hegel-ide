@@ -55,7 +55,7 @@ test.describe('Application Launch', () => {
     // Verify split-pane content is visible
     const heading = await mainWindow.locator('h2');
     expect(await heading.isVisible()).toBe(true);
-    expect(await heading.textContent()).toBe('Markdown Browser');
+    expect(await heading.textContent()).toBe('Projects');
 
     await electronApp.close();
   });

@@ -33,7 +33,7 @@ test.describe('Split-Pane Layout', () => {
     expect(await rightPane.isVisible()).toBe(true);
 
     // Verify terminal container inside right pane
-    const terminalContainer = await rightPane.locator('#terminal-container');
+    const terminalContainer = await rightPane.locator('#terminal-container-term-1');
     expect(await terminalContainer.isVisible()).toBe(true);
 
     await electronApp.close();

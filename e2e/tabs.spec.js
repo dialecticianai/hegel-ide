@@ -55,7 +55,7 @@ test.describe('Tab Management', () => {
     expect(hasActiveClass).toBe(true);
 
     // Verify Projects content is visible
-    const projectsContent = await mainWindow.locator('.left-pane .tab-content').locator('h2').filter({ hasText: 'Markdown Browser' });
+    const projectsContent = await mainWindow.locator('.left-pane .tab-content').locator('h2').filter({ hasText: 'Projects' });
     expect(await projectsContent.isVisible()).toBe(true);
 
     await electronApp.close();
@@ -213,12 +213,15 @@ test.describe('Tab Management', () => {
     // Wait for data to load
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
-    // Check for either data or error (one should be visible)
-    const hasData = await mainWindow.locator('.left-pane .tab-content pre').isVisible();
-    const hasError = await mainWindow.locator('.left-pane .tab-content .error').isVisible();
+    // Check for either data (markdown or JSON) or error
+    const markdownContent = await mainWindow.locator('.left-pane .markdown-content');
+    const errorMsg = await mainWindow.locator('.left-pane .tab-content .error');
+
+    const hasMarkdown = await markdownContent.isVisible();
+    const hasError = await errorMsg.isVisible();
 
     // One of them should be true
-    expect(hasData || hasError).toBe(true);
+    expect(hasMarkdown || hasError).toBe(true);
 
     await electronApp.close();
   });
