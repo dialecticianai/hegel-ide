@@ -20,7 +20,7 @@ function createWindow() {
   mainWindow.loadFile('index.html');
 
   // Spawn initial terminal (term-1)
-  const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+  const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
   const term1 = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 80,
@@ -128,7 +128,7 @@ function createWindow() {
   // Handle create-terminal request
   ipcMain.handle('create-terminal', async (event, { terminalId }) => {
     try {
-      const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
+      const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
       const ptyProc = pty.spawn(shell, [], {
         name: 'xterm-color',
         cols: 80,
