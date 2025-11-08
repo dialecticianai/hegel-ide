@@ -131,7 +131,7 @@
             <div x-show="projectDetails[tab.projectName]?.data" class="tab-content-padded">
               <template x-if="projectDetails[tab.projectName]?.readme">
                 <div class="markdown-content"
-                     x-html="renderMarkdown(projectDetails[tab.projectName].readme)"
+                     x-html="renderMarkdown(projectDetails[tab.projectName].readme, tab.projectName, 'README.md')"
                      @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
               </template>
               <template x-if="!projectDetails[tab.projectName]?.readme && !projectDetails[tab.projectName]?.loading">
@@ -153,7 +153,7 @@
                      x-text="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"></div>
                 <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.content"
                      class="markdown-content"
-                     x-html="renderMarkdown(fileContents[`${tab.projectName}:${tab.filePath}`]?.content)"
+                     x-html="renderMarkdown(fileContents[`${tab.projectName}:${tab.filePath}`]?.content, tab.projectName, tab.filePath)"
                      @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
               </div>
             </template>
