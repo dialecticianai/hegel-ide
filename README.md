@@ -73,10 +73,13 @@ npm test              # Run Playwright E2E tests
 
 ```
 hegel-ide/
-├── index.html              Application entry point with split-pane layout and markdown rendering
+├── index.html              Application entry point with split-pane layout
+├── styles.css              All application CSS (extracted for modularity)
 ├── main.js                 Electron main process (window, terminals, file reading, hegel CLI)
-├── renderer.js             Alpine.js state management, tabs, markdown rendering
 ├── playwright.config.js    Playwright test configuration
+│
+├── lib/                    Frontend modules (Alpine.js components)
+│   └── See lib/README.md
 │
 ├── e2e/                    Playwright E2E tests
 │   └── See e2e/README.md
