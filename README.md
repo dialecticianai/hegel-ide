@@ -69,9 +69,9 @@ npm test              # Run Playwright E2E tests
 
 ```
 hegel-ide/
-├── index.html              Application entry point with tab-based split-pane layout
-├── main.js                 Electron main process (window, multi-terminal IPC, hegel CLI)
-├── renderer.js             Alpine.js tab management and multi-terminal initialization
+├── index.html              Application entry point with split-pane layout and markdown rendering
+├── main.js                 Electron main process (window, terminals, file reading, hegel CLI)
+├── renderer.js             Alpine.js state management, tabs, markdown rendering
 ├── playwright.config.js    Playwright test configuration
 │
 ├── e2e/                    Playwright E2E tests
@@ -80,6 +80,7 @@ hegel-ide/
 ├── .ddd/                   Document-Driven Development artifacts
 │   ├── toys/               Discovery mode experiments (toy1: terminal, toy2: playwright)
 │   └── feat/               Execution mode feature specs and plans
+│       ├── project_readme_render/    Markdown browser Phase 1
 │       ├── split_pane_layout/
 │       └── ui_tabs/
 │

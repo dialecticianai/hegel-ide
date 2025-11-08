@@ -6,25 +6,13 @@ Playwright E2E test suite for Hegel IDE. Tests cover application launch, tab ope
 
 ```
 e2e/
-├── test-constants.js       Shared timeout constants for consistent test timing
-│
-├── app.spec.js             Application launch and window content tests
-│
-├── tabs.spec.js            Tab management tests (add, close, switch, overflow)
-│                           - Default tabs (Projects, Terminal 1)
-│                           - Terminal tab operations
-│                           - Project detail tab operations
-│
-├── terminal.spec.js        Terminal presence and I/O tests
-│                           - Terminal container rendering
-│                           - Command execution (echo, pwd, sequential)
-│
-├── split-pane.spec.js      Split-pane layout and drag functionality tests
-│                           - Panel structure and dimensions
-│                           - Divider cursor and drag behavior
-│                           - Project list population from hegel CLI
-│
-└── alpine.spec.js.bak      Archived Alpine reactivity test (test component removed)
+├── test-constants.js           Shared timeout constants for consistent test timing
+├── app.spec.js                 Application launch and window content tests
+├── tabs.spec.js                Tab management (add, close, switch, overflow, project tabs)
+├── terminal.spec.js            Terminal presence, rendering, and I/O command tests
+├── split-pane.spec.js          Split-pane layout, divider, and project list tests
+├── readme-rendering.spec.js    README markdown rendering and refresh functionality tests
+└── alpine.spec.js.bak          Archived Alpine reactivity test (test component removed)
 ```
 
 ## Test Execution
