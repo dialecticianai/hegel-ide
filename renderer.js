@@ -171,27 +171,33 @@ document.addEventListener('alpine:init', () => {
       }
     },
 
-    async fetchProjectReadme(projectName) {
+    async fetchProjectFile(projectName, fileName) {
       try {
         const projectData = this.projectDetails[projectName]?.data;
         if (!projectData || !projectData.project_path) {
-          return;
+          return null;
         }
 
-        const result = await ipcRenderer.invoke('get-project-readme', {
-          projectPath: projectData.project_path
+        const result = await ipcRenderer.invoke('get-project-file', {
+          projectPath: projectData.project_path,
+          fileName: fileName
         });
 
         if (result.content) {
-          this.projectDetails[projectName].readme = result.content;
-          this.projectDetails[projectName].readmeError = null;
+          return { content: result.content, error: null };
         } else {
-          this.projectDetails[projectName].readme = null;
-          this.projectDetails[projectName].readmeError = result.error;
+          return { content: null, error: result.error };
         }
       } catch (error) {
-        this.projectDetails[projectName].readme = null;
-        this.projectDetails[projectName].readmeError = error.message;
+        return { content: null, error: error.message };
+      }
+    },
+
+    async fetchProjectReadme(projectName) {
+      const result = await this.fetchProjectFile(projectName, 'README.md');
+      if (result) {
+        this.projectDetails[projectName].readme = result.content;
+        this.projectDetails[projectName].readmeError = result.error;
       }
     },
 

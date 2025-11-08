@@ -177,11 +177,11 @@ function createWindow() {
     return { success: true };
   });
 
-  // Handle get-project-readme request
-  ipcMain.handle('get-project-readme', async (event, { projectPath }) => {
+  // Handle get-project-file request
+  ipcMain.handle('get-project-file', async (event, { projectPath, fileName }) => {
     try {
-      const readmePath = path.join(projectPath, 'README.md');
-      const content = await fs.readFile(readmePath, 'utf-8');
+      const filePath = path.join(projectPath, fileName);
+      const content = await fs.readFile(filePath, 'utf-8');
       return { content };
     } catch (error) {
       // All failures treated as missing file
