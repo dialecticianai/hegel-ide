@@ -205,8 +205,12 @@
       <div class="tab-content">
         <!-- Projects tab content -->
         <div x-show="activeLeftTab === 'projects'">
-          <h2>Markdown Browser</h2>
-          <p>Discovered Projects:</p>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Projects</h2>
+            <button @click="toggleDevTools" class="devtools-button">
+              Toggle DevTools
+            </button>
+          </div>
 
           <template x-if="projectsLoading">
             <p>Loading projects...</p>
@@ -223,10 +227,6 @@
                   x-text="project"></li>
             </template>
           </ul>
-
-          <button @click="toggleDevTools" class="devtools-button" style="margin-top: 20px;">
-            Toggle Developer Tools
-          </button>
         </div>
 
         <!-- Project detail tabs content -->
