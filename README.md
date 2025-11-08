@@ -12,7 +12,7 @@ The terminal work is foundational but "off-vision" - the left panel (Markdown + 
 
 ## Current Status
 
-Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support).
+Split-pane Electron application with tab-based interface. Left panel supports Projects list tab plus closeable project detail tabs with markdown rendering. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser Phase 1 complete (README.md rendering with theme support). Application-wide theming system with auto/dark/light/synthwave modes.
 
 ## Setup
 
@@ -39,13 +39,14 @@ npm test              # Run Playwright E2E tests
 - **Tab system**: Each panel supports multiple tabs with add/close functionality
 - **Project discovery**: Left panel Projects tab shows discovered Hegel projects via `hegel pm discover list`
 - **Project details**: Click projects to open detail tabs showing metrics and README.md content
-- **Markdown rendering**: README.md files rendered with theme-aware styling (dark/light mode via system preference)
+- **Markdown rendering**: README.md files rendered with theme-aware styling
+- **Theme system**: Application-wide theming with auto/dark/light/synthwave modes, localStorage persistence, system preference tracking
 - **Multi-terminal**: Right panel supports multiple independent bash sessions in separate tabs
 - **Terminal 1**: Non-closeable default terminal, additional terminals are closeable
 - **Data caching**: Project details cached with refresh button for fresh data
-- **State persistence**: Split position saved to localStorage
+- **State persistence**: Split position and theme preference saved to localStorage
 - **Multi-terminal IPC**: Renderer ↔ main process communication routes I/O by terminalId
-- **E2E test suite**: 28 tests covering tabs, terminals, projects, markdown rendering, and layout (~40s execution time)
+- **E2E test suite**: 33 tests covering tabs, terminals, projects, markdown rendering, themes, and layout (~40s execution time)
 
 ## Usage
 
@@ -89,7 +90,8 @@ hegel-ide/
 │   └── feat/               Execution mode feature specs and plans
 │       ├── project_readme_render/    Markdown browser Phase 1
 │       ├── split_pane_layout/
-│       └── ui_tabs/
+│       ├── ui_tabs/
+│       └── ui_themes/
 │
 ├── ARCHITECTURE.md         Technology stack and architectural decisions
 ├── VISION.md               Product vision and target users
@@ -99,10 +101,11 @@ hegel-ide/
 
 ## Testing
 
-- **Playwright E2E tests**: 28 tests covering tabs, terminals, projects, markdown rendering, split-pane, and app launch
-- **Test execution**: ~40 seconds, runs via `npm test`
+- **Playwright E2E tests**: 33 tests covering tabs, terminals, projects, markdown rendering, themes, split-pane, and app launch
+- **Vitest unit tests**: 41 tests covering frontend modules (split-pane, tabs, terminals, projects, markdown, themes)
+- **Test execution**: E2E ~40 seconds via `npm test`, unit tests <1 second via `npm run test:unit`
 - **Test organization**: Shared timeout constants in test-constants.js for consistency
-- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering)
+- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering, theme system)
 
 ## Known Limitations
 

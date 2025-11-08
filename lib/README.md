@@ -11,6 +11,7 @@ lib/
 ├── terminals.js     Terminal creation, initialization, and IPC handling
 ├── projects.js      Project discovery, details fetching, file operations
 ├── markdown.js      Markdown rendering and dev tools utilities
+├── themes.js        Theme management with localStorage persistence and auto mode
 └── app.js           Main Alpine component composition (loads after all modules)
 ```
 
@@ -22,7 +23,8 @@ Scripts must load in dependency order (defined in index.html):
 3. terminals.js
 4. projects.js
 5. markdown.js
-6. app.js (composes all modules into Alpine component)
+6. themes.js
+7. app.js (composes all modules into Alpine component)
 
 ## Pattern
 

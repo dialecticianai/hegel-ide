@@ -12,6 +12,7 @@ e2e/
 ├── terminal.spec.js            Terminal presence, rendering, and I/O command tests
 ├── split-pane.spec.js          Split-pane layout, divider, and project list tests
 ├── readme-rendering.spec.js    README markdown rendering and refresh functionality tests
+├── themes.spec.js              Theme system (dropdown, switching, persistence, auto mode)
 └── alpine.spec.js.bak          Archived Alpine reactivity test (test component removed)
 ```
 
@@ -64,3 +65,5 @@ Test suite covers core application functionality:
 - **Terminal I/O**: Command execution, multi-terminal support
 - **Split-pane layout**: Panel structure, resize, project discovery
 - **App launch**: Window initialization, title, content visibility
+- **Theme system**: Theme dropdown, switching, persistence, auto mode
+- **README rendering**: Markdown display, formatting, refresh
