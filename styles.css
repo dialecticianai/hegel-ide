@@ -325,6 +325,28 @@ body.theme-synthwave .tab.active::after {
   border-radius: 4px;
 }
 
+.empty-terminal-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.open-terminal-button {
+  background: var(--button-primary);
+  border: none;
+  color: var(--button-text);
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.open-terminal-button:hover {
+  background: var(--button-primary-hover);
+}
+
 .settings-icon {
   cursor: pointer;
   font-size: 18px;
@@ -362,7 +384,8 @@ body.theme-synthwave .tab.active::after {
 /* Synthwave gradient border on buttons */
 body.theme-synthwave .refresh-button,
 body.theme-synthwave .devtools-button,
-body.theme-synthwave .theme-selector {
+body.theme-synthwave .theme-selector,
+body.theme-synthwave .open-terminal-button {
   position: relative;
   border: 2px solid transparent;
   background-origin: border-box;

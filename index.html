@@ -189,6 +189,13 @@
 
       <!-- Terminal Content Area -->
       <div class="tab-content">
+        <!-- Show "Open Terminal" button when no terminals exist -->
+        <div x-show="rightTabs.length === 0" class="empty-terminal-state">
+          <button @click="addTerminalTab" class="open-terminal-button">
+            Open Terminal
+          </button>
+        </div>
+
         <template x-for="tab in rightTabs" :key="tab.id">
           <div x-show="activeRightTab === tab.id"
                :id="'terminal-container-' + tab.terminalId"

@@ -168,3 +168,129 @@ test.describe('Terminal I/O', () => {
     await electronApp.close();
   });
 });
+
+test.describe('Terminal Tab Management', () => {
+  test('default terminal tab is closeable', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Find the close button on the default terminal tab in right pane
+    const closeButton = await mainWindow.locator('.right-pane .tab .close-tab').first();
+    expect(await closeButton.isVisible()).toBe(true);
+
+    await electronApp.close();
+  });
+
+  test('closing all terminals shows "Open Terminal" button', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Close the default terminal
+    const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
+    await closeButton.click();
+
+    await mainWindow.waitForTimeout(200);
+
+    // Verify "Open Terminal" button appears
+    const openTerminalButton = await mainWindow.locator('.open-terminal-button');
+    expect(await openTerminalButton.isVisible()).toBe(true);
+    expect(await openTerminalButton.textContent()).toContain('Open Terminal');
+
+    await electronApp.close();
+  });
+
+  test('clicking "Open Terminal" creates new terminal', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Close the default terminal
+    const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
+    await closeButton.click();
+
+    await mainWindow.waitForTimeout(200);
+
+    // Click "Open Terminal" button
+    const openTerminalButton = await mainWindow.locator('.open-terminal-button');
+    await openTerminalButton.click();
+
+    await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
+
+    // Verify new terminal exists
+    const xtermElement = await mainWindow.locator('.xterm');
+    expect(await xtermElement.count()).toBeGreaterThan(0);
+
+    // Verify terminal tab exists
+    const terminalTab = await mainWindow.locator('.right-pane .tab');
+    expect(await terminalTab.count()).toBe(1);
+
+    await electronApp.close();
+  });
+
+  test('reopened terminal is functional', async () => {
+    const electronApp = await electron.launch({
+      args: ['.']
+    });
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Close the default terminal
+    const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
+    await closeButton.click();
+
+    await mainWindow.waitForTimeout(200);
+
+    // Reopen terminal
+    const openTerminalButton = await mainWindow.locator('.open-terminal-button');
+    await openTerminalButton.click();
+
+    await mainWindow.waitForTimeout(TERMINAL_READY);
+
+    // Try executing a command
+    const terminalContainer = await mainWindow.locator('[id^="terminal-container-"]').first();
+    await terminalContainer.click();
+
+    await mainWindow.keyboard.type('echo "reopened works"');
+    await mainWindow.keyboard.press('Enter');
+
+    await mainWindow.waitForTimeout(TERMINAL_EXEC);
+
+    const xtermScreen = await mainWindow.locator('.xterm-screen');
+    const content = await xtermScreen.textContent();
+    expect(content).toContain('reopened works');
+
+    await electronApp.close();
+  });
+});
