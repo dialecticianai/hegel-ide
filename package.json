@@ -4,7 +4,11 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:all": "npm run test:unit && npm test"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +17,10 @@
   "devDependencies": {
     "@electron/rebuild": "^3.7.2",
     "@playwright/test": "^1.56.1",
-    "electron": "^39.1.1"
+    "@vitest/coverage-v8": "^4.0.8",
+    "electron": "^39.1.1",
+    "happy-dom": "^20.0.10",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@xterm/addon-fit": "^0.10.0",
