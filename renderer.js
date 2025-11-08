@@ -136,7 +136,9 @@ document.addEventListener('alpine:init', () => {
 
       // Fetch project details if not cached
       if (!this.projectDetails[projectName]) {
-        this.fetchProjectDetails(projectName);
+        this.fetchProjectDetails(projectName).then(() => {
+          this.fetchProjectReadme(projectName);
+        });
       }
     },
 
@@ -145,26 +147,57 @@ document.addEventListener('alpine:init', () => {
         this.projectDetails[projectName] = {
           data: null,
           loading: true,
-          error: null
+          error: null,
+          readme: null,
+          readmeError: null
         };
 
         const data = await ipcRenderer.invoke('get-project-details', { projectName });
         this.projectDetails[projectName] = {
           data: data,
           loading: false,
-          error: null
+          error: null,
+          readme: this.projectDetails[projectName]?.readme || null,
+          readmeError: this.projectDetails[projectName]?.readmeError || null
         };
       } catch (error) {
         this.projectDetails[projectName] = {
           data: null,
           loading: false,
-          error: error.message || 'Failed to load project details'
+          error: error.message || 'Failed to load project details',
+          readme: null,
+          readmeError: null
         };
       }
     },
 
-    refreshProjectDetails(projectName) {
-      this.fetchProjectDetails(projectName);
+    async fetchProjectReadme(projectName) {
+      try {
+        const projectData = this.projectDetails[projectName]?.data;
+        if (!projectData || !projectData.project_path) {
+          return;
+        }
+
+        const result = await ipcRenderer.invoke('get-project-readme', {
+          projectPath: projectData.project_path
+        });
+
+        if (result.content) {
+          this.projectDetails[projectName].readme = result.content;
+          this.projectDetails[projectName].readmeError = null;
+        } else {
+          this.projectDetails[projectName].readme = null;
+          this.projectDetails[projectName].readmeError = result.error;
+        }
+      } catch (error) {
+        this.projectDetails[projectName].readme = null;
+        this.projectDetails[projectName].readmeError = error.message;
+      }
+    },
+
+    async refreshProjectDetails(projectName) {
+      await this.fetchProjectDetails(projectName);
+      await this.fetchProjectReadme(projectName);
     },
 
     async toggleDevTools() {
