@@ -2,7 +2,7 @@ const { test, expect } = require('@playwright/test');
 const { launchTestElectron } = require('./test-constants');
 
 test.describe('Application Launch', () => {
-  test('app starts without errors', async () => {
+  test('app launches and displays initial UI', async () => {
     const electronApp = await launchTestElectron();
 
     // Get first window
@@ -13,36 +13,13 @@ test.describe('Application Launch', () => {
     const windows = electronApp.windows();
     expect(windows.length).toBeGreaterThan(0);
 
-    await electronApp.close();
-  });
-
-  test('main window has correct title', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
     // Find main window
-    const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
-
     expect(mainWindow).toBeDefined();
 
+    // Verify correct title
     const title = await mainWindow.title();
     expect(title).toBe('Hegel IDE');
-
-    await electronApp.close();
-  });
-
-  test('window content is visible', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    // Find main window
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for Alpine to initialize
     await mainWindow.waitForTimeout(500);
