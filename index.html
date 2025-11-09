@@ -127,6 +127,23 @@
               </template>
             </div>
 
+            <!-- Markdown tree section -->
+            <div x-show="projectDetails[tab.projectName]?.data" class="markdown-tree-container">
+              <template x-if="projectDetails[tab.projectName]?.markdownTreeLoading">
+                <div class="markdown-tree-loading">Fetching document tree...</div>
+              </template>
+              <template x-if="projectDetails[tab.projectName]?.markdownTreeError">
+                <div class="markdown-tree-error" x-text="'Failed to load document tree: ' + projectDetails[tab.projectName].markdownTreeError"></div>
+              </template>
+              <template x-if="projectDetails[tab.projectName]?.markdownTree">
+                <div class="markdown-tree">
+                  <div class="markdown-tree-content"
+                       x-html="renderMarkdownTree(projectDetails[tab.projectName].markdownTree, projectDetails[tab.projectName].currentFile || 'README.md')"
+                       @click="handleTreeClick($event, tab.projectName)"></div>
+                </div>
+              </template>
+            </div>
+
             <!-- README section -->
             <div x-show="projectDetails[tab.projectName]?.data" class="tab-content-padded">
               <template x-if="projectDetails[tab.projectName]?.readme">

@@ -94,6 +94,7 @@ describe('lib/tabs.js', () => {
       tabs.projectDetails = {};
       tabs.fetchProjectDetails = vi.fn().mockResolvedValue();
       tabs.fetchProjectReadme = vi.fn().mockResolvedValue();
+      tabs.fetchMarkdownTree = vi.fn().mockResolvedValue();
 
       tabs.openProjectTab('test-project');
 
