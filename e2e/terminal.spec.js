@@ -3,26 +3,7 @@ const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, TERMINAL_EXEC, TERMINAL_EXEC_FAST, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Terminal Presence', () => {
-  test('terminal container exists', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    // Wait briefly for Alpine
-    await mainWindow.waitForTimeout(ALPINE_INIT);
-
-    // Find terminal container (updated ID for tab system)
-    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
-    expect(await terminalContainer.isVisible()).toBe(true);
-
-    await electronApp.close();
-  });
-
-  test('xterm DOM elements are rendered', async () => {
+  test('terminal renders with correct DOM structure', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -34,28 +15,16 @@ test.describe('Terminal Presence', () => {
     // Wait for xterm to initialize
     await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
 
-    // xterm creates a div with class "xterm"
+    // Verify terminal container exists and is visible
+    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
+    expect(await terminalContainer.isVisible()).toBe(true);
+
+    // Verify xterm DOM elements are rendered
     const xtermElement = await mainWindow.locator('.xterm');
     expect(await xtermElement.count()).toBeGreaterThan(0);
 
-    await electronApp.close();
-  });
-
-  test('terminal has visible dimensions', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
-
-    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
+    // Verify container has non-zero dimensions
     const boundingBox = await terminalContainer.boundingBox();
-
-    // Container should have non-zero dimensions
     expect(boundingBox.width).toBeGreaterThan(0);
     expect(boundingBox.height).toBeGreaterThan(0);
 
