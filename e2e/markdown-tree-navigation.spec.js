@@ -20,14 +20,24 @@ test.describe('Markdown Tree Navigation', () => {
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Get initial README content
-    const markdownContent = await mainWindow.locator('.markdown-content');
+    const markdownContent = mainWindow.locator('.markdown-content');
+    await markdownContent.waitFor({ state: 'visible', timeout: 5000 });
     const initialContent = await markdownContent.textContent();
 
     // Click a file in the tree (e.g., VISION.md or ARCHITECTURE.md)
-    const treeFile = await mainWindow.locator('.markdown-tree-file').first();
+    const treeFile = mainWindow.locator('.markdown-tree-file').first();
+    await treeFile.waitFor({ state: 'visible', timeout: 5000 });
     await treeFile.click();
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    // Wait for content to actually change instead of fixed timeout
+    await mainWindow.waitForFunction(
+      (origContent) => {
+        const elem = document.querySelector('.markdown-content');
+        return elem && elem.textContent !== origContent;
+      },
+      initialContent,
+      { timeout: 5000 }
+    );
 
     // Verify content changed
     const newContent = await markdownContent.textContent();
@@ -154,9 +164,18 @@ test.describe('Markdown Tree Navigation', () => {
 
     // Click another file
     const otherFile = await mainWindow.locator('.markdown-tree-file').filter({ hasNotText: 'README.md' }).first();
+    const otherFileName = await otherFile.textContent();
     await otherFile.click();
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    // Wait for the active class to move to a different element
+    await mainWindow.waitForFunction(
+      (origText) => {
+        const activeElem = document.querySelector('.markdown-tree-file.active');
+        return activeElem && !activeElem.textContent.includes(origText);
+      },
+      'README.md',
+      { timeout: 5000 }
+    );
 
     // New file should be highlighted
     const newHighlighted = await mainWindow.locator('.markdown-tree-file.active');
@@ -185,14 +204,26 @@ test.describe('Markdown Tree Navigation', () => {
     await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
+    // Get initial content before clicking
+    const markdownContent = mainWindow.locator('.markdown-content');
+    await markdownContent.waitFor({ state: 'visible', timeout: 5000 });
+    const initialContent = await markdownContent.textContent();
+
     // Click a file in the tree
-    const treeFile = await mainWindow.locator('.markdown-tree-file').first();
+    const treeFile = mainWindow.locator('.markdown-tree-file').first();
     await treeFile.click();
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    // Wait for content to actually change
+    await mainWindow.waitForFunction(
+      (origContent) => {
+        const elem = document.querySelector('.markdown-content');
+        return elem && elem.textContent !== origContent;
+      },
+      initialContent,
+      { timeout: 5000 }
+    );
 
     // Verify markdown content is rendered (has HTML tags)
-    const markdownContent = await mainWindow.locator('.markdown-content');
     const innerHTML = await markdownContent.innerHTML();
 
     // Should contain rendered HTML elements
