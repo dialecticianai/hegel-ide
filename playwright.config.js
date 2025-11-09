@@ -5,6 +5,12 @@ module.exports = defineConfig({
   timeout: 10000,
   use: {
     // Point to our installed electron binary
-    electronPath: require('electron')
+    electronPath: require('electron'),
+    launchOptions: {
+      env: {
+        ...process.env,
+        TESTING: 'true'
+      }
+    }
   }
 });

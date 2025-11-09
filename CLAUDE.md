@@ -243,6 +243,7 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 **DO:**
 - ✅ Check `hegel status` at session start
 - ✅ Before implementing code, check `hegel status` and suggest to the user that they start an appropriate workflow if none is active
+- ✅ Always assume broken tests are caused by your changes - workflows never start with failing tests
 - ✅ Read review files after `hegel reflect`
 - ✅ Defer to `hegel <command> --help` for detailed syntax
 

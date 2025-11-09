@@ -234,8 +234,12 @@ function createWindow() {
   });
 }
 
-// Confirm before quitting
+// Confirm before quitting (skip in test environment)
 app.on('before-quit', (event) => {
+  if (process.env.TESTING) {
+    return; // Skip confirmation during tests
+  }
+
   const choice = dialog.showMessageBoxSync(mainWindow, {
     type: 'question',
     buttons: ['Quit', 'Cancel'],
