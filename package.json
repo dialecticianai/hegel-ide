@@ -4,6 +4,8 @@
   "main": "src/main.js",
   "scripts": {
     "build": "node esbuild.js",
+    "lint": "eslint src/ esbuild.js",
+    "lint:fix": "eslint src/ esbuild.js --fix",
     "start": "npm run build && electron .",
     "test": "npm run build && playwright test",
     "test:unit": "vitest run",
@@ -21,6 +23,7 @@
     "@vitest/coverage-v8": "^4.0.8",
     "electron": "^39.1.1",
     "esbuild": "^0.27.0",
+    "eslint": "^9.39.1",
     "happy-dom": "^20.0.10",
     "vitest": "^3.2.4"
   },

@@ -235,7 +235,7 @@ function createWindow() {
 
   mainWindow.on('closed', function () {
     // Kill all pty processes
-    for (const [terminalId, ptyProc] of ptyProcesses) {
+    for (const [_terminalId, ptyProc] of ptyProcesses) {
       ptyProc.kill();
     }
     ptyProcesses.clear();

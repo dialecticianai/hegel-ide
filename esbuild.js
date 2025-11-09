@@ -1,6 +1,5 @@
 const esbuild = require('esbuild');
 const fs = require('fs').promises;
-const path = require('path');
 
 async function build() {
   try {
