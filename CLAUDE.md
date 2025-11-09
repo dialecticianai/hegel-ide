@@ -242,10 +242,12 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 
 **DO:**
 - ✅ Check `hegel status` at session start
+- ✅ Before implementing code, check `hegel status` and suggest to the user that they start an appropriate workflow if none is active
 - ✅ Read review files after `hegel reflect`
 - ✅ Defer to `hegel <command> --help` for detailed syntax
 
 **DON'T:**
+- ❌ **NEVER start implementing code without an active hegel workflow**
 - ❌ DON'T start workflow if user hasn't requested structure
 - ❌ DON'T ignore workflow prompts (contain phase-specific guidance)
 - ❌ DON'T reset workflow without user confirmation
