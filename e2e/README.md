@@ -6,20 +6,21 @@ Playwright E2E test suite for Hegel IDE. Tests cover application launch, tab ope
 
 ```
 e2e/
-├── test-constants.js              Shared timeout constants for consistent test timing
-├── app.spec.js                    Application launch and window content tests
-├── tabs.spec.js                   Tab management (add, close, switch, overflow, project tabs, Settings tab)
-├── terminal.spec.js               Terminal presence, rendering, and I/O command tests
-├── split-pane.spec.js             Split-pane layout, divider, and project list tests
-├── readme-rendering.spec.js       README markdown rendering and refresh functionality tests
-├── markdown-links.spec.js         Markdown link navigation and tab behavior tests
-├── markdown-links-debug.spec.js   Debug test for markdown link click handler investigation
-├── markdown-links-minimal.spec.js Minimal repro test for Alpine event binding issue
-├── themes.spec.js                 Theme system in Settings tab (dropdown, switching, persistence, auto mode)
-├── alpine.spec.js.bak             Archived Alpine reactivity test (test component removed)
+├── test-constants.js                  Shared timeout constants and launchTestElectron() helper for test setup
+├── app.spec.js                        Application launch and window content tests
+├── tabs.spec.js                       Tab management (add, close, switch, overflow, project tabs, Settings tab)
+├── terminal.spec.js                   Terminal presence, rendering, and I/O command tests
+├── split-pane.spec.js                 Split-pane layout, divider, and project list tests
+├── readme-rendering.spec.js           README markdown rendering and refresh functionality tests
+├── markdown-links.spec.js             Markdown link navigation and tab behavior tests
+├── markdown-tree.spec.js              Markdown document tree rendering and display tests
+├── markdown-tree-navigation.spec.js   Tree click navigation and file highlighting tests
+├── themes.spec.js                     Theme system in Settings tab (dropdown, switching, persistence, auto mode)
+├── image-rendering.spec.js            Image path resolution in markdown (inline HTML and markdown syntax)
+├── quit-test.spec.js                  Quit confirmation dialog behavior in test mode
 │
-└── fixtures/                      Test fixture data
-    └── markdown-links/            Markdown files for link navigation tests (index.md, page-a.md, page-b.md, page-c.md)
+└── fixtures/                          Test fixture data
+    └── markdown-links/                Markdown files for link navigation tests (index.md, page-a.md, page-b.md, page-c.md)
 ```
 
 ## Test Execution
@@ -50,9 +51,13 @@ npx playwright test e2e/tabs.spec.js
 - Catch related issues immediately during development
 - Full regression coverage before changes land
 
-## Test Constants
+## Test Infrastructure
 
-Shared timeout values in `test-constants.js`:
+**`test-constants.js`** provides:
+
+**launchTestElectron() helper**: Centralized Electron launch with `TESTING=true` env var to disable quit confirmation dialog during tests.
+
+**Shared timeout constants**:
 - `ALPINE_INIT`: 300ms - Wait for Alpine.js initialization
 - `TERMINAL_READY`: 600ms - Wait for terminal to be ready for input
 - `TERMINAL_EXEC`: 500ms - Wait for terminal command to execute
@@ -75,3 +80,7 @@ Test suite covers core application functionality:
 - **Settings tab**: Opening via ⚙️ button, closeable, positioning at index 1, deduplication
 - **README rendering**: Markdown display, formatting, refresh
 - **Markdown link navigation**: Regular click navigation, modifier click new tabs, file deduplication, external link passthrough
+- **Markdown tree**: Document tree rendering, box-drawing characters, scrolling, loading states
+- **Tree navigation**: Click to replace content, Cmd+Click for new tabs, file highlighting, link styling
+- **Image rendering**: Inline HTML images and markdown image syntax with correct path resolution
+- **Quit behavior**: Confirmation dialog skipped in test mode via TESTING env var
