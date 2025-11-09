@@ -142,7 +142,7 @@ test.describe('Tab Management', () => {
     await electronApp.close();
   });
 
-  test('can open project detail tab', async () => {
+  test('project tab opens with expected UI elements', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -170,6 +170,10 @@ test.describe('Tab Management', () => {
     const closeBtn = projectTab.locator('.close-tab');
     expect(await closeBtn.isVisible()).toBe(true);
 
+    // Verify refresh button exists (in active tab)
+    const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab');
+    expect(await refreshBtn.isVisible()).toBe(true);
+
     // Wait for data to load
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
@@ -182,29 +186,6 @@ test.describe('Tab Management', () => {
 
     // One of them should be true
     expect(hasMarkdown || hasError).toBe(true);
-
-    await electronApp.close();
-  });
-
-  test('project tab shows refresh button', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(ALPINE_INIT);
-
-    // Click first project
-    const firstProject = await mainWindow.locator('.projects-list li').first();
-    await firstProject.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
-
-    // Verify refresh button exists (in active tab)
-    const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab');
-    expect(await refreshBtn.isVisible()).toBe(true);
 
     await electronApp.close();
   });
