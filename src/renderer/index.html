@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hegel IDE</title>
+  <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="renderer.js"></script>
+</head>
+<body>
+  <!-- Split-pane layout -->
+  <div id="app" x-data="splitPane" class="split-container">
+    <!-- Left Panel: Markdown Browser -->
+    <div class="split-pane left-pane" :style="{ width: leftPanelPercent + '%' }">
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tabs-list">
+          <template x-for="tab in leftTabs" :key="tab.id">
+            <div class="tab"
+                 :class="{ 'active': activeLeftTab === tab.id }"
+                 @click="switchLeftTab(tab.id)">
+              <span x-text="tab.label"></span>
+              <button x-show="tab.type === 'project-detail'"
+                      class="refresh-tab"
+                      :class="{ 'spinning': projectDetails[tab.projectName]?.loading }"
+                      @click.stop="refreshProjectDetails(tab.projectName)"
+                      :disabled="projectDetails[tab.projectName]?.loading"
+                      title="Refresh project details">⟳</button>
+              <button x-show="tab.closeable"
+                      class="close-tab"
+                      @click.stop="closeLeftTab(tab.id)">×</button>
+            </div>
+          </template>
+        </div>
+        <button class="add-tab" @click="addProjectTab">+</button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="tab-content">
+        <!-- Projects tab content -->
+        <div x-show="activeLeftTab === 'projects'" class="tab-content-padded">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Projects</h2>
+            <span @click="openSettingsTab" class="settings-icon" title="Settings"></span>
+          </div>
+
+          <template x-if="projectsLoading">
+            <p>Loading projects...</p>
+          </template>
+
+          <template x-if="projectsError">
+            <p class="error" x-text="projectsError"></p>
+          </template>
+
+          <ul class="projects-list" x-show="!projectsLoading && !projectsError">
+            <template x-for="project in projects" :key="project">
+              <li @click="openProjectTab(project)"
+                  style="cursor: pointer;"
+                  x-text="project"></li>
+            </template>
+          </ul>
+        </div>
+
+        <!-- Settings tab content -->
+        <div x-show="activeLeftTab === 'settings'" class="tab-content-padded">
+          <h2>Settings</h2>
+          <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+            <div>
+              <label style="display: block; margin-bottom: 8px;">Theme</label>
+              <select x-model="currentTheme" @change="setTheme(currentTheme)" class="theme-selector">
+                <option value="auto">Auto</option>
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+                <option value="synthwave">Synthwave</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 8px;">Debug</label>
+              <button @click="toggleDevTools" class="devtools-button">
+                Toggle DevTools
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project detail tabs content -->
+        <template x-for="tab in leftTabs.filter(t => t.type === 'project-detail')" :key="tab.id">
+          <div x-show="activeLeftTab === tab.id">
+            <div x-show="projectDetails[tab.projectName]?.loading">Loading project details...</div>
+            <div x-show="projectDetails[tab.projectName]?.error" class="error" x-text="projectDetails[tab.projectName]?.error"></div>
+
+            <!-- Project details card -->
+            <div x-show="projectDetails[tab.projectName]?.data" class="project-details-card">
+              <template x-if="projectDetails[tab.projectName]?.data">
+                <div class="project-info-row">
+                  <span class="info-value info-value-path"
+                        x-text="formatPath(projectDetails[tab.projectName].data.project_path)"
+                        :title="'Path: ' + projectDetails[tab.projectName].data.project_path"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Cache size" x-text="formatBytes(projectDetails[tab.projectName].data.hegel_size_bytes)"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Last activity" x-text="formatTimeAgo(projectDetails[tab.projectName].data.last_activity)"></span>
+                  <span class="metric-sep">|</span>
+                  <span class="info-value" title="Workflow" x-text="formatWorkflowState(projectDetails[tab.projectName].data.workflow_state)"></span>
+                </div>
+              </template>
+
+              <template x-if="projectDetails[tab.projectName]?.data?.metrics">
+                <div class="metrics-row">
+                  <span class="metrics-label">usage</span>
+                  <span class="metric-sep">|</span>
+                  <span title="input tokens" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_input_tokens) + ' i'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="output tokens" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_output_tokens) + ' o'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="events" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.total_events) + ' e'"></span>
+                  <span class="metric-sep">|</span>
+                  <span title="phases" x-text="formatNumber(projectDetails[tab.projectName].data.metrics.phase_count) + ' p'"></span>
+                </div>
+              </template>
+            </div>
+
+            <!-- Markdown tree section -->
+            <div x-show="projectDetails[tab.projectName]?.data" class="markdown-tree-container">
+              <template x-if="projectDetails[tab.projectName]?.markdownTreeLoading">
+                <div class="markdown-tree-loading">Fetching document tree...</div>
+              </template>
+              <template x-if="projectDetails[tab.projectName]?.markdownTreeError">
+                <div class="markdown-tree-error" x-text="'Failed to load document tree: ' + projectDetails[tab.projectName].markdownTreeError"></div>
+              </template>
+              <template x-if="projectDetails[tab.projectName]?.markdownTree">
+                <div class="markdown-tree">
+                  <div class="markdown-tree-content"
+                       x-html="renderMarkdownTree(projectDetails[tab.projectName].markdownTree, projectDetails[tab.projectName].currentFile || 'README.md')"
+                       @click="handleTreeClick($event, tab.projectName)"></div>
+                </div>
+              </template>
+            </div>
+
+            <!-- README section -->
+            <div x-show="projectDetails[tab.projectName]?.data" class="tab-content-padded">
+              <template x-if="projectDetails[tab.projectName]?.readme">
+                <div class="markdown-content"
+                     x-html="renderMarkdown(projectDetails[tab.projectName].readme, tab.projectName, projectDetails[tab.projectName].currentFile || 'README.md')"
+                     @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
+              </template>
+              <template x-if="!projectDetails[tab.projectName]?.readme && !projectDetails[tab.projectName]?.loading">
+                <div class="readme-missing">Project missing README.md</div>
+              </template>
+            </div>
+          </div>
+        </template>
+
+        <!-- File tabs content -->
+        <template x-for="tab in leftTabs.filter(t => t.type === 'file')" :key="tab.id">
+          <div x-show="activeLeftTab === tab.id" class="tab-content-padded">
+            <h2 x-text="tab.filePath"></h2>
+            <template x-if="fileContents[`${tab.projectName}:${tab.filePath}`]">
+              <div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.loading">Loading file...</div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"
+                     class="error"
+                     x-text="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"></div>
+                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.content"
+                     class="markdown-content"
+                     x-html="renderMarkdown(fileContents[`${tab.projectName}:${tab.filePath}`]?.content, tab.projectName, tab.filePath)"
+                     @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Draggable Divider -->
+    <div class="divider"
+         @mousedown="startDrag"
+         :class="{ 'dragging': isDragging }">
+    </div>
+
+    <!-- Right Panel: Terminal -->
+    <div class="split-pane right-pane" :style="{ width: (100 - leftPanelPercent) + '%' }">
+      <!-- Tab Bar -->
+      <div class="tab-bar">
+        <div class="tabs-list">
+          <template x-for="tab in rightTabs" :key="tab.id">
+            <div class="tab"
+                 :class="{ 'active': activeRightTab === tab.id }"
+                 @click="switchRightTab(tab.id)">
+              <span x-text="tab.label"></span>
+              <button x-show="tab.closeable"
+                      class="close-tab"
+                      @click.stop="closeRightTab(tab.id)">×</button>
+            </div>
+          </template>
+        </div>
+        <button class="add-tab" @click="addTerminalTab">+</button>
+      </div>
+
+      <!-- Terminal Content Area -->
+      <div class="tab-content">
+        <!-- Show "Open Terminal" button when no terminals exist -->
+        <div x-show="rightTabs.length === 0" class="empty-terminal-state">
+          <button @click="addTerminalTab" class="open-terminal-button">
+            Open Terminal
+          </button>
+        </div>
+
+        <template x-for="tab in rightTabs" :key="tab.id">
+          <div x-show="activeRightTab === tab.id"
+               :id="'terminal-container-' + tab.terminalId"
+               class="terminal-container"></div>
+        </template>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
