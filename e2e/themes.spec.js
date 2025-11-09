@@ -3,7 +3,7 @@ const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TAB_CREATE } = require('./test-constants');
 
 test.describe('Theme System', () => {
-  test('theme dropdown is visible in Settings tab', async () => {
+  test('theme dropdown displays with all options', async () => {
     const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
@@ -15,29 +15,12 @@ test.describe('Theme System', () => {
     await settingsButton.click();
     await window.waitForTimeout(TAB_CREATE);
 
-    // Find theme dropdown
+    // Verify theme dropdown is visible
     const themeSelector = window.locator('.theme-selector');
     expect(await themeSelector.isVisible()).toBe(true);
 
-    await electronApp.close();
-  });
-
-  test('theme dropdown shows all four options', async () => {
-    const electronApp = await launchTestElectron();
-
-    const window = await electronApp.firstWindow();
-    await window.waitForLoadState('domcontentloaded');
-    await window.waitForTimeout(ALPINE_INIT);
-
-    // Open Settings tab
-    const settingsButton = await window.locator('.left-pane .settings-icon');
-    await settingsButton.click();
-    await window.waitForTimeout(TAB_CREATE);
-
-    // Check all options are present
-    const themeSelector = window.locator('.theme-selector');
+    // Verify all options are present
     const options = await themeSelector.locator('option').allTextContents();
-
     expect(options).toContain('Auto');
     expect(options).toContain('Dark');
     expect(options).toContain('Light');
