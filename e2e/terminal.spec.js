@@ -1,11 +1,10 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, TERMINAL_EXEC, TERMINAL_EXEC_FAST, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Terminal Presence', () => {
   test('terminal container exists', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -24,9 +23,7 @@ test.describe('Terminal Presence', () => {
   });
 
   test('xterm DOM elements are rendered', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -45,9 +42,7 @@ test.describe('Terminal Presence', () => {
   });
 
   test('terminal has visible dimensions', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -70,9 +65,7 @@ test.describe('Terminal Presence', () => {
 
 test.describe('Terminal I/O', () => {
   test('simple echo command produces output', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -103,9 +96,7 @@ test.describe('Terminal I/O', () => {
   });
 
   test('pwd command shows current directory', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -133,9 +124,7 @@ test.describe('Terminal I/O', () => {
   });
 
   test('sequential commands work', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -171,9 +160,7 @@ test.describe('Terminal I/O', () => {
 
 test.describe('Terminal Tab Management', () => {
   test('default terminal tab is closeable', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -191,9 +178,7 @@ test.describe('Terminal Tab Management', () => {
   });
 
   test('closing all terminals shows "Open Terminal" button', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -218,9 +203,7 @@ test.describe('Terminal Tab Management', () => {
   });
 
   test('clicking "Open Terminal" creates new terminal', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -254,9 +237,7 @@ test.describe('Terminal Tab Management', () => {
   });
 
   test('reopened terminal is functional', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

@@ -1,11 +1,10 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Tab Management', () => {
   test('default tabs exist and are clickable', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -34,9 +33,7 @@ test.describe('Tab Management', () => {
   });
 
   test('clicking tab updates active state', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -62,9 +59,7 @@ test.describe('Tab Management', () => {
   });
 
   test('terminal still works after tab changes', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -85,9 +80,7 @@ test.describe('Tab Management', () => {
   });
 
   test('can add new terminal tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -120,9 +113,7 @@ test.describe('Tab Management', () => {
   });
 
   test('can close terminal tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -160,9 +151,7 @@ test.describe('Tab Management', () => {
   });
 
   test('can open project detail tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -206,9 +195,7 @@ test.describe('Tab Management', () => {
   });
 
   test('project tab shows refresh button', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -231,9 +218,7 @@ test.describe('Tab Management', () => {
   });
 
   test('can close project detail tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -271,9 +256,7 @@ test.describe('Tab Management', () => {
   });
 
   test('cannot close Projects tab (non-closeable)', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -292,9 +275,7 @@ test.describe('Tab Management', () => {
   });
 
   test('tab overflow has correct CSS', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -317,9 +298,7 @@ test.describe('Tab Management', () => {
   });
 
   test('can open Settings tab via ⚙️ button', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -355,9 +334,7 @@ test.describe('Tab Management', () => {
   });
 
   test('Settings tab is closeable', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -393,9 +370,7 @@ test.describe('Tab Management', () => {
   });
 
   test('Settings tab positions at index 1 when reopened', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -440,9 +415,7 @@ test.describe('Tab Management', () => {
   });
 
   test('clicking ⚙️ when Settings open does not duplicate tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -479,9 +452,7 @@ test.describe('Tab Management', () => {
   });
 
   test('Settings tab contains theme selector and dev tools button', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

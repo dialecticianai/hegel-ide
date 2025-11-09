@@ -1,12 +1,11 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { PROJECT_LOAD, TAB_CREATE, ALPINE_INIT } = require('./test-constants');
 const path = require('path');
 
 test.describe('Image Rendering', () => {
   test('renders inline HTML images with correct src paths', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -75,9 +74,7 @@ test.describe('Image Rendering', () => {
   });
 
   test('renders markdown images with correct src paths', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

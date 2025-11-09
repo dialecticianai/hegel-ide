@@ -1,4 +1,5 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TAB_CREATE } = require('./test-constants');
 const fs = require('fs');
 const path = require('path');
@@ -59,9 +60,7 @@ async function openFixtureTab(mainWindow, fileName, projectName = 'test-project'
 
 test.describe('Markdown Link Navigation', () => {
   test('regular click on markdown link navigates current tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -102,9 +101,7 @@ test.describe('Markdown Link Navigation', () => {
   });
 
   test('cmd+click on markdown link opens new tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -144,9 +141,7 @@ test.describe('Markdown Link Navigation', () => {
   });
 
   test('clicking link to already-open file switches to that tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -196,9 +191,7 @@ test.describe('Markdown Link Navigation', () => {
   });
 
   test('external links are not intercepted', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -232,9 +225,7 @@ test.describe('Markdown Link Navigation', () => {
   });
 
   test('file tab can navigate to another file', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -274,9 +265,7 @@ test.describe('Markdown Link Navigation', () => {
   });
 
   test('tab position preserved during navigation', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

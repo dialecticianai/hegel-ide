@@ -1,11 +1,10 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { SPLIT_PANE_INIT, HEGEL_CMD } = require('./test-constants');
 
 test.describe('Split-Pane Layout', () => {
   test('split-pane structure renders correctly', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -40,9 +39,7 @@ test.describe('Split-Pane Layout', () => {
   });
 
   test('divider has resize cursor', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -61,9 +58,7 @@ test.describe('Split-Pane Layout', () => {
   });
 
   test('project list populates from hegel', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -90,9 +85,7 @@ test.describe('Split-Pane Layout', () => {
   });
 
   test('panels have non-zero width', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

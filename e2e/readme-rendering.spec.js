@@ -1,11 +1,10 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('README Rendering', () => {
   test('project with README.md shows rendered content', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -36,9 +35,7 @@ test.describe('README Rendering', () => {
   });
 
   test('project without README.md shows missing message', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -76,9 +73,7 @@ test.describe('README Rendering', () => {
   });
 
   test('markdown formatting displays correctly', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -110,9 +105,7 @@ test.describe('README Rendering', () => {
 
   test('refresh button updates README content', async () => {
     test.setTimeout(15000); // Needs extra time for double project load
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

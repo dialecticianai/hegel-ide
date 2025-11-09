@@ -1,10 +1,9 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 
 test.describe('Application Launch', () => {
   test('app starts without errors', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     // Get first window
     const firstPage = await electronApp.firstWindow();
@@ -18,9 +17,7 @@ test.describe('Application Launch', () => {
   });
 
   test('main window has correct title', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -38,9 +35,7 @@ test.describe('Application Launch', () => {
   });
 
   test('window content is visible', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

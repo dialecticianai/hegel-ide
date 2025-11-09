@@ -1,11 +1,9 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
-const { PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('Markdown Document Tree', () => {
   test('tree section visible above README', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -27,14 +25,14 @@ test.describe('Markdown Document Tree', () => {
     expect(await treeSection.isVisible()).toBe(true);
 
     // Verify it's above README content (earlier in DOM order)
-    const tabContent = await mainWindow.locator('.tab-content');
-    const children = await tabContent.locator('> *').all();
+    const projectTabContainer = await mainWindow.locator('.tab-content > div').filter({ has: mainWindow.locator('.markdown-tree-container') });
+    const children = await projectTabContainer.locator('> *').all();
 
     let treeIndex = -1;
     let readmeIndex = -1;
     for (let i = 0; i < children.length; i++) {
       const className = await children[i].getAttribute('class');
-      if (className && className.includes('markdown-tree')) treeIndex = i;
+      if (className && className.includes('markdown-tree-container')) treeIndex = i;
       if (className && className.includes('tab-content-padded')) readmeIndex = i;
     }
 
@@ -45,9 +43,7 @@ test.describe('Markdown Document Tree', () => {
   });
 
   test('tree renders with box-drawing characters', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -74,9 +70,7 @@ test.describe('Markdown Document Tree', () => {
   });
 
   test('tree shows directories with trailing slash', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -103,9 +97,7 @@ test.describe('Markdown Document Tree', () => {
   });
 
   test('tree shows files with line counts', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -132,9 +124,7 @@ test.describe('Markdown Document Tree', () => {
   });
 
   test('tree has three-line max height with scroll', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -171,9 +161,7 @@ test.describe('Markdown Document Tree', () => {
   });
 
   test('tree shows loading state initially', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

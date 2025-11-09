@@ -1,11 +1,10 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TAB_CREATE } = require('./test-constants');
 
 test.describe('Theme System', () => {
   test('theme dropdown is visible in Settings tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
@@ -24,9 +23,7 @@ test.describe('Theme System', () => {
   });
 
   test('theme dropdown shows all four options', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
@@ -50,9 +47,7 @@ test.describe('Theme System', () => {
   });
 
   test('selecting theme updates UI immediately', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
@@ -81,9 +76,7 @@ test.describe('Theme System', () => {
   });
 
   test('theme persists across page reload', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
@@ -139,9 +132,7 @@ test.describe('Theme System', () => {
   });
 
   test('theme dropdown defaults to auto on first launch', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');

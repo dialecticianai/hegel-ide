@@ -1,11 +1,9 @@
-const { test, expect, _electron: electron } = require('@playwright/test');
-const { PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
+const { test, expect } = require('@playwright/test');
+const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('Markdown Tree Navigation', () => {
   test('clicking file in tree replaces README content', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -39,9 +37,7 @@ test.describe('Markdown Tree Navigation', () => {
   });
 
   test('Cmd+Click file opens new tab', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -74,9 +70,7 @@ test.describe('Markdown Tree Navigation', () => {
   });
 
   test('file nodes styled as links', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -105,9 +99,7 @@ test.describe('Markdown Tree Navigation', () => {
   });
 
   test('directory nodes not clickable', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -137,9 +129,7 @@ test.describe('Markdown Tree Navigation', () => {
   });
 
   test('current file highlighted in tree', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -179,9 +169,7 @@ test.describe('Markdown Tree Navigation', () => {
   });
 
   test('file content rendered correctly after navigation', async () => {
-    const electronApp = await electron.launch({
-      args: ['.']
-    });
+    const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
