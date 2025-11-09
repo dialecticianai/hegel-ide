@@ -3,7 +3,7 @@ const { launchTestElectron } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Tab Management', () => {
-  test('default tabs exist and are clickable', async () => {
+  test('initial tab UI renders correctly', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -12,8 +12,8 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    // Wait for Alpine to initialize
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    // Wait for terminal initialization (longest wait needed)
+    await mainWindow.waitForTimeout(TERMINAL_READY);
 
     // Verify left panel Projects tab
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
@@ -28,6 +28,19 @@ test.describe('Tab Management', () => {
     // Closeable - close button should be visible
     const terminal1CloseBtn = terminal1Tab.locator('.close-tab');
     expect(await terminal1CloseBtn.isVisible()).toBe(true);
+
+    // Verify terminal container exists in right panel
+    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
+    expect(await terminalContainer.isVisible()).toBe(true);
+
+    // Verify tabs-list has overflow-x: auto CSS
+    const tabsList = await mainWindow.locator('.left-pane .tabs-list');
+    const overflowX = await tabsList.evaluate(el => window.getComputedStyle(el).overflowX);
+    expect(overflowX).toBe('auto');
+
+    // Verify add button visible in left pane
+    const addBtn = await mainWindow.locator('.left-pane .add-tab');
+    expect(await addBtn.isVisible()).toBe(true);
 
     await electronApp.close();
   });
@@ -54,27 +67,6 @@ test.describe('Tab Management', () => {
     // Verify Projects content is visible
     const projectsContent = await mainWindow.locator('.left-pane .tab-content').locator('h2').filter({ hasText: 'Projects' });
     expect(await projectsContent.isVisible()).toBe(true);
-
-    await electronApp.close();
-  });
-
-  test('terminal still works after tab changes', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    // Wait for terminal initialization
-    await mainWindow.waitForTimeout(TERMINAL_READY);
-
-    // Verify terminal container exists in right panel
-    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
-    expect(await terminalContainer.isVisible()).toBe(true);
-
-    // Terminal functionality will be tested by existing terminal.spec.js
 
     await electronApp.close();
   });
@@ -255,47 +247,6 @@ test.describe('Tab Management', () => {
     await electronApp.close();
   });
 
-  test('cannot close Projects tab (non-closeable)', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(ALPINE_INIT);
-
-    // Verify Projects tab has no close button
-    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
-    const closeBtn = projectsTab.locator('.close-tab');
-    expect(await closeBtn.isVisible()).toBe(false);
-
-    await electronApp.close();
-  });
-
-  test('tab overflow has correct CSS', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(ALPINE_INIT);
-
-    // Verify tabs-list has overflow-x: auto CSS
-    const tabsList = await mainWindow.locator('.left-pane .tabs-list');
-    const overflowX = await tabsList.evaluate(el => window.getComputedStyle(el).overflowX);
-    expect(overflowX).toBe('auto');
-
-    // Verify add button visible
-    const addBtn = await mainWindow.locator('.left-pane .add-tab');
-    expect(await addBtn.isVisible()).toBe(true);
-
-    await electronApp.close();
-  });
 
   test('can open Settings tab via ⚙️ button', async () => {
     const electronApp = await launchTestElectron();
