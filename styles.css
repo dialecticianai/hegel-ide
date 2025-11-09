@@ -542,13 +542,13 @@ body.theme-synthwave .open-terminal-button {
   font-family: 'DejaVuSansM Nerd Font Mono', 'Courier New', Courier, monospace;
   font-size: 0.9em;
   color: var(--text-primary);
-  white-space: pre;
 }
 
 .markdown-tree-content {
   max-height: 4.5em; /* Approximately 3 lines */
   overflow-y: auto;
   line-height: 1.5;
+  white-space: pre;
 }
 
 .markdown-tree-file {

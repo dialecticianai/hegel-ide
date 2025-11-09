@@ -148,7 +148,7 @@
             <div x-show="projectDetails[tab.projectName]?.data" class="tab-content-padded">
               <template x-if="projectDetails[tab.projectName]?.readme">
                 <div class="markdown-content"
-                     x-html="renderMarkdown(projectDetails[tab.projectName].readme, tab.projectName, 'README.md')"
+                     x-html="renderMarkdown(projectDetails[tab.projectName].readme, tab.projectName, projectDetails[tab.projectName].currentFile || 'README.md')"
                      @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
               </template>
               <template x-if="!projectDetails[tab.projectName]?.readme && !projectDetails[tab.projectName]?.loading">
