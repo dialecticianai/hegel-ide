@@ -3,7 +3,7 @@ const { launchTestElectron } = require('./test-constants');
 const { SPLIT_PANE_INIT, HEGEL_CMD } = require('./test-constants');
 
 test.describe('Split-Pane Layout', () => {
-  test('split-pane structure renders correctly', async () => {
+  test('split-pane layout renders with correct structure', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -23,9 +23,11 @@ test.describe('Split-Pane Layout', () => {
     const leftPane = await mainWindow.locator('.left-pane');
     expect(await leftPane.isVisible()).toBe(true);
 
-    // Verify divider exists
+    // Verify divider exists and has resize cursor
     const divider = await mainWindow.locator('.divider');
     expect(await divider.isVisible()).toBe(true);
+    const cursor = await divider.evaluate(el => window.getComputedStyle(el).cursor);
+    expect(cursor).toBe('col-resize');
 
     // Verify right pane exists
     const rightPane = await mainWindow.locator('.right-pane');
@@ -35,24 +37,11 @@ test.describe('Split-Pane Layout', () => {
     const terminalContainer = await rightPane.locator('#terminal-container-term-1');
     expect(await terminalContainer.isVisible()).toBe(true);
 
-    await electronApp.close();
-  });
-
-  test('divider has resize cursor', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(500);
-
-    const divider = await mainWindow.locator('.divider');
-    const cursor = await divider.evaluate(el => window.getComputedStyle(el).cursor);
-
-    expect(cursor).toBe('col-resize');
+    // Verify panels have non-zero width
+    const leftBox = await leftPane.boundingBox();
+    const rightBox = await rightPane.boundingBox();
+    expect(leftBox.width).toBeGreaterThan(0);
+    expect(rightBox.width).toBeGreaterThan(0);
 
     await electronApp.close();
   });
@@ -80,29 +69,6 @@ test.describe('Split-Pane Layout', () => {
 
     // One of them should be visible
     expect(hasProjects || hasError).toBe(true);
-
-    await electronApp.close();
-  });
-
-  test('panels have non-zero width', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(500);
-
-    const leftPane = await mainWindow.locator('.left-pane');
-    const rightPane = await mainWindow.locator('.right-pane');
-
-    const leftBox = await leftPane.boundingBox();
-    const rightBox = await rightPane.boundingBox();
-
-    expect(leftBox.width).toBeGreaterThan(0);
-    expect(rightBox.width).toBeGreaterThan(0);
 
     await electronApp.close();
   });
