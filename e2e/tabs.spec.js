@@ -229,7 +229,7 @@ test.describe('Tab Management', () => {
   });
 
 
-  test('can open Settings tab via ⚙️ button', async () => {
+  test('Settings tab opens with expected content and position', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -261,6 +261,21 @@ test.describe('Tab Management', () => {
     }));
     const settingsIndex = settingsTabIndex.find(i => i !== -1);
     expect(settingsIndex).toBe(1);
+
+    // Verify theme selector exists in Settings content
+    const themeSelector = await mainWindow.locator('.left-pane .theme-selector');
+    expect(await themeSelector.isVisible()).toBe(true);
+
+    // Verify theme selector has all options
+    const options = await themeSelector.locator('option').allTextContents();
+    expect(options).toContain('Auto');
+    expect(options).toContain('Dark');
+    expect(options).toContain('Light');
+    expect(options).toContain('Synthwave');
+
+    // Verify dev tools button exists
+    const devToolsBtn = await mainWindow.locator('.left-pane .devtools-button');
+    expect(await devToolsBtn.isVisible()).toBe(true);
 
     await electronApp.close();
   });
@@ -383,37 +398,4 @@ test.describe('Tab Management', () => {
     await electronApp.close();
   });
 
-  test('Settings tab contains theme selector and dev tools button', async () => {
-    const electronApp = await launchTestElectron();
-
-    const firstPage = await electronApp.firstWindow();
-    await firstPage.waitForLoadState('domcontentloaded');
-
-    const windows = electronApp.windows();
-    const mainWindow = windows.find(w => w.url().includes('index.html'));
-
-    await mainWindow.waitForTimeout(ALPINE_INIT);
-
-    // Open Settings tab
-    const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
-    await settingsButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
-
-    // Verify theme selector exists in Settings content
-    const themeSelector = await mainWindow.locator('.left-pane .theme-selector');
-    expect(await themeSelector.isVisible()).toBe(true);
-
-    // Verify theme selector has all options
-    const options = await themeSelector.locator('option').allTextContents();
-    expect(options).toContain('Auto');
-    expect(options).toContain('Dark');
-    expect(options).toContain('Light');
-    expect(options).toContain('Synthwave');
-
-    // Verify dev tools button exists
-    const devToolsBtn = await mainWindow.locator('.left-pane .devtools-button');
-    expect(await devToolsBtn.isVisible()).toBe(true);
-
-    await electronApp.close();
-  });
 });
