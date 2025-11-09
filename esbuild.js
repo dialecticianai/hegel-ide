@@ -12,7 +12,15 @@ async function build() {
       platform: 'browser',
       target: 'es2020',
       sourcemap: true,
-      minify: false
+      minify: false,
+      external: [
+        'electron',
+        'os',
+        '@xterm/*',
+        'dayjs',
+        'marked',
+        'node-pty'
+      ]
     });
 
     // Copy static assets

@@ -131,5 +131,4 @@ export function createMarkdown() {
         }
       }
     };
-  }
 }

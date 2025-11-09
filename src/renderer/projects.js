@@ -336,5 +336,4 @@ export function createProjects() {
         return JSON.stringify(state);
       }
     };
-  }
 }
