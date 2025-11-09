@@ -51,6 +51,65 @@ npx playwright test e2e/tabs.spec.js
 - Catch related issues immediately during development
 - Full regression coverage before changes land
 
+## Test Writing Guidelines
+
+**Combine independent assertions into single tests:**
+
+Electron app launches are expensive. When multiple assertions test independent aspects of the same initial state, combine them into one test:
+
+**✅ Good - Combined test:**
+```javascript
+test('initial UI renders correctly', async () => {
+  const electronApp = await launchTestElectron();
+  // ... setup ...
+
+  // Multiple independent assertions about initial state
+  expect(await projectsTab.isVisible()).toBe(true);
+  expect(await terminalTab.isVisible()).toBe(true);
+  expect(await overflowX).toBe('auto');
+
+  await electronApp.close();
+});
+```
+
+**❌ Bad - Separate tests for independent state checks:**
+```javascript
+test('projects tab is visible', async () => {
+  const electronApp = await launchTestElectron();
+  // ... setup ...
+  expect(await projectsTab.isVisible()).toBe(true);
+  await electronApp.close();
+});
+
+test('terminal tab is visible', async () => {
+  const electronApp = await launchTestElectron();
+  // ... setup ... (duplicated!)
+  expect(await terminalTab.isVisible()).toBe(true);
+  await electronApp.close();
+});
+```
+
+**When to combine tests:**
+- Checking different DOM elements in the same initial state
+- Verifying CSS properties, dimensions, visibility together
+- Testing multiple aspects of rendered output without interactions
+
+**When to keep tests separate:**
+- Tests involving state changes (clicks, navigation, data mutations)
+- Tests requiring different setup or teardown
+- Tests with complex multi-step flows
+- Tests that verify different error states or edge cases
+
+**Example patterns to combine:**
+- "element exists" + "element has correct style" + "element has correct dimensions"
+- "dropdown visible" + "dropdown has all options"
+- "tab opens" + "tab has correct UI elements" + "tab shows expected content"
+
+**Efficiency impact:**
+- Reducing unnecessary Electron launches speeds up test execution
+- Suite went from 63 → 51 tests (19% reduction) saving ~15-20s per run
+- Each test combination eliminates ~1-2 seconds of app launch overhead
+
 ## Test Infrastructure
 
 **`test-constants.js`** provides:
