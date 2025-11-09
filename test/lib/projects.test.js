@@ -116,4 +116,180 @@ describe('lib/projects.js', () => {
       expect(fetchReadmeSpy).toHaveBeenCalledWith('test');
     });
   });
+
+  describe('buildTreeFromPaths', () => {
+    it('should build tree from single root file', () => {
+      const files = [
+        { path: 'README.md', lines: 100 }
+      ];
+
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths(files);
+
+      expect(tree).toHaveLength(1);
+      expect(tree[0]).toEqual({
+        type: 'file',
+        name: 'README.md',
+        path: 'README.md',
+        lines: 100
+      });
+    });
+
+    it('should build tree from multiple root files', () => {
+      const files = [
+        { path: 'README.md', lines: 100 },
+        { path: 'ARCHITECTURE.md', lines: 256 },
+        { path: 'VISION.md', lines: 125 }
+      ];
+
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths(files);
+
+      expect(tree).toHaveLength(3);
+      expect(tree[0].name).toBe('README.md');
+      expect(tree[1].name).toBe('ARCHITECTURE.md');
+      expect(tree[2].name).toBe('VISION.md');
+    });
+
+    it('should build tree with nested directories', () => {
+      const files = [
+        { path: 'README.md', lines: 100 },
+        { path: 'lib/README.md', lines: 46 }
+      ];
+
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths(files);
+
+      expect(tree).toHaveLength(2);
+      expect(tree[0]).toEqual({
+        type: 'file',
+        name: 'README.md',
+        path: 'README.md',
+        lines: 100
+      });
+      expect(tree[1].type).toBe('directory');
+      expect(tree[1].name).toBe('lib');
+      expect(tree[1].children).toHaveLength(1);
+      expect(tree[1].children[0]).toEqual({
+        type: 'file',
+        name: 'README.md',
+        path: 'lib/README.md',
+        lines: 46
+      });
+    });
+
+    it('should build tree with deeply nested paths', () => {
+      const files = [
+        { path: 'e2e/fixtures/markdown-links/page-a.md', lines: 9 }
+      ];
+
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths(files);
+
+      expect(tree).toHaveLength(1);
+      expect(tree[0].type).toBe('directory');
+      expect(tree[0].name).toBe('e2e');
+      expect(tree[0].children).toHaveLength(1);
+      expect(tree[0].children[0].type).toBe('directory');
+      expect(tree[0].children[0].name).toBe('fixtures');
+      expect(tree[0].children[0].children[0].type).toBe('directory');
+      expect(tree[0].children[0].children[0].name).toBe('markdown-links');
+      expect(tree[0].children[0].children[0].children[0]).toEqual({
+        type: 'file',
+        name: 'page-a.md',
+        path: 'e2e/fixtures/markdown-links/page-a.md',
+        lines: 9
+      });
+    });
+
+    it('should handle mixed depth levels', () => {
+      const files = [
+        { path: 'ARCHITECTURE.md', lines: 256 },
+        { path: 'lib/README.md', lines: 46 },
+        { path: 'e2e/README.md', lines: 77 }
+      ];
+
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths(files);
+
+      expect(tree).toHaveLength(3);
+      expect(tree[0].type).toBe('file');
+      expect(tree[1].type).toBe('directory');
+      expect(tree[1].name).toBe('lib');
+      expect(tree[2].type).toBe('directory');
+      expect(tree[2].name).toBe('e2e');
+    });
+
+    it('should return empty array for empty input', () => {
+      const projects = global.window.HegelIDE.createProjects();
+      const tree = projects.buildTreeFromPaths([]);
+
+      expect(tree).toEqual([]);
+    });
+  });
+
+  describe('fetchMarkdownTree', () => {
+    it('should fetch markdown tree successfully', async () => {
+      const mockData = {
+        other_markdown: [
+          { path: 'README.md', lines: 100 },
+          { path: 'lib/README.md', lines: 46 }
+        ]
+      };
+      global.ipcRenderer.invoke.mockResolvedValue(mockData);
+
+      const projects = global.window.HegelIDE.createProjects();
+      projects.projectDetails.test = {
+        data: { project_path: '/path/to/project' },
+        markdownTree: null,
+        markdownTreeLoading: false,
+        markdownTreeError: null
+      };
+
+      await projects.fetchMarkdownTree('test');
+
+      expect(projects.projectDetails.test.markdownTreeLoading).toBe(false);
+      expect(projects.projectDetails.test.markdownTreeError).toBe(null);
+      expect(projects.projectDetails.test.markdownTree).toHaveLength(2);
+      expect(global.ipcRenderer.invoke).toHaveBeenCalledWith('get-markdown-tree', {
+        projectPath: '/path/to/project'
+      });
+    });
+
+    it('should handle fetch markdown tree error', async () => {
+      global.ipcRenderer.invoke.mockRejectedValue(new Error('Command failed'));
+
+      const projects = global.window.HegelIDE.createProjects();
+      projects.projectDetails.test = {
+        data: { project_path: '/path/to/project' },
+        markdownTree: null,
+        markdownTreeLoading: false,
+        markdownTreeError: null
+      };
+
+      await projects.fetchMarkdownTree('test');
+
+      expect(projects.projectDetails.test.markdownTreeLoading).toBe(false);
+      expect(projects.projectDetails.test.markdownTreeError).toBe('Command failed');
+      expect(projects.projectDetails.test.markdownTree).toBe(null);
+    });
+
+    it('should handle empty markdown tree', async () => {
+      const mockData = { other_markdown: [] };
+      global.ipcRenderer.invoke.mockResolvedValue(mockData);
+
+      const projects = global.window.HegelIDE.createProjects();
+      projects.projectDetails.test = {
+        data: { project_path: '/path/to/project' },
+        markdownTree: null,
+        markdownTreeLoading: false,
+        markdownTreeError: null
+      };
+
+      await projects.fetchMarkdownTree('test');
+
+      expect(projects.projectDetails.test.markdownTree).toEqual([]);
+      expect(projects.projectDetails.test.markdownTreeError).toBe(null);
+    });
+  });
 });
