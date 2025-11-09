@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const pty = require('node-pty');
 const os = require('os');
@@ -198,6 +198,22 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
+// Confirm before quitting
+app.on('before-quit', (event) => {
+  const choice = dialog.showMessageBoxSync(mainWindow, {
+    type: 'question',
+    buttons: ['Quit', 'Cancel'],
+    title: 'Confirm Quit',
+    message: 'Are you sure you want to quit Hegel IDE?',
+    defaultId: 1, // Cancel is default
+    cancelId: 1
+  });
+
+  if (choice === 1) { // Cancel
+    event.preventDefault();
+  }
+});
 
 app.whenReady().then(createWindow);
 

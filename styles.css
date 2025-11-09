@@ -499,7 +499,7 @@ body.theme-synthwave .open-terminal-button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
+  max-width: 400px;
   min-width: 0;
 }
 
