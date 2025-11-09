@@ -11,12 +11,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Get initial README content
@@ -55,12 +52,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Count initial tabs
@@ -88,12 +82,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Check file node styling
@@ -117,12 +108,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Check directory node styling (should not be pointer)
@@ -147,12 +135,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Initially README.md should be highlighted
@@ -196,12 +181,9 @@ test.describe('Markdown Tree Navigation', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Get initial content before clicking

@@ -11,13 +11,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    // Click hegel-ide project
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Verify tree section exists
@@ -51,12 +46,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
@@ -78,12 +69,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
@@ -105,12 +92,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
@@ -132,12 +115,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     const treeContent = await mainWindow.locator('.markdown-tree-content');
@@ -169,12 +148,8 @@ test.describe('Markdown Document Tree', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
-
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Check for loading state before tree loads (may be too fast to catch reliably)
     // This test verifies the state exists in the code path

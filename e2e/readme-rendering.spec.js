@@ -13,14 +13,10 @@ test.describe('README Rendering', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project (known to have README.md)
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    // Wait for tab and content to load
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Verify markdown content exists
@@ -43,7 +39,14 @@ test.describe('README Rendering', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access projects list
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Click first project (may or may not have README)
     const firstProject = await mainWindow.locator('.projects-list li').first();
@@ -53,12 +56,12 @@ test.describe('README Rendering', () => {
     await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
-    // Check for either markdown content or missing message
-    const markdownContent = await mainWindow.locator('.markdown-content');
-    const missingMessage = await mainWindow.locator('.readme-missing');
+    // Check for either markdown content or missing message (in active tab only)
+    const markdownContent = await mainWindow.locator('.markdown-content:visible').first();
+    const missingMessage = await mainWindow.locator('.readme-missing:visible').first();
 
-    const hasMarkdown = await markdownContent.isVisible();
-    const hasMissing = await missingMessage.isVisible();
+    const hasMarkdown = await markdownContent.isVisible().catch(() => false);
+    const hasMissing = await missingMessage.isVisible().catch(() => false);
 
     // Exactly one should be visible
     expect(hasMarkdown || hasMissing).toBe(true);
@@ -81,13 +84,10 @@ test.describe('README Rendering', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     const markdownContent = await mainWindow.locator('.markdown-content');
@@ -113,13 +113,10 @@ test.describe('README Rendering', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project
-    const hegelIdeProject = await mainWindow.locator('.projects-list li').filter({ hasText: 'hegel-ide' });
-    await hegelIdeProject.click();
-
-    await mainWindow.waitForTimeout(TAB_CREATE);
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
     // Verify initial content loaded

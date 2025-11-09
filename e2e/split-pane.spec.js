@@ -58,6 +58,11 @@ test.describe('Split-Pane Layout', () => {
     // Wait for projects to load (hegel command)
     await mainWindow.waitForTimeout(HEGEL_CMD);
 
+    // Switch to Projects tab (auto-open may have opened a project tab)
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
+
     const leftPane = await mainWindow.locator('.left-pane');
 
     // Either projects loaded or error shown (both are valid)

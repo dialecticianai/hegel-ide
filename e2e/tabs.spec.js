@@ -151,8 +151,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
-    // Wait for projects to load
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access projects list
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Click first project in list
     const firstProject = await mainWindow.locator('.projects-list li').first();
@@ -177,12 +183,12 @@ test.describe('Tab Management', () => {
     // Wait for data to load
     await mainWindow.waitForTimeout(PROJECT_DETAIL);
 
-    // Check for either data (markdown or JSON) or error
-    const markdownContent = await mainWindow.locator('.left-pane .markdown-content');
-    const errorMsg = await mainWindow.locator('.left-pane .tab-content .error');
+    // Check for either data (markdown or JSON) or error (in active tab)
+    const markdownContent = await mainWindow.locator('.markdown-content:visible').first();
+    const errorMsg = await mainWindow.locator('.tab-content:visible .error').first();
 
-    const hasMarkdown = await markdownContent.isVisible();
-    const hasError = await errorMsg.isVisible();
+    const hasMarkdown = await markdownContent.isVisible().catch(() => false);
+    const hasError = await errorMsg.isVisible().catch(() => false);
 
     // One of them should be true
     expect(hasMarkdown || hasError).toBe(true);
@@ -199,7 +205,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access projects list
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Open project tab
     const firstProject = await mainWindow.locator('.projects-list li').first();
@@ -221,7 +234,6 @@ test.describe('Tab Management', () => {
     expect(await projectTab.isVisible()).toBe(false);
 
     // Verify Projects tab is active
-    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     const hasActiveClass = await projectsTab.evaluate(el => el.classList.contains('active'));
     expect(hasActiveClass).toBe(true);
 
@@ -238,7 +250,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Click Settings icon in Projects tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
@@ -289,7 +308,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
@@ -309,7 +335,6 @@ test.describe('Tab Management', () => {
     expect(await settingsTab.isVisible()).toBe(false);
 
     // Verify Projects tab is active
-    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     const hasActiveClass = await projectsTab.evaluate(el => el.classList.contains('active'));
     expect(hasActiveClass).toBe(true);
 
@@ -325,7 +350,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
@@ -344,7 +376,6 @@ test.describe('Tab Management', () => {
     await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Switch back to Projects tab to access Settings icon
-    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
     await mainWindow.waitForTimeout(ALPINE_INIT);
 
@@ -370,7 +401,14 @@ test.describe('Tab Management', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
+    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await mainWindow.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
@@ -378,7 +416,6 @@ test.describe('Tab Management', () => {
     await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Switch to Projects tab to make Settings icon visible
-    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
     await mainWindow.waitForTimeout(ALPINE_INIT);
 

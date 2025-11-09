@@ -278,14 +278,14 @@ test.describe('Markdown Link Navigation', () => {
     // Inject all fixtures into cache
     await injectAllFixtures(mainWindow);
 
-    // Create 3 tabs: Projects (default), index.md, page-a.md
+    // Create tabs: Projects (default), hegel-ide (auto-opened), index.md, page-a.md
     await openFixtureTab(mainWindow, 'index.md');
     await openFixtureTab(mainWindow, 'page-a.md');
 
-    // Should have 3 tabs now
+    // Should have 4 tabs now (Projects + hegel-ide auto-open + 2 fixtures)
     let allTabs = await mainWindow.locator('.left-pane .tab');
     let tabCount = await allTabs.count();
-    expect(tabCount).toBe(3);
+    expect(tabCount).toBe(4);
 
     // Switch to middle tab (index.md)
     const indexTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'index' });
@@ -298,18 +298,15 @@ test.describe('Markdown Link Navigation', () => {
 
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Should still have 3 tabs
+    // Should still have 4 tabs (navigation replaces content, doesn't add tabs)
     allTabs = await mainWindow.locator('.left-pane .tab');
     tabCount = await allTabs.count();
-    expect(tabCount).toBe(3);
+    expect(tabCount).toBe(4);
 
-    // Middle tab should be page-b (active)
-    const middleTab = await allTabs.nth(1);
-    const middleTabText = await middleTab.locator('span').first().textContent();
-    expect(middleTabText.trim()).toBe('page-b');
-
-    const hasActiveClass = await middleTab.evaluate(el => el.classList.contains('active'));
-    expect(hasActiveClass).toBe(true);
+    // Active tab should be page-b (navigated in place)
+    const activeTab = await mainWindow.locator('.left-pane .tab.active');
+    const activeTabText = await activeTab.locator('span').first().textContent();
+    expect(activeTabText.trim()).toBe('page-b');
 
     await electronApp.close();
   });

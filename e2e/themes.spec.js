@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { launchTestElectron } = require('./test-constants');
-const { ALPINE_INIT, TAB_CREATE } = require('./test-constants');
+const { ALPINE_INIT, TAB_CREATE, PROJECT_DETAIL } = require('./test-constants');
 
 test.describe('Theme System', () => {
   test('theme dropdown displays with all options', async () => {
@@ -8,7 +8,14 @@ test.describe('Theme System', () => {
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
+    // Wait for projects to load and hegel-ide to auto-open
     await window.waitForTimeout(ALPINE_INIT);
+    await window.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await window.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');
@@ -34,7 +41,14 @@ test.describe('Theme System', () => {
 
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
+    // Wait for projects to load and hegel-ide to auto-open
     await window.waitForTimeout(ALPINE_INIT);
+    await window.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await window.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');
@@ -74,6 +88,12 @@ test.describe('Theme System', () => {
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+    await window.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await window.waitForTimeout(300);
 
     // Open Settings tab
     let settingsButton = await window.locator('.left-pane .settings-icon');
@@ -95,6 +115,12 @@ test.describe('Theme System', () => {
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
     await window.waitForTimeout(ALPINE_INIT);
+    await window.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon (re-locate after reload)
+    const projectsTabAfterReload = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTabAfterReload.click();
+    await window.waitForTimeout(300);
 
     // Open Settings tab again after reload
     settingsButton = await window.locator('.left-pane .settings-icon');
@@ -129,7 +155,14 @@ test.describe('Theme System', () => {
     // Reload to apply default theme
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
+    // Wait for projects to load and hegel-ide to auto-open
     await window.waitForTimeout(ALPINE_INIT);
+    await window.waitForTimeout(PROJECT_DETAIL);
+
+    // Switch to Projects tab to access Settings icon
+    const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    await projectsTab.click();
+    await window.waitForTimeout(300);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');

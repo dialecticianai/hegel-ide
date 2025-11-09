@@ -21,13 +21,16 @@ test.describe('Application Launch', () => {
     const title = await mainWindow.title();
     expect(title).toBe('Hegel IDE');
 
-    // Wait for Alpine to initialize
-    await mainWindow.waitForTimeout(500);
+    // Wait for Alpine to initialize and project auto-open
+    await mainWindow.waitForTimeout(2500);
 
-    // Verify split-pane content is visible
-    const heading = await mainWindow.locator('.left-pane h2').filter({ hasText: 'Projects' });
-    expect(await heading.isVisible()).toBe(true);
-    expect(await heading.textContent()).toBe('Projects');
+    // Verify Projects tab exists
+    const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
+    expect(await projectsTab.isVisible()).toBe(true);
+
+    // Verify hegel-ide project tab auto-opened
+    const hegelIdeTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'hegel-ide' });
+    expect(await hegelIdeTab.isVisible()).toBe(true);
 
     await electronApp.close();
   });

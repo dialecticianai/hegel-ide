@@ -8,6 +8,9 @@ const fs = require('fs').promises;
 let mainWindow;
 let ptyProcesses = new Map(); // Map of terminalId -> ptyProcess
 
+// Use HEGEL_IDE_CWD env var if set, otherwise use process.cwd()
+const terminalCwd = process.env.HEGEL_IDE_CWD || process.cwd();
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
@@ -27,7 +30,7 @@ function createWindow() {
     name: 'xterm-color',
     cols: 80,
     rows: 24,
-    cwd: process.cwd(),
+    cwd: terminalCwd,
     env: process.env
   });
 
@@ -170,7 +173,7 @@ function createWindow() {
         name: 'xterm-color',
         cols: 80,
         rows: 24,
-        cwd: process.cwd(),
+        cwd: terminalCwd,
         env: process.env
       });
 
@@ -223,6 +226,11 @@ function createWindow() {
       // All failures treated as missing file
       return { error: error.message };
     }
+  });
+
+  // Handle get-terminal-cwd request
+  ipcMain.handle('get-terminal-cwd', async () => {
+    return { cwd: terminalCwd };
   });
 
   mainWindow.on('closed', function () {
