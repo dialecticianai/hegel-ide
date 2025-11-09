@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 const { launchTestElectron } = require('./test-constants');
-const { SPLIT_PANE_INIT, HEGEL_CMD } = require('./test-constants');
+const { ALPINE_INIT, SPLIT_PANE_INIT, HEGEL_CMD } = require('./test-constants');
 
 test.describe('Split-Pane Layout', () => {
   test('split-pane layout renders with correct structure', async () => {
@@ -61,7 +61,7 @@ test.describe('Split-Pane Layout', () => {
     // Switch to Projects tab (auto-open may have opened a project tab)
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(300);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     const leftPane = await mainWindow.locator('.left-pane');
 

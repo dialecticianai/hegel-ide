@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectsList } = require('./test-constants');
 const { ALPINE_INIT, TAB_CREATE, PROJECT_DETAIL } = require('./test-constants');
 
 test.describe('Theme System', () => {
@@ -9,13 +9,12 @@ test.describe('Theme System', () => {
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
     // Wait for projects to load and hegel-ide to auto-open
-    await window.waitForTimeout(ALPINE_INIT);
-    await window.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(window, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await window.waitForTimeout(300);
+    await waitForProjectsList(window);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');
@@ -42,13 +41,12 @@ test.describe('Theme System', () => {
     const window = await electronApp.firstWindow();
     await window.waitForLoadState('domcontentloaded');
     // Wait for projects to load and hegel-ide to auto-open
-    await window.waitForTimeout(ALPINE_INIT);
-    await window.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(window, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await window.waitForTimeout(300);
+    await waitForProjectsList(window);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');
@@ -87,13 +85,12 @@ test.describe('Theme System', () => {
     // Reload to apply cleared state
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
-    await window.waitForTimeout(ALPINE_INIT);
-    await window.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(window, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await window.waitForTimeout(300);
+    await waitForProjectsList(window);
 
     // Open Settings tab
     let settingsButton = await window.locator('.left-pane .settings-icon');
@@ -114,13 +111,12 @@ test.describe('Theme System', () => {
     // Reload page to test persistence
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
-    await window.waitForTimeout(ALPINE_INIT);
-    await window.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(window, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access Settings icon (re-locate after reload)
     const projectsTabAfterReload = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTabAfterReload.click();
-    await window.waitForTimeout(300);
+    await waitForProjectsList(window);
 
     // Open Settings tab again after reload
     settingsButton = await window.locator('.left-pane .settings-icon');
@@ -156,13 +152,12 @@ test.describe('Theme System', () => {
     await window.reload();
     await window.waitForLoadState('domcontentloaded');
     // Wait for projects to load and hegel-ide to auto-open
-    await window.waitForTimeout(ALPINE_INIT);
-    await window.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(window, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await window.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await window.waitForTimeout(300);
+    await waitForProjectsList(window);
 
     // Open Settings tab
     const settingsButton = await window.locator('.left-pane .settings-icon');

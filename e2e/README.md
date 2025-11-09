@@ -116,7 +116,34 @@ test('terminal tab is visible', async () => {
 
 **launchTestElectron() helper**: Centralized Electron launch with `TESTING=true` env var to disable quit confirmation dialog during tests.
 
-**Shared timeout constants**:
+**waitForCondition() helper**: Poll for a condition instead of blind waiting. More reliable and faster than `waitForTimeout()`.
+
+```javascript
+const { waitForCondition, PROJECT_DETAIL } = require('./test-constants');
+
+// Instead of: await mainWindow.waitForTimeout(PROJECT_DETAIL);
+// Use:
+await waitForCondition(
+  mainWindow,
+  async () => await mainWindow.locator('.project-tab').isVisible(),
+  PROJECT_DETAIL,
+  50,
+  'Project tab did not appear'
+);
+```
+
+**Benefits of waitForCondition:**
+- **Faster**: Stops waiting immediately when condition is met (vs blind timeout)
+- **More reliable**: Polls actual state instead of hoping timing is right
+- **Better errors**: Shows what condition failed and last error encountered
+- **Configurable**: Adjust poll interval (default 50ms) and timeout per use case
+
+**When to use waitForCondition vs waitForTimeout:**
+- ✅ Use `waitForCondition` for checking UI state (element visible, text content, classes)
+- ✅ Use `waitForCondition` for async operations (data loading, API responses)
+- ⚠️ Use `waitForTimeout` only for animations/transitions that have no observable state change
+
+**Shared timeout constants** (use with waitForCondition):
 - `ALPINE_INIT`: 300ms - Wait for Alpine.js initialization
 - `TERMINAL_READY`: 600ms - Wait for terminal to be ready for input
 - `TERMINAL_EXEC`: 500ms - Wait for terminal command to execute

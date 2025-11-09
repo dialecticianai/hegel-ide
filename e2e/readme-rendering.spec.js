@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron } = require('./test-constants');
-const { PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent } = require('./test-constants');
+const { ALPINE_INIT, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('README Rendering', () => {
   test('project with README.md shows rendered content', async () => {
@@ -17,7 +17,7 @@ test.describe('README Rendering', () => {
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project (known to have README.md)
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Verify markdown content exists
     const markdownContent = await mainWindow.locator('.markdown-content');
@@ -40,13 +40,12 @@ test.describe('README Rendering', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForTab(mainWindow, 'hegel-ide', 'left', PROJECT_DETAIL);
 
     // Switch to Projects tab to access projects list
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(300);
+    await waitForProjectsList(mainWindow);
 
     // Click first project (may or may not have README)
     const firstProject = await mainWindow.locator('.projects-list li').first();
@@ -54,7 +53,7 @@ test.describe('README Rendering', () => {
     await firstProject.click();
 
     await mainWindow.waitForTimeout(TAB_CREATE);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Check for either markdown content or missing message (in active tab only)
     const markdownContent = await mainWindow.locator('.markdown-content:visible').first();
@@ -88,7 +87,7 @@ test.describe('README Rendering', () => {
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     const markdownContent = await mainWindow.locator('.markdown-content');
 
@@ -117,7 +116,7 @@ test.describe('README Rendering', () => {
     await mainWindow.waitForTimeout(PROJECT_LOAD);
 
     // Click hegel-ide project
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Verify initial content loaded
     const markdownContent = await mainWindow.locator('.markdown-content');
@@ -129,7 +128,7 @@ test.describe('README Rendering', () => {
     await refreshButton.click();
 
     // Wait for refresh to complete
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Verify content still present (may be same or updated)
     expect(await markdownContent.isVisible()).toBe(true);

@@ -215,7 +215,7 @@ test.describe('Markdown Link Navigation', () => {
     const externalLink = await markdownContent.locator('a[href="https://example.com"]');
     await externalLink.click();
 
-    await mainWindow.waitForTimeout(300);
+    await mainWindow.waitForTimeout(ALPINE_INIT);
 
     // Tab count should not change
     const tabsAfter = await mainWindow.locator('.left-pane .tab').count();

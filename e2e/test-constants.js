@@ -24,7 +24,103 @@ async function launchTestElectron() {
   });
 }
 
+/**
+ * Poll for a condition to be true, checking every pollIntervalMs until timeoutMs is reached.
+ * More reliable and faster than blind waitForTimeout() calls.
+ *
+ * @param {Page} page - Playwright page/window object
+ * @param {Function} checkFn - Async function that returns true when condition is met
+ * @param {number} timeoutMs - Maximum time to wait (default: 2000ms)
+ * @param {number} pollIntervalMs - How often to check (default: 50ms)
+ * @param {string} errorMessage - Custom error message when timeout is reached
+ * @returns {Promise<void>}
+ * @throws {Error} If condition is not met within timeout
+ *
+ * @example
+ * await waitForCondition(
+ *   page,
+ *   async () => await page.locator('.my-element').isVisible(),
+ *   2000,
+ *   50,
+ *   'Element .my-element did not become visible'
+ * );
+ */
+async function waitForCondition(page, checkFn, timeoutMs = 2000, pollIntervalMs = 50, errorMessage = null) {
+  const startTime = Date.now();
+  let lastError = null;
+
+  while (Date.now() - startTime < timeoutMs) {
+    try {
+      const result = await checkFn();
+      if (result) {
+        return;
+      }
+    } catch (error) {
+      // Store error but continue polling
+      lastError = error;
+    }
+    await page.waitForTimeout(pollIntervalMs);
+  }
+
+  const defaultMessage = `Condition not met within ${timeoutMs}ms`;
+  const finalMessage = errorMessage || defaultMessage;
+  const errorDetails = lastError ? `\nLast error: ${lastError.message}` : '';
+  throw new Error(finalMessage + errorDetails);
+}
+
+/**
+ * Wait for a tab with given text to appear
+ */
+async function waitForTab(page, tabText, pane = 'left', timeoutMs = TIMEOUTS.TAB_CREATE) {
+  await waitForCondition(
+    page,
+    async () => {
+      const tab = await page.locator(`.${pane}-pane .tab`).filter({ hasText: tabText });
+      return await tab.isVisible();
+    },
+    timeoutMs,
+    50,
+    `Tab "${tabText}" did not appear in ${pane} pane`
+  );
+}
+
+/**
+ * Wait for projects list to be visible
+ */
+async function waitForProjectsList(page, timeoutMs = TIMEOUTS.ALPINE_INIT) {
+  await waitForCondition(
+    page,
+    async () => await page.locator('.projects-list li').first().isVisible(),
+    timeoutMs,
+    50,
+    'Projects list did not appear'
+  );
+}
+
+/**
+ * Wait for project content (markdown or error) to load
+ */
+async function waitForProjectContent(page, timeoutMs = TIMEOUTS.PROJECT_DETAIL) {
+  await waitForCondition(
+    page,
+    async () => {
+      const markdown = await page.locator('.markdown-content:visible').first();
+      const error = await page.locator('.tab-content:visible .error').first();
+      const hasMarkdown = await markdown.isVisible().catch(() => false);
+      const hasError = await error.isVisible().catch(() => false);
+      return hasMarkdown || hasError;
+    },
+    timeoutMs,
+    50,
+    'Project content did not load'
+  );
+}
+
 module.exports = {
   ...TIMEOUTS,
-  launchTestElectron
+  launchTestElectron,
+  waitForCondition,
+  waitForTab,
+  waitForProjectsList,
+  waitForProjectContent
 };
