@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
+const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 
 test.describe('Markdown Document Tree', () => {
   test('tree section visible above README', async () => {
@@ -12,8 +12,8 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     // Verify tree section exists
     const treeSection = await mainWindow.locator('.markdown-tree');
@@ -47,8 +47,8 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
     const treeText = await treeSection.textContent();
@@ -70,8 +70,8 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
     const treeText = await treeSection.textContent();
@@ -93,8 +93,8 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     const treeSection = await mainWindow.locator('.markdown-tree');
     const treeText = await treeSection.textContent();
@@ -116,8 +116,8 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     const treeContent = await mainWindow.locator('.markdown-tree-content');
 
@@ -149,7 +149,7 @@ test.describe('Markdown Document Tree', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
     // Check for loading state before tree loads (may be too fast to catch reliably)
     // This test verifies the state exists in the code path

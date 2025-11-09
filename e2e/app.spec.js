@@ -22,6 +22,7 @@ test.describe('Application Launch', () => {
     expect(title).toBe('Hegel IDE');
 
     // Wait for Alpine to initialize and project auto-open
+    // TODO: review if this timeout can be replaced with a helper
     await mainWindow.waitForTimeout(2500);
 
     // Verify Projects tab exists

@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 const { ALPINE_INIT, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('README Rendering', () => {
@@ -14,7 +14,7 @@ test.describe('README Rendering', () => {
 
     // Wait for projects to load
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
     // Click hegel-ide project (known to have README.md)
     await waitForProjectContent(mainWindow);
@@ -84,7 +84,7 @@ test.describe('README Rendering', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
     // Click hegel-ide project
     await waitForProjectContent(mainWindow);
@@ -113,7 +113,7 @@ test.describe('README Rendering', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
     // Click hegel-ide project
     await waitForProjectContent(mainWindow);

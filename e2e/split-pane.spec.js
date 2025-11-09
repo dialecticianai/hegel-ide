@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron } = require('./test-constants');
+const { launchTestElectron, waitForProjectsList } = require('./test-constants');
 const { ALPINE_INIT, SPLIT_PANE_INIT, HEGEL_CMD } = require('./test-constants');
 
 test.describe('Split-Pane Layout', () => {
@@ -13,6 +13,7 @@ test.describe('Split-Pane Layout', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for Alpine to initialize
+    // TODO: review if this timeout can be replaced with a helper
     await mainWindow.waitForTimeout(SPLIT_PANE_INIT);
 
     // Verify split-container exists
@@ -56,12 +57,13 @@ test.describe('Split-Pane Layout', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load (hegel command)
+    // TODO: review if this timeout can be replaced with a helper
     await mainWindow.waitForTimeout(HEGEL_CMD);
 
     // Switch to Projects tab (auto-open may have opened a project tab)
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     const leftPane = await mainWindow.locator('.left-pane');
 

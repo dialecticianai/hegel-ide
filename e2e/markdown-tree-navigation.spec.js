@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
+const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 
 test.describe('Markdown Tree Navigation', () => {
   test('clicking file in tree replaces README content', async () => {
@@ -12,9 +12,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Get initial README content
     const markdownContent = mainWindow.locator('.markdown-content');
@@ -53,9 +53,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Count initial tabs
     const initialTabCount = await mainWindow.locator('.tab').count();
@@ -83,9 +83,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Check file node styling
     const treeFile = await mainWindow.locator('.markdown-tree-file').first();
@@ -109,9 +109,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Check directory node styling (should not be pointer)
     const treeDir = await mainWindow.locator('.markdown-tree-dir').first();
@@ -136,9 +136,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Initially README.md should be highlighted
     const readmeFile = await mainWindow.locator('.markdown-tree-file.active');
@@ -182,9 +182,9 @@ test.describe('Markdown Tree Navigation', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
+    await waitForAutoOpenedProject(mainWindow);
 
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Get initial content before clicking
     const markdownContent = mainWindow.locator('.markdown-content');

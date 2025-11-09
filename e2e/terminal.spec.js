@@ -13,6 +13,7 @@ test.describe('Terminal Presence', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for xterm to initialize
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
 
     // Verify terminal container exists and is visible
@@ -43,6 +44,7 @@ test.describe('Terminal I/O', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for terminal to be ready
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_READY);
 
     // Focus terminal (click on it)
@@ -54,6 +56,7 @@ test.describe('Terminal I/O', () => {
     await mainWindow.keyboard.press('Enter');
 
     // Wait for command to execute
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_EXEC);
 
     // Check terminal content contains our output
@@ -73,6 +76,8 @@ test.describe('Terminal I/O', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Justified: waiting for terminal I/O, no reliable DOM state
+
     await mainWindow.waitForTimeout(TERMINAL_READY);
 
     const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
@@ -80,6 +85,8 @@ test.describe('Terminal I/O', () => {
 
     await mainWindow.keyboard.type('pwd');
     await mainWindow.keyboard.press('Enter');
+
+    // Justified: waiting for terminal I/O, no reliable DOM state
 
     await mainWindow.waitForTimeout(TERMINAL_EXEC);
 
@@ -101,6 +108,8 @@ test.describe('Terminal I/O', () => {
     const windows = electronApp.windows();
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
+    // Justified: waiting for terminal I/O, no reliable DOM state
+
     await mainWindow.waitForTimeout(TERMINAL_READY);
 
     const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
@@ -109,11 +118,13 @@ test.describe('Terminal I/O', () => {
     // First command
     await mainWindow.keyboard.type('echo "first"');
     await mainWindow.keyboard.press('Enter');
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
 
     // Second command
     await mainWindow.keyboard.type('echo "second"');
     await mainWindow.keyboard.press('Enter');
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
 
     const xtermScreen = await mainWindow.locator('.xterm-screen');
@@ -161,6 +172,8 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
+    // Justified: waiting for tab close animation
+
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Verify "Open Terminal" button appears
@@ -186,11 +199,15 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
+    // Justified: waiting for tab close animation
+
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Click "Open Terminal" button
     const openTerminalButton = await mainWindow.locator('.open-terminal-button');
     await openTerminalButton.click();
+
+    // Justified: waiting for terminal I/O, no reliable DOM state
 
     await mainWindow.waitForTimeout(TERMINAL_EXEC_FAST);
 
@@ -220,11 +237,15 @@ test.describe('Terminal Tab Management', () => {
     const closeButton = await mainWindow.locator('.right-pane .tab.active .close-tab').first();
     await closeButton.click();
 
+    // Justified: waiting for tab close animation
+
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Reopen terminal
     const openTerminalButton = await mainWindow.locator('.open-terminal-button');
     await openTerminalButton.click();
+
+    // Justified: waiting for terminal I/O, no reliable DOM state
 
     await mainWindow.waitForTimeout(TERMINAL_READY);
 
@@ -234,6 +255,8 @@ test.describe('Terminal Tab Management', () => {
 
     await mainWindow.keyboard.type('echo "reopened works"');
     await mainWindow.keyboard.press('Enter');
+
+    // Justified: waiting for terminal I/O, no reliable DOM state
 
     await mainWindow.waitForTimeout(TERMINAL_EXEC);
 

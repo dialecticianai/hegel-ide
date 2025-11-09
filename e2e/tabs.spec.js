@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Tab Management', () => {
@@ -13,6 +13,7 @@ test.describe('Tab Management', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for terminal initialization (longest wait needed)
+    // Justified: waiting for terminal I/O, no reliable DOM state
     await mainWindow.waitForTimeout(TERMINAL_READY);
 
     // Verify left panel Projects tab
@@ -118,7 +119,7 @@ test.describe('Tab Management', () => {
     // Add Terminal 2
     const addButton = await mainWindow.locator('.right-pane .add-tab');
     await addButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, 'Terminal 2', 'right');
 
     // Verify Terminal 2 exists
     let terminal2Tab = await mainWindow.locator('.right-pane .tab').filter({ hasText: 'Terminal 2' });
@@ -127,6 +128,7 @@ test.describe('Tab Management', () => {
     // Close Terminal 2
     const closeBtn = terminal2Tab.locator('.close-tab');
     await closeBtn.click();
+    // Justified: waiting for tab close animation
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Verify Terminal 2 is gone
@@ -208,18 +210,18 @@ test.describe('Tab Management', () => {
 
     // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Switch to Projects tab to access projects list
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Open project tab
     const firstProject = await mainWindow.locator('.projects-list li').first();
     const projectName = await firstProject.textContent();
     await firstProject.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, projectName, 'left');
 
     // Verify project tab exists
     let projectTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: projectName });
@@ -228,6 +230,7 @@ test.describe('Tab Management', () => {
     // Close project tab
     const closeBtn = projectTab.locator('.close-tab');
     await closeBtn.click();
+    // Justified: waiting for tab close animation
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Verify project tab is gone
@@ -253,17 +256,17 @@ test.describe('Tab Management', () => {
 
     // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Click Settings icon in Projects tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, 'Settings', 'left');
 
     // Verify Settings tab appears
     const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
@@ -311,17 +314,17 @@ test.describe('Tab Management', () => {
 
     // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, 'Settings', 'left');
 
     // Verify Settings tab has close button
     const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
@@ -330,6 +333,7 @@ test.describe('Tab Management', () => {
 
     // Close Settings tab
     await closeBtn.click();
+    // Justified: waiting for tab close animation
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Verify Settings tab is gone
@@ -352,23 +356,24 @@ test.describe('Tab Management', () => {
     const mainWindow = windows.find(w => w.url().includes('index.html'));
 
     // Wait for projects to load and hegel-ide to auto-open
-    await mainWindow.waitForTimeout(PROJECT_LOAD);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForAutoOpenedProject(mainWindow);
+    await waitForProjectContent(mainWindow);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, 'Settings', 'left');
 
     // Close Settings tab
     const settingsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Settings' });
     const closeBtn = settingsTab.locator('.close-tab');
     await closeBtn.click();
+    // Justified: waiting for tab close animation
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Open a project detail tab (should be at index 1)
@@ -378,7 +383,7 @@ test.describe('Tab Management', () => {
 
     // Switch back to Projects tab to access Settings icon
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Re-open Settings tab
     await settingsButton.click();
@@ -404,21 +409,21 @@ test.describe('Tab Management', () => {
 
     // Wait for projects to load and hegel-ide to auto-open
     await mainWindow.waitForTimeout(ALPINE_INIT);
-    await mainWindow.waitForTimeout(PROJECT_DETAIL);
+    await waitForProjectContent(mainWindow);
 
     // Switch to Projects tab to access Settings icon
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Open Settings tab
     const settingsButton = await mainWindow.locator('.left-pane .settings-icon');
     await settingsButton.click();
-    await mainWindow.waitForTimeout(TAB_CREATE);
+    await waitForTab(mainWindow, 'Settings', 'left');
 
     // Switch to Projects tab to make Settings icon visible
     await projectsTab.click();
-    await mainWindow.waitForTimeout(ALPINE_INIT);
+    await waitForProjectsList(mainWindow);
 
     // Click Settings icon again
     await settingsButton.click();

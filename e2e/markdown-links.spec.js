@@ -171,6 +171,7 @@ test.describe('Markdown Link Navigation', () => {
 
     // Go back to index tab
     await indexTab.click();
+    // TODO: review if this timeout can be replaced with a helper
     await mainWindow.waitForTimeout(200);
 
     // Regular click on page-a link again
@@ -290,6 +291,7 @@ test.describe('Markdown Link Navigation', () => {
     // Switch to middle tab (index.md)
     const indexTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'index' });
     await indexTab.click();
+    // TODO: review if this timeout can be replaced with a helper
     await mainWindow.waitForTimeout(200);
 
     // Click link in index.md to page-b.md (only visible content)
