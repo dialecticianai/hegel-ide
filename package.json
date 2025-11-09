@@ -1,10 +1,11 @@
 {
   "name": "hegel-ide",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "playwright test",
+    "build": "node esbuild.js",
+    "start": "npm run build && electron .",
+    "test": "npm run build && playwright test",
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:coverage": "vitest run --coverage",

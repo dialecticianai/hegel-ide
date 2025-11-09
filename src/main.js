@@ -22,7 +22,7 @@ function createWindow() {
     }
   });
 
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('dist/index.html');
 
   // Spawn initial terminal (term-1)
   const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
