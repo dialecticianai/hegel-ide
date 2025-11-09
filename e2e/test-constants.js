@@ -116,11 +116,34 @@ async function waitForProjectContent(page, timeoutMs = TIMEOUTS.PROJECT_DETAIL) 
   );
 }
 
+/**
+ * Wait for Alpine.js to initialize (x-data component ready)
+ */
+async function waitForAlpineInit(page, timeoutMs = TIMEOUTS.ALPINE_INIT) {
+  await waitForCondition(
+    page,
+    async () => await page.locator('[x-data]').isVisible(),
+    timeoutMs,
+    50,
+    'Alpine.js did not initialize'
+  );
+}
+
+/**
+ * Wait for hegel-ide project to auto-open on startup
+ * (This happens when terminal CWD matches a project path)
+ */
+async function waitForAutoOpenedProject(page, projectName = 'hegel-ide', timeoutMs = TIMEOUTS.PROJECT_LOAD) {
+  await waitForTab(page, projectName, 'left', timeoutMs);
+}
+
 module.exports = {
   ...TIMEOUTS,
   launchTestElectron,
   waitForCondition,
   waitForTab,
   waitForProjectsList,
-  waitForProjectContent
+  waitForProjectContent,
+  waitForAlpineInit,
+  waitForAutoOpenedProject
 };
