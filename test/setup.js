@@ -36,6 +36,22 @@ const mockRequire = (moduleName) => {
       }))
     };
   }
+  if (moduleName === 'dayjs') {
+    const mockDayjs = vi.fn((date) => ({
+      fromNow: () => '2 hours ago',
+      format: () => '2025-11-08'
+    }));
+    mockDayjs.extend = vi.fn();
+    return mockDayjs;
+  }
+  if (moduleName === 'dayjs/plugin/relativeTime') {
+    return vi.fn(); // Plugin function
+  }
+  if (moduleName === 'os') {
+    return {
+      homedir: () => '/Users/testuser'
+    };
+  }
   return {};
 };
 

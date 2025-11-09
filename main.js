@@ -126,6 +126,41 @@ function createWindow() {
     });
   });
 
+  // Handle markdown tree request
+  ipcMain.handle('get-markdown-tree', async (event, { projectPath }) => {
+    return new Promise((resolve, reject) => {
+      const hegel = spawn('hegel', ['md', '--no-ddd', '--json', '--state-dir', projectPath]);
+      let stdout = '';
+      let stderr = '';
+
+      hegel.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      hegel.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      hegel.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`hegel command failed: ${stderr}`));
+          return;
+        }
+
+        try {
+          const output = JSON.parse(stdout);
+          resolve(output);
+        } catch (error) {
+          reject(new Error(`Failed to parse hegel output: ${error.message}`));
+        }
+      });
+
+      hegel.on('error', (error) => {
+        reject(new Error(`Failed to spawn hegel: ${error.message}`));
+      });
+    });
+  });
+
   // Handle create-terminal request
   ipcMain.handle('create-terminal', async (event, { terminalId }) => {
     try {
