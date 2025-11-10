@@ -266,35 +266,6 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 
 ---
 
-## Quick Reference
-
-```bash
-# Initialization
-hegel init
-hegel config list|get|set <key> [<value>]
-
-# Meta-mode (required before workflows)
-hegel meta <learning|standard>
-hegel meta
-
-# Workflows
-hegel start <cowboy|discovery|execution|research|refactor>
-hegel next|restart|abort|repeat|status|reset
-
-# Review
-hegel reflect <files...>
-
-# Metrics
-hegel top
-hegel analyze
-```
-
----
-
-**For detailed command syntax, always use:** `hegel <command> --help`
-
----
-
 ## Session Start Protocol
 
 **At the beginning of every session:**
