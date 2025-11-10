@@ -99,4 +99,66 @@ test.describe('Markdown Line Tracking', () => {
       await expect(block).toHaveAttribute('data-type', expected.type);
     }
   });
+
+  test('selection detection extracts correct line range', async ({ page }) => {
+    await page.goto(indexPath);
+    await page.waitForTimeout(500);
+
+    // Test selection in multi-line paragraph (lines 3-4)
+    const paragraphBlock = page.locator('.markdown-block[data-type="paragraph"]').first();
+    await expect(paragraphBlock).toBeVisible();
+
+    // Select text within the paragraph
+    await paragraphBlock.locator('p').selectText();
+
+    // Execute selection helper in browser context
+    const selectionInfo = await page.evaluate(() => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return null;
+
+      const node = selection.anchorNode;
+      const blockInfo = window.findMarkdownBlock(node);
+      return blockInfo;
+    });
+
+    // Verify line range extraction
+    expect(selectionInfo).not.toBeNull();
+    expect(selectionInfo.lineStart).toBe(3);
+    expect(selectionInfo.lineEnd).toBe(4);
+    expect(selectionInfo.blockType).toBe('paragraph');
+  });
+
+  test('selection works across different block types', async ({ page }) => {
+    await page.goto(indexPath);
+    await page.waitForTimeout(500);
+
+    // Test heading selection
+    const headingBlock = page.locator('.markdown-block[data-type="heading"]').first();
+    await headingBlock.locator('h1').selectText();
+
+    const headingInfo = await page.evaluate(() => {
+      const selection = window.getSelection();
+      const node = selection.anchorNode;
+      return window.findMarkdownBlock(node);
+    });
+
+    expect(headingInfo.lineStart).toBe(1);
+    expect(headingInfo.lineEnd).toBe(1);
+    expect(headingInfo.blockType).toBe('heading');
+
+    // Test code block selection
+    const codeBlock = page.locator('.markdown-block[data-type="code"]').first();
+    await codeBlock.locator('code').click();  // Click to focus
+    await page.keyboard.press('Control+A');   // Select all in code block
+
+    const codeInfo = await page.evaluate(() => {
+      const selection = window.getSelection();
+      const node = selection.anchorNode;
+      return window.findMarkdownBlock(node);
+    });
+
+    expect(codeInfo.lineStart).toBe(12);
+    expect(codeInfo.lineEnd).toBe(16);
+    expect(codeInfo.blockType).toBe('code');
+  });
 });

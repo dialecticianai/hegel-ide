@@ -64,7 +64,29 @@ function parseMarkdownWithLines(markdown, outputFormat = 'html') {
 }
 
 function findMarkdownBlock(node) {
-  // TODO: Implement DOM traversal to find containing markdown-block
+  // Walk up the DOM tree to find the containing .markdown-block element
+  let current = node;
+
+  while (current && current !== document.body) {
+    // Check if this is a markdown-block element
+    if (current.classList && current.classList.contains('markdown-block')) {
+      // Extract line range attributes
+      const lineStart = parseInt(current.dataset.lineStart, 10);
+      const lineEnd = parseInt(current.dataset.lineEnd, 10);
+      const blockType = current.dataset.type;
+
+      return {
+        lineStart,
+        lineEnd,
+        blockType,
+        element: current
+      };
+    }
+
+    current = current.parentElement;
+  }
+
+  // No markdown-block found
   return null;
 }
 
@@ -98,6 +120,9 @@ Another paragraph.
 
 Final paragraph at the end.
 `;
+
+// Expose helper functions globally
+window.findMarkdownBlock = findMarkdownBlock;
 
 // Alpine.js component
 window.markdownApp = function() {
