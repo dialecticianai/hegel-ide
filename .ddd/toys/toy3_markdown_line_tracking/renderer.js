@@ -121,8 +121,9 @@ Another paragraph.
 Final paragraph at the end.
 `;
 
-// Expose helper functions globally
+// Expose helper functions globally for testing
 window.findMarkdownBlock = findMarkdownBlock;
+window.parseMarkdownWithLines = parseMarkdownWithLines;
 
 // Alpine.js component
 window.markdownApp = function() {

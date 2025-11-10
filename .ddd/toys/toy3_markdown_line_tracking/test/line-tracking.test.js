@@ -161,4 +161,69 @@ test.describe('Markdown Line Tracking', () => {
     expect(codeInfo.lineEnd).toBe(16);
     expect(codeInfo.blockType).toBe('code');
   });
+
+  test('empty markdown returns empty result', async ({ page }) => {
+    await page.goto(indexPath);
+
+    // Test parseMarkdownWithLines with empty input
+    const result = await page.evaluate(() => {
+      return window.parseMarkdownWithLines('', 'array');
+    });
+
+    expect(result).toEqual([]);
+  });
+
+  test('whitespace-only markdown returns empty result', async ({ page }) => {
+    await page.goto(indexPath);
+
+    const result = await page.evaluate(() => {
+      return window.parseMarkdownWithLines('   \n\n  \n   ', 'array');
+    });
+
+    expect(result).toEqual([]);
+  });
+
+  test('single-line document has matching start and end lines', async ({ page }) => {
+    await page.goto(indexPath);
+
+    const result = await page.evaluate(() => {
+      return window.parseMarkdownWithLines('Single line.', 'array');
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].lineStart).toBe(1);
+    expect(result[0].lineEnd).toBe(1);
+  });
+
+  test('consecutive blank lines handled correctly', async ({ page }) => {
+    await page.goto(indexPath);
+
+    const markdown = `# First\n\n\n\n## Second`;
+    const result = await page.evaluate((md) => {
+      return window.parseMarkdownWithLines(md, 'array');
+    }, markdown);
+
+    // Should have 2 blocks with correct line positions
+    expect(result).toHaveLength(2);
+    expect(result[0].lineStart).toBe(1);
+    expect(result[0].lineEnd).toBe(1);
+    expect(result[0].type).toBe('heading');
+
+    // Second heading should be at line 5 (after blank lines)
+    expect(result[1].lineStart).toBe(5);
+    expect(result[1].lineEnd).toBe(5);
+    expect(result[1].type).toBe('heading');
+  });
+
+  test('findMarkdownBlock returns null for non-block nodes', async ({ page }) => {
+    await page.goto(indexPath);
+
+    const result = await page.evaluate(() => {
+      // Try to find block from body element (not inside a markdown-block)
+      const bodyElement = document.querySelector('body > div > h1');
+      return window.findMarkdownBlock(bodyElement);
+    });
+
+    expect(result).toBeNull();
+  });
 });
