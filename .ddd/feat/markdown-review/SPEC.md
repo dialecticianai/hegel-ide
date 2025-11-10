@@ -21,7 +21,9 @@ Enable inline review of markdown documents with selection-based commenting and a
 
 **Integration context:**
 - Extends existing tab system in `src/renderer/tabs.js`
-- Uses existing markdown rendering from `src/renderer/markdown.js` (modified for line tracking)
+- New line-tracking module extracted as pure functions (independently testable with vitest)
+- Alpine.js components use line-tracking module for review tab rendering
+- Existing `renderMarkdown()` in `src/renderer/markdown.js` unchanged (file tabs remain compatible)
 - Integrates with hegel CLI via new IPC handlers in `src/main.js`
 - Compatible with Mirror's review format (`.hegel/reviews.json`)
 
@@ -67,7 +69,7 @@ Enable inline review of markdown documents with selection-based commenting and a
 
 ### Rendered Block Structure (NEW)
 
-Each markdown block is wrapped with line tracking metadata:
+Each markdown block is wrapped with line tracking metadata (using `marked.lexer()` for line extraction):
 
 ```javascript
 // Rendered output structure
@@ -78,6 +80,8 @@ Each markdown block is wrapped with line tracking metadata:
   html: '<p>Rendered content...</p>'
 }
 ```
+
+**Implementation validated**: See `.ddd/toys/toy3_markdown_line_tracking/` for proven approach using marked.lexer token.raw for line tracking.
 
 ### Review Persistence Format
 

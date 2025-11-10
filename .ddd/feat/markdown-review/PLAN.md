@@ -71,31 +71,41 @@ Modify the get-project-file IPC handler to accept absolute paths directly instea
 
 ---
 
-## Step 2: Create Line-Tracking Markdown Renderer
+## Step 2: Create Line-Tracking Markdown Module
 
 ### Goal
-Build custom marked renderer that wraps each block element with line number metadata, enabling selection-to-comment mapping.
+Extract line-tracking markdown renderer as independent pure functions, enabling unit testing with vitest and reuse across components.
 
-### Step 2.a: Test Line Tracking Output
+**Reference**: `.ddd/toys/toy3_markdown_line_tracking/` contains validated implementation and learnings.
 
-Write E2E test that opens a markdown file and verifies rendered blocks have line tracking attributes. Test should check that paragraphs, headings, code blocks, and lists all get wrapped with data-line-start and data-line-end attributes. Verify line numbers are sequential and accurate.
+### Step 2.a: Write Vitest Unit Tests
 
-### Step 2.b: Implement Custom Renderer
+Create vitest test suite for line-tracking functions. Test parseMarkdownWithLines with array output format for various markdown structures. Verify line numbers match expectations for single-line blocks, multi-line blocks, code blocks, lists, and blockquotes. Test edge cases like empty markdown, whitespace-only, and consecutive blank lines. Test findMarkdownBlock with mock DOM nodes.
 
-Create new markdown rendering module that extends the existing renderMarkdown function. Use marked's renderer API to wrap block-level elements in divs with line tracking data attributes. Parse markdown with marked.lexer to extract line positions. Map each rendered block to its source line range.
+### Step 2.b: Implement Line-Tracking Module
 
-### Step 2.c: Integrate with Existing Markdown Module
+Create new file `src/renderer/markdown-line-tracking.js` with pure functions. Export parseMarkdownWithLines function that uses marked.lexer to tokenize markdown and extract line positions from token.raw. Implement line number calculation with trailing newline handling - trim token.raw.trimEnd to separate content newlines from whitespace newlines. Export findMarkdownBlock function for DOM traversal from selection node to containing markdown-block element. Wrap rendered blocks in divs with data-line-start, data-line-end, and data-type attributes.
 
-Update the markdown module to support both standard rendering (for file tabs) and line-tracking rendering (for review tabs). Add optional parameter to renderMarkdown function to enable line tracking mode. Ensure backward compatibility with existing file tab rendering.
+**Key implementation details from toy3:**
+- Count newlines in token.raw.trimEnd for lineEnd calculation
+- Advance line counter by total newlines including trailing whitespace
+- Skip space tokens but advance line counter to maintain sequential numbering
+- Map token types to simplified block types (heading, paragraph, code, list, blockquote, hr, table)
+
+### Step 2.c: Write E2E Integration Test
+
+Add Playwright E2E test that verifies line-tracking module works in Electron context. Test should load markdown file, parse with line tracking, and verify rendered DOM has correct data attributes. This validates that pure functions work correctly when integrated with Alpine and Electron IPC. Keep existing renderMarkdown and file tab tests unchanged to verify backward compatibility.
 
 ### Success Criteria
 
-- E2E tests verify line tracking attributes on rendered blocks
-- All block types (paragraphs, headings, code, lists, tables) get line metadata
-- Line numbers match source markdown accurately
-- Existing file tab rendering unchanged
+- Vitest unit tests pass for parseMarkdownWithLines and findMarkdownBlock
+- E2E tests verify line tracking attributes on rendered blocks in Electron
+- All block types (paragraphs, headings, code, lists, tables, blockquotes) get line metadata
+- Line numbers match source markdown accurately (verified against toy3 sample)
+- Module exports pure functions with no Alpine or Electron dependencies
+- Existing file tab rendering and tests unchanged
 
-**Commit Point**: `feat(markdown): add line-tracking renderer for review mode`
+**Commit Point**: `feat(markdown): add line-tracking module with unit tests`
 
 ---
 
@@ -139,7 +149,7 @@ Write E2E test that simulates text selection in a markdown block using Playwrigh
 
 ### Step 4.b: Add Selection Event Handlers
 
-Implement mouseup event listener on markdown content area that captures window.getSelection. Walk DOM tree to find containing markdown-block element and extract line range from data attributes. Show comment input form in corresponding margin cell with selected text and line range.
+Implement mouseup event listener on markdown content area that captures window.getSelection. Use findMarkdownBlock function from line-tracking module to walk DOM tree and extract line range from data attributes. Show comment input form in corresponding margin cell with selected text and line range. Function already tested in Step 2 unit tests.
 
 ### Step 4.c: Build Comment Form Component
 
