@@ -84,24 +84,17 @@ hegel config set <key> <value>
 - **Greenfield** (no code): Creates CLAUDE.md, VISION.md, ARCHITECTURE.md, initializes git
 - **Retrofit** (existing code): Analyzes structure, creates code maps in README.md files, integrates DDD patterns
 
-### Meta-Modes & Workflows
+### Workflows
 
 ```bash
-hegel meta <learning|standard>  # Declare meta-mode (optional)
-hegel meta                      # View current meta-mode
-
 hegel start <workflow> [node]   # Load workflow (optionally at specific node)
 hegel status                    # Show current state
 hegel next                      # Advance to next phase (auto-infers completion claim)
 hegel restart                   # Return to SPEC phase (restart cycle, keep same workflow)
 hegel repeat                    # Re-display current prompt
-hegel abort                     # Abandon workflow entirely (required before starting new one)
-hegel reset                     # Clear all state
+hegel abort                     # Abandon workflow entirely (only use with explicit user instruction)
+hegel reset                     # Clear all state (only use with explicit user instruction)
 ```
-
-**Meta-modes:**
-- `learning` - Research ↔ Discovery loop (starts with research)
-- `standard` - Discovery ↔ Execution (starts with discovery)
 
 **Workflows:**
 - `cowboy` - **DEFAULT** - Minimal overhead for straightforward tasks (just LEXICON guidance)
@@ -133,10 +126,10 @@ hegel start execution code      # Start directly at code phase
 - `hegel next` advances and prints the next phase prompt - **follow these instructions**
 - `hegel repeat` re-displays current prompt if you need to see it again
 - `hegel restart` returns to SPEC phase (same workflow, fresh cycle)
-- `hegel abort` abandons workflow entirely (required before starting different workflow)
+- `hegel abort` abandons workflow entirely
 
 **Guardrails:**
-- Cannot start new workflow while one is active → run `hegel abort` first
+- Never abort an active workflow without explicit instruction from the user
 - Invalid start node returns error with list of available nodes
 - Prevents accidental loss of workflow progress
 
@@ -147,36 +140,16 @@ hegel reflect <file.md> [files...]      # Launch Markdown review GUI
 hegel reflect <file.md> --out-dir <dir> # Custom output location
 ```
 
-Reviews saved to `.ddd/<filename>.review.N` (JSONL format). Read with `cat .ddd/SPEC.review.1 | jq -r '.comment'`.
+Reviews are returned via stdout when the user completes their review. Reviews are also saved to `.hegel/reviews.json` for recordkeeping.
 
 ### Metrics
 
 ```bash
 hegel top               # Real-time TUI dashboard (4 tabs: Overview, Phases, Events, Files)
 hegel analyze           # Static summary (tokens, activity, workflow graph, per-phase metrics)
-hegel hook <event>      # Process Claude Code hook events (stdin JSON)
 ```
 
 Dashboard shortcuts: `q` (quit), `Tab` (switch tabs), `↑↓`/`j`/`k` (scroll), `g`/`G` (top/bottom), `r` (reload).
-
----
-
-## Workflow Selection Guide
-
-**Cowboy mode (default):** Use for most tasks. Just LEXICON guidance without ceremony - tongue-in-cheek acknowledgement that full DDD is overkill for straightforward work.
-
-**When to use full DDD workflows:**
-- Hard problems requiring novel solutions
-- Complex domains where mistakes are expensive
-- Learning-dense exploration
-- User explicitly requests structured methodology
-
-**Starting cowboy mode:**
-```bash
-hegel start cowboy
-```
-
-**When in doubt:** Start with cowboy. Escalate to discovery/execution only when complexity demands it.
 
 ---
 
@@ -185,10 +158,8 @@ hegel start cowboy
 ### Session Start
 
 ```bash
-hegel meta              # Check meta-mode
 hegel status            # Check active workflow
 # If workflow active and relevant, continue with `hegel next`
-# If user requests structure but no workflow, run `hegel meta <mode>`
 ```
 
 ### During Development
@@ -206,43 +177,14 @@ hegel top                           # Monitor metrics
 ```bash
 hegel next              # Completed current phase (infers happy-path claim)
 hegel restart           # Return to SPEC phase
-hegel abort             # Abandon workflow entirely
 ```
 
 ### Document Review
 
 ```bash
 hegel reflect SPEC.md
-# User reviews in GUI, submits
-cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
+# User reviews in GUI, submits - feedback appears in stdout
 ```
-
----
-
-## State Files
-
-```
-.hegel/
-├── state.json          # Current workflow (def, node, history, session metadata)
-├── metamode.json       # Meta-mode declaration
-├── config.toml         # User configuration
-├── hooks.jsonl         # Claude Code events (tool usage, file mods, timestamps)
-└── states.jsonl        # Workflow transitions (from/to, mode, workflow_id)
-```
-
-**JSONL format:** One JSON object per line (newline-delimited)
-**Atomicity:** `state.json` uses atomic writes (write temp, rename)
-**Correlation:** `workflow_id` (ISO 8601 timestamp) links hooks/states/transcripts
-
----
-
-## Error Handling
-
-| Error | Solution |
-|-------|----------|
-| "No workflow loaded" | `hegel start <workflow>` |
-| "Cannot start workflow while one is active" | `hegel abort` then `hegel start <workflow>` |
-| "Stayed at current node" (unexpected) | Check `hegel status`, verify not at terminal node, use `hegel restart` |
 
 ---
 
@@ -256,8 +198,6 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 - ✅ Defer to `hegel <command> --help` for detailed syntax
 
 **DON'T:**
-- ❌ **NEVER start implementing code without an active hegel workflow**
-- ❌ DON'T start workflow if user hasn't requested structure
 - ❌ DON'T ignore workflow prompts (contain phase-specific guidance)
 - ❌ DON'T reset workflow without user confirmation
 - ❌ DON'T abort workflow without specific user guidance
@@ -275,7 +215,7 @@ cat .ddd/SPEC.review.1 | jq -r '.comment'  # Read feedback
 3. Recommend next action:
    - **No active workflow:** Suggest `hegel start cowboy` (default for most tasks)
    - **Active workflow completed (at done node):** Workflow is finished, suggest `hegel start cowboy` for new work
-   - **Active workflow in progress:** Suggest `hegel repeat` to see current prompt, or `hegel abort` if starting fresh work
+   - **Active workflow in progress:** Suggest `hegel repeat` to see current prompt
    - **User explicitly requests structured methodology:** Suggest appropriate DDD workflow (discovery/execution/research)
 
 **Default recommendation:** `hegel start cowboy` unless context suggests otherwise.
