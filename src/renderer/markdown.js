@@ -5,41 +5,35 @@ const { marked } = require('marked');
 
 export function createMarkdown() {
     return {
-      renderMarkdown(content, projectName, filePath) {
+      renderMarkdown(content, absoluteFilePath = null) {
         if (!content) return '';
 
         let html = marked.parse(content);
 
         // Transform relative image paths to absolute file:// URLs
-        if (projectName && filePath) {
-          const projectData = this.projectDetails?.[projectName]?.data;
-          if (projectData?.project_path) {
-            const projectPath = projectData.project_path;
-            const fileDir = filePath.includes('/')
-              ? filePath.substring(0, filePath.lastIndexOf('/'))
-              : '';
-            const basePath = fileDir ? `${projectPath}/${fileDir}` : projectPath;
+        if (absoluteFilePath) {
+          // Get the directory of the current file
+          const fileDir = absoluteFilePath.substring(0, absoluteFilePath.lastIndexOf('/'));
 
-            // Transform both <img src="..."> and markdown images
-            html = html.replace(
-              /(<img[^>]+src=["'])([^"':]+)(["'])/g,
-              (match, prefix, src, suffix) => {
-                // Skip absolute URLs (http://, https://, file://, data:)
-                if (src.match(/^([a-z]+:|\/)/i)) {
-                  return match;
-                }
-                // Convert relative path to file:// URL
-                const absolutePath = `file://${basePath}/${src}`;
-                return `${prefix}${absolutePath}${suffix}`;
+          // Transform both <img src="..."> and markdown images
+          html = html.replace(
+            /(<img[^>]+src=["'])([^"':]+)(["'])/g,
+            (match, prefix, src, suffix) => {
+              // Skip absolute URLs (http://, https://, file://, data:)
+              if (src.match(/^([a-z]+:|\/)/i)) {
+                return match;
               }
-            );
-          }
+              // Convert relative path to file:// URL
+              const absolutePath = `file://${fileDir}/${src}`;
+              return `${prefix}${absolutePath}${suffix}`;
+            }
+          );
         }
 
         return html;
       },
 
-      handleMarkdownClick(event, tabId, projectName) {
+      handleMarkdownClick(event, tabId) {
         // Check if clicked element is a link or inside a link
         let target = event.target;
         while (target && target.tagName !== 'A') {
@@ -65,18 +59,26 @@ export function createMarkdown() {
         if (!href.match(/\.md(#.*)?$/i)) return;
 
         // Extract file path and hash
-        const [filePath, ...hashParts] = href.split('#');
+        const [relativeFilePath, ...hashParts] = href.split('#');
         const hash = hashParts.length > 0 ? hashParts.join('#') : null;
+
+        // Get current tab to resolve relative path
+        const currentTab = this.leftTabs.find(t => t.id === tabId);
+        if (!currentTab || !currentTab.filePath) return;
+
+        // Resolve relative path to absolute path
+        const currentFileDir = currentTab.filePath.substring(0, currentTab.filePath.lastIndexOf('/'));
+        const absoluteFilePath = `${currentFileDir}/${relativeFilePath}`;
 
         // Determine if we should open in a new tab based on modifier keys
         const openInNewTab = event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1;
 
         if (openInNewTab) {
           // Just open the new file in a new tab
-          this.openFileTab(projectName, filePath, hash);
+          this.openFileTab(absoluteFilePath, hash);
         } else {
           // Navigate: open new file at current tab position, then close current tab
-          const targetTabId = `file-${projectName}-${filePath.replace(/\//g, '-')}`;
+          const targetTabId = `file-${absoluteFilePath.replace(/\//g, '-')}`;
           const existingTab = this.leftTabs.find(t => t.id === targetTabId);
 
           if (existingTab) {
@@ -91,24 +93,22 @@ export function createMarkdown() {
             const currentIndex = this.leftTabs.findIndex(t => t.id === tabId);
 
             // Create new tab at same position
-            const fileName = filePath.split('/').pop();
+            const fileName = absoluteFilePath.split('/').pop();
             const fileLabel = fileName.replace('.md', '');
             const newTab = {
               id: targetTabId,
               type: 'file',
               label: fileLabel,
               closeable: true,
-              projectName: projectName,
-              filePath: filePath
+              filePath: absoluteFilePath
             };
 
             this.leftTabs.splice(currentIndex, 0, newTab);
             this.switchLeftTab(targetTabId);
 
             // Fetch file content
-            const fileKey = `${projectName}:${filePath}`;
-            if (!this.fileContents[fileKey]) {
-              this.fetchFileContent(projectName, filePath).then(() => {
+            if (!this.fileContents[absoluteFilePath]) {
+              this.fetchFileContent(absoluteFilePath).then(() => {
                 if (hash) {
                   this.scrollToHash(targetTabId, hash);
                 }

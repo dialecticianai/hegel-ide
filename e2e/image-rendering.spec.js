@@ -18,46 +18,33 @@ test.describe('Image Rendering', () => {
     // Inject test markdown with image
     const testMarkdown = `# Image Test\n\n<img src="test-pixel.png" alt="Test" width="10">`;
     const fixturesPath = path.join(__dirname, 'fixtures', 'images');
+    const absoluteFilePath = path.join(fixturesPath, 'image-test.md');
 
-    await mainWindow.evaluate(({ markdown, projectPath }) => {
+    await mainWindow.evaluate(({ markdown, filePath }) => {
       const alpineData = Alpine.$data(document.getElementById('app'));
-      const projectName = 'test-project';
-      const fileName = 'image-test.md';
-      const fileKey = `${projectName}:${fileName}`;
 
-      // Set up project details with path
-      if (!alpineData.projectDetails) {
-        alpineData.projectDetails = {};
-      }
-      alpineData.projectDetails[projectName] = {
-        data: {
-          project_path: projectPath
-        }
-      };
-
-      // Store file content
+      // Store file content using absolute path as key
       if (!alpineData.fileContents) {
         alpineData.fileContents = {};
       }
-      alpineData.fileContents[fileKey] = {
+      alpineData.fileContents[filePath] = {
         content: markdown,
         loading: false,
         error: null
       };
 
-      // Create tab
-      const tabId = `file-${projectName}-${fileName}`;
+      // Create tab with absolute path
+      const tabId = `file-${filePath.replace(/\//g, '-')}`;
       alpineData.leftTabs.push({
         id: tabId,
         type: 'file',
         label: 'image-test',
         closeable: true,
-        projectName: projectName,
-        filePath: fileName
+        filePath: filePath
       });
 
       alpineData.switchLeftTab(tabId);
-    }, { markdown: testMarkdown, projectPath: fixturesPath });
+    }, { markdown: testMarkdown, filePath: absoluteFilePath });
 
     await mainWindow.waitForTimeout(ALPINE_INIT);
 
@@ -87,44 +74,33 @@ test.describe('Image Rendering', () => {
     // Inject test markdown with markdown-style image
     const testMarkdown = `# Image Test\n\n![Test Pixel](test-pixel.png)`;
     const fixturesPath = path.join(__dirname, 'fixtures', 'images');
+    const absoluteFilePath = path.join(fixturesPath, 'image-test.md');
 
-    await mainWindow.evaluate(({ markdown, projectPath }) => {
+    await mainWindow.evaluate(({ markdown, filePath }) => {
       const alpineData = Alpine.$data(document.getElementById('app'));
-      const projectName = 'test-project';
-      const fileName = 'image-test.md';
-      const fileKey = `${projectName}:${fileName}`;
 
-      // Set up project details with path
-      if (!alpineData.projectDetails) {
-        alpineData.projectDetails = {};
-      }
-      alpineData.projectDetails[projectName] = {
-        data: {
-          project_path: projectPath
-        }
-      };
-
+      // Store file content using absolute path as key
       if (!alpineData.fileContents) {
         alpineData.fileContents = {};
       }
-      alpineData.fileContents[fileKey] = {
+      alpineData.fileContents[filePath] = {
         content: markdown,
         loading: false,
         error: null
       };
 
-      const tabId = `file-${projectName}-${fileName}`;
+      // Create tab with absolute path
+      const tabId = `file-${filePath.replace(/\//g, '-')}`;
       alpineData.leftTabs.push({
         id: tabId,
         type: 'file',
         label: 'image-test',
         closeable: true,
-        projectName: projectName,
-        filePath: fileName
+        filePath: filePath
       });
 
       alpineData.switchLeftTab(tabId);
-    }, { markdown: testMarkdown, projectPath: fixturesPath });
+    }, { markdown: testMarkdown, filePath: absoluteFilePath });
 
     await mainWindow.waitForTimeout(ALPINE_INIT);
 

@@ -227,6 +227,17 @@ function createWindow() {
     }
   });
 
+  // Handle get-file-content request (absolute paths)
+  ipcMain.handle('get-file-content', async (event, { filePath }) => {
+    try {
+      const content = await fs.readFile(filePath, 'utf-8');
+      return { content };
+    } catch (error) {
+      // All failures treated as missing file
+      return { error: error.message };
+    }
+  });
+
   // Handle get-terminal-cwd request
   ipcMain.handle('get-terminal-cwd', async () => {
     return { cwd: terminalCwd };

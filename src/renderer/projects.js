@@ -217,21 +217,27 @@ export function createProjects() {
           return;
         }
 
-        const filePath = target.getAttribute('data-path');
-        console.log('[handleTreeClick] filePath:', filePath);
-        if (!filePath) return;
+        const relativeFilePath = target.getAttribute('data-path');
+        console.log('[handleTreeClick] relativeFilePath:', relativeFilePath);
+        if (!relativeFilePath) return;
+
+        // Get project path to construct absolute path
+        const projectData = this.projectDetails[projectName]?.data;
+        if (!projectData || !projectData.project_path) return;
+
+        const absoluteFilePath = `${projectData.project_path}/${relativeFilePath}`;
 
         const isModifierClick = event.metaKey || event.ctrlKey;
         console.log('[handleTreeClick] isModifierClick:', isModifierClick);
 
         if (isModifierClick) {
-          // Cmd+Click: open new file tab
-          console.log('[handleTreeClick] opening file tab for:', filePath);
-          this.openFileTab(projectName, filePath);
+          // Cmd+Click: open new file tab with absolute path
+          console.log('[handleTreeClick] opening file tab for:', absoluteFilePath);
+          this.openFileTab(absoluteFilePath);
         } else {
           // Regular click: replace README inline
-          console.log('[handleTreeClick] loading file inline for:', filePath);
-          this.loadFileInline(projectName, filePath);
+          console.log('[handleTreeClick] loading file inline for:', relativeFilePath);
+          this.loadFileInline(projectName, relativeFilePath);
         }
       },
 
@@ -243,49 +249,6 @@ export function createProjects() {
         } else if (result && result.error) {
           this.projectDetails[projectName].readmeError = result.error;
         }
-      },
-
-      openFileTab(projectName, filePath) {
-        // Check if tab already exists
-        const existingTab = this.leftTabs.find(t =>
-          t.type === 'file' && t.projectName === projectName && t.filePath === filePath
-        );
-
-        if (existingTab) {
-          this.switchLeftTab(existingTab.id);
-          return;
-        }
-
-        // Create new file tab
-        const tabId = `file-${projectName}-${filePath.replace(/\//g, '-')}`;
-        const newTab = {
-          id: tabId,
-          type: 'file',
-          label: filePath,
-          closeable: true,
-          projectName: projectName,
-          filePath: filePath
-        };
-
-        this.leftTabs.push(newTab);
-        this.switchLeftTab(tabId);
-
-        // Fetch file content
-        this.fileContents[`${projectName}:${filePath}`] = {
-          content: null,
-          loading: true,
-          error: null
-        };
-
-        this.fetchProjectFile(projectName, filePath).then(result => {
-          if (result && result.content) {
-            this.fileContents[`${projectName}:${filePath}`].content = result.content;
-            this.fileContents[`${projectName}:${filePath}`].loading = false;
-          } else if (result && result.error) {
-            this.fileContents[`${projectName}:${filePath}`].error = result.error;
-            this.fileContents[`${projectName}:${filePath}`].loading = false;
-          }
-        });
       },
 
       renderMarkdownTree(tree, currentFile = null) {

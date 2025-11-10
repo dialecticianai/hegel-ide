@@ -114,12 +114,10 @@ export function createTabs() {
       },
 
       // File tab operations
-      openFileTab(projectName, filePath, hash = null) {
-        const fileKey = `${projectName}:${filePath}`;
-
+      openFileTab(absoluteFilePath, hash = null) {
         // Check if tab already exists showing this file
         const existingTab = this.leftTabs.find(t =>
-          t.projectName === projectName && t.filePath === filePath
+          t.type === 'file' && t.filePath === absoluteFilePath
         );
 
         if (existingTab) {
@@ -131,24 +129,23 @@ export function createTabs() {
         }
 
         // Create new tab
-        const fileName = filePath.split('/').pop();
+        const fileName = absoluteFilePath.split('/').pop();
         const fileLabel = fileName.replace('.md', '');
-        const tabId = `file-${projectName}-${filePath.replace(/\//g, '-')}`;
+        const tabId = `file-${absoluteFilePath.replace(/\//g, '-')}`;
         const newTab = {
           id: tabId,
           type: 'file',
           label: fileLabel,
           closeable: true,
-          projectName: projectName,
-          filePath: filePath
+          filePath: absoluteFilePath
         };
 
         this.leftTabs.push(newTab);
         this.switchLeftTab(tabId);
 
         // Fetch file content if not cached
-        if (!this.fileContents[fileKey]) {
-          this.fetchFileContent(projectName, filePath).then(() => {
+        if (!this.fileContents[absoluteFilePath]) {
+          this.fetchFileContent(absoluteFilePath).then(() => {
             if (hash) {
               this.scrollToHash(tabId, hash);
             }
@@ -158,31 +155,45 @@ export function createTabs() {
         }
       },
 
-      async fetchFileContent(projectName, filePath) {
-        const fileKey = `${projectName}:${filePath}`;
-
+      async fetchFileContent(absoluteFilePath) {
         try {
-          this.fileContents[fileKey] = {
+          this.fileContents[absoluteFilePath] = {
             content: null,
             loading: true,
             error: null
           };
 
-          const result = await this.fetchProjectFile(projectName, filePath);
+          const result = await this.fetchAbsoluteFile(absoluteFilePath);
 
           if (result) {
-            this.fileContents[fileKey] = {
+            this.fileContents[absoluteFilePath] = {
               content: result.content,
               loading: false,
               error: result.error
             };
           }
         } catch (error) {
-          this.fileContents[fileKey] = {
+          this.fileContents[absoluteFilePath] = {
             content: null,
             loading: false,
             error: error.message || 'Failed to load file'
           };
+        }
+      },
+
+      async fetchAbsoluteFile(absoluteFilePath) {
+        try {
+          const result = await ipcRenderer.invoke('get-file-content', {
+            filePath: absoluteFilePath
+          });
+
+          if (result.content) {
+            return { content: result.content, error: null };
+          } else {
+            return { content: null, error: result.error };
+          }
+        } catch (error) {
+          return { content: null, error: error.message };
         }
       },
 
@@ -198,9 +209,8 @@ export function createTabs() {
         });
       },
 
-      getFileContent(projectName, filePath) {
-        const fileKey = `${projectName}:${filePath}`;
-        return this.fileContents[fileKey];
+      getFileContent(absoluteFilePath) {
+        return this.fileContents[absoluteFilePath];
       }
     };
 }

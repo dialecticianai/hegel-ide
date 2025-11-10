@@ -13,9 +13,9 @@ const fixtures = {
   'page-c.md': fs.readFileSync(path.join(fixturesDir, 'page-c.md'), 'utf-8')
 };
 
-async function injectAllFixtures(mainWindow, projectName = 'test-project') {
+async function injectAllFixtures(mainWindow, baseDir = fixturesDir) {
   // Inject all fixture content into cache so link navigation can find them
-  await mainWindow.evaluate(({ projectName, fixtures }) => {
+  await mainWindow.evaluate(({ baseDir, fixtures }) => {
     const alpineData = Alpine.$data(document.getElementById('app'));
 
     // Initialize fileContents if it doesn't exist
@@ -23,24 +23,25 @@ async function injectAllFixtures(mainWindow, projectName = 'test-project') {
       alpineData.fileContents = {};
     }
 
-    // Inject all fixtures
+    // Inject all fixtures using absolute paths as keys
     for (const [fileName, content] of Object.entries(fixtures)) {
-      const fileKey = `${projectName}:${fileName}`;
-      alpineData.fileContents[fileKey] = {
+      const absolutePath = `${baseDir}/${fileName}`;
+      alpineData.fileContents[absolutePath] = {
         content: content,
         loading: false,
         error: null
       };
     }
-  }, { projectName, fixtures });
+  }, { baseDir, fixtures });
 }
 
-async function openFixtureTab(mainWindow, fileName, projectName = 'test-project') {
-  await mainWindow.evaluate(({ projectName, fileName }) => {
+async function openFixtureTab(mainWindow, fileName, baseDir = fixturesDir) {
+  await mainWindow.evaluate(({ baseDir, fileName }) => {
     const alpineData = Alpine.$data(document.getElementById('app'));
 
-    // Create tab
-    const tabId = `file-${projectName}-${fileName.replace(/\//g, '-')}`;
+    // Create tab with absolute path
+    const absolutePath = `${baseDir}/${fileName}`;
+    const tabId = `file-${absolutePath.replace(/\//g, '-')}`;
     const fileLabel = fileName.split('/').pop().replace('.md', '');
 
     alpineData.leftTabs.push({
@@ -48,12 +49,11 @@ async function openFixtureTab(mainWindow, fileName, projectName = 'test-project'
       type: 'file',
       label: fileLabel,
       closeable: true,
-      projectName: projectName,
-      filePath: fileName
+      filePath: absolutePath
     });
 
     alpineData.switchLeftTab(tabId);
-  }, { projectName, fileName });
+  }, { baseDir, fileName });
 
   await mainWindow.waitForTimeout(ALPINE_INIT);
 }

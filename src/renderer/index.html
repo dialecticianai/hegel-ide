@@ -174,16 +174,16 @@
         <template x-for="tab in leftTabs.filter(t => t.type === 'file')" :key="tab.id">
           <div x-show="activeLeftTab === tab.id" class="tab-content-padded">
             <h2 x-text="tab.filePath"></h2>
-            <template x-if="fileContents[`${tab.projectName}:${tab.filePath}`]">
+            <template x-if="fileContents[tab.filePath]">
               <div>
-                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.loading">Loading file...</div>
-                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"
+                <div x-show="fileContents[tab.filePath]?.loading">Loading file...</div>
+                <div x-show="fileContents[tab.filePath]?.error"
                      class="error"
-                     x-text="fileContents[`${tab.projectName}:${tab.filePath}`]?.error"></div>
-                <div x-show="fileContents[`${tab.projectName}:${tab.filePath}`]?.content"
+                     x-text="fileContents[tab.filePath]?.error"></div>
+                <div x-show="fileContents[tab.filePath]?.content"
                      class="markdown-content"
-                     x-html="renderMarkdown(fileContents[`${tab.projectName}:${tab.filePath}`]?.content, tab.projectName, tab.filePath)"
-                     @click="handleMarkdownClick($event, tab.id, tab.projectName)"></div>
+                     x-html="renderMarkdown(fileContents[tab.filePath]?.content, tab.filePath)"
+                     @click="handleMarkdownClick($event, tab.id)"></div>
               </div>
             </template>
           </div>
