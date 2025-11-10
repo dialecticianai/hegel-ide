@@ -1,0 +1,9 @@
+{
+  "name": "toy3-markdown-line-tracking",
+  "version": "1.0.0",
+  "description": "Line-tracking markdown renderer toy",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test test/line-tracking.test.js"
+  }
+}

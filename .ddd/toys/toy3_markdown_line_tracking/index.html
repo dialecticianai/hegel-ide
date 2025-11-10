@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Line Tracking Toy</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .markdown-block {
+      border-left: 3px solid #e0e0e0;
+      padding-left: 10px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    .markdown-block::before {
+      content: attr(data-line-start) '-' attr(data-line-end);
+      position: absolute;
+      left: -60px;
+      top: 0;
+      font-size: 12px;
+      color: #999;
+      font-family: monospace;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      overflow-x: auto;
+    }
+    code {
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div x-data="markdownApp()">
+    <h1>Markdown Line Tracking Renderer</h1>
+    <div x-html="renderedContent"></div>
+  </div>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>
