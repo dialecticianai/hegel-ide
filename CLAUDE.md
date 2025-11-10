@@ -34,6 +34,14 @@ This project is **hegel-ide**, a subproject of the Hegel ecosystem. See [README.
 - Good: `$HOME/Code/proj` (truncated, hover shows full path)
 - Bad: `/Users/username/Code/github.com/org/project`
 
+## One-off Transformation Scripts
+
+**Location:** `scripts/oneoffs/`
+**Naming:** `YYYYMMDD-description.pl` or `YYYYMMDD-N-description.pl` (indexed if multiple same day)
+**Pattern:** Default to dry-run preview, require `--apply` flag to execute changes
+**Template-driven:** Read most recent script and adapt the pattern
+**Immutable:** Don't modify old scripts - they're timestamped artifacts
+
 ## Relationship to `hegel` CLI
 
 **Two roles for `hegel` in this project:**
