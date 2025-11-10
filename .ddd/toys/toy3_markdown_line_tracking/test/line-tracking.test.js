@@ -12,33 +12,91 @@ const indexPath = 'file://' + path.join(toyDir, 'index.html');
 test.describe('Markdown Line Tracking', () => {
   test('renders HTML page', async ({ page }) => {
     await page.goto(indexPath);
-    await expect(page.locator('h1')).toContainText('Markdown Line Tracking Renderer');
+    // Check page title H1 (outside x-html)
+    await expect(page.locator('body > div > h1').first()).toContainText('Markdown Line Tracking Renderer');
+    // Check that markdown blocks are rendered
+    await expect(page.locator('.markdown-block').first()).toBeVisible();
   });
 
-  test('single paragraph has correct line attributes', async ({ page }) => {
-    // Capture console messages for debugging
-    page.on('console', msg => console.log('Browser:', msg.text()));
-    page.on('pageerror', err => console.error('Page error:', err));
-
+  test('single-line heading has correct attributes', async ({ page }) => {
     await page.goto(indexPath);
-
-    // Wait a bit for Alpine to initialize
     await page.waitForTimeout(500);
 
-    // Check rendered content
-    const content = await page.locator('div[x-html]').innerHTML();
-    console.log('Rendered content:', content);
-
-    // Find the markdown-block element
-    const block = page.locator('.markdown-block').first();
+    // Find the first heading block (Heading One)
+    const block = page.locator('.markdown-block[data-type="heading"]').first();
     await expect(block).toBeVisible();
 
-    // Check data attributes
+    // Check data attributes - single line block
     await expect(block).toHaveAttribute('data-line-start', '1');
     await expect(block).toHaveAttribute('data-line-end', '1');
+    await expect(block).toHaveAttribute('data-type', 'heading');
+
+    // Check rendered content
+    await expect(block.locator('h1')).toContainText('Heading One');
+  });
+
+  test('multi-line paragraph has correct attributes', async ({ page }) => {
+    await page.goto(indexPath);
+    await page.waitForTimeout(500);
+
+    // Find the first paragraph block (lines 3-4)
+    const block = page.locator('.markdown-block[data-type="paragraph"]').first();
+    await expect(block).toBeVisible();
+
+    // Check data attributes - multi-line block
+    await expect(block).toHaveAttribute('data-line-start', '3');
+    await expect(block).toHaveAttribute('data-line-end', '4');
     await expect(block).toHaveAttribute('data-type', 'paragraph');
 
     // Check rendered content
-    await expect(block.locator('p')).toBeVisible();
+    await expect(block.locator('p')).toContainText('This is a paragraph spanning');
+  });
+
+  test('multi-block document has sequential line numbers', async ({ page }) => {
+    // Capture console logs
+    page.on('console', msg => console.log('Browser log:', msg.text()));
+
+    await page.goto(indexPath);
+    await page.waitForTimeout(500);
+
+    // Find all markdown blocks
+    const blocks = page.locator('.markdown-block');
+    const count = await blocks.count();
+
+    // Expected blocks from sample.md (verified with cat -n):
+    // 1. Heading One (line 1)
+    // 2. Paragraph (lines 3-4)
+    // 3. Heading Two (line 6)
+    // 4. List (lines 8-10)
+    // 5. Code (lines 12-16)
+    // 6. Paragraph (line 18)
+    // 7. Blockquote (lines 20-21)
+    // 8. HR (line 23)
+    // 9. Ordered list (lines 25-26)
+    // 10. Paragraph (line 28)
+    expect(count).toBe(10);
+
+    // Verify each block has sequential line numbers
+    const expectedBlocks = [
+      { lineStart: 1, lineEnd: 1, type: 'heading' },
+      { lineStart: 3, lineEnd: 4, type: 'paragraph' },
+      { lineStart: 6, lineEnd: 6, type: 'heading' },
+      { lineStart: 8, lineEnd: 10, type: 'list' },
+      { lineStart: 12, lineEnd: 16, type: 'code' },
+      { lineStart: 18, lineEnd: 18, type: 'paragraph' },
+      { lineStart: 20, lineEnd: 21, type: 'blockquote' },
+      { lineStart: 23, lineEnd: 23, type: 'hr' },
+      { lineStart: 25, lineEnd: 26, type: 'list' },
+      { lineStart: 28, lineEnd: 28, type: 'paragraph' }
+    ];
+
+    for (let i = 0; i < count; i++) {
+      const block = blocks.nth(i);
+      const expected = expectedBlocks[i];
+
+      await expect(block).toHaveAttribute('data-line-start', expected.lineStart.toString());
+      await expect(block).toHaveAttribute('data-line-end', expected.lineEnd.toString());
+      await expect(block).toHaveAttribute('data-type', expected.type);
+    }
   });
 });

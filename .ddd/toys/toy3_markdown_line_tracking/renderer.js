@@ -15,8 +15,14 @@ function parseMarkdownWithLines(markdown, outputFormat = 'html') {
 
     // Calculate line range for this token
     const lineStart = currentLine;
-    const newlines = (token.raw.match(/\n/g) || []).length;
-    const lineEnd = currentLine + newlines;
+    const totalNewlines = (token.raw.match(/\n/g) || []).length;
+
+    // Count newlines in content (excluding trailing newlines)
+    const trimmedRaw = token.raw.trimEnd();
+    const contentNewlines = (trimmedRaw.match(/\n/g) || []).length;
+
+    // lineEnd is the last line the content occupies
+    const lineEnd = lineStart + contentNewlines;
 
     // Map token type to simplified block type
     let blockType = 'paragraph';
@@ -29,7 +35,7 @@ function parseMarkdownWithLines(markdown, outputFormat = 'html') {
     else if (token.type === 'paragraph') blockType = 'paragraph';
     else if (token.type === 'space') {
       // Skip space tokens but advance line counter
-      currentLine = lineEnd;
+      currentLine = lineStart + totalNewlines;
       continue;
     }
 
@@ -43,8 +49,8 @@ function parseMarkdownWithLines(markdown, outputFormat = 'html') {
       html: html.trim()
     });
 
-    // Advance line counter
-    currentLine = lineEnd;
+    // Advance line counter by total number of newlines (including trailing whitespace)
+    currentLine = lineStart + totalNewlines;
   }
 
   if (outputFormat === 'array') {
@@ -62,15 +68,45 @@ function findMarkdownBlock(node) {
   return null;
 }
 
+// Sample markdown content (inlined for file:// protocol compatibility)
+const SAMPLE_MARKDOWN = `# Heading One
+
+This is a paragraph spanning
+multiple lines in the source.
+
+## Heading Two
+
+- List item one
+- List item two
+- List item three
+
+\`\`\`javascript
+function example() {
+  return 42;
+}
+\`\`\`
+
+Another paragraph.
+
+> This is a blockquote
+> spanning two lines.
+
+---
+
+1. Ordered item one
+2. Ordered item two
+
+Final paragraph at the end.
+`;
+
 // Alpine.js component
 window.markdownApp = function() {
   return {
     renderedContent: '',
 
     init() {
-      // Load simple single-paragraph markdown for testing
-      const markdown = 'This is a test paragraph.';
-      this.renderedContent = parseMarkdownWithLines(markdown, 'html');
+      // Use sample markdown content
+      this.renderedContent = parseMarkdownWithLines(SAMPLE_MARKDOWN, 'html');
     }
   };
 };
