@@ -188,6 +188,37 @@
             </template>
           </div>
         </template>
+
+        <!-- Review tabs content -->
+        <template x-for="tab in leftTabs.filter(t => t.type === 'review')" :key="tab.id">
+          <div x-show="activeLeftTab === tab.id" class="review-tab-container">
+            <template x-if="fileContents[tab.filePath]">
+              <div>
+                <div x-show="fileContents[tab.filePath]?.loading" class="tab-content-padded">Loading file...</div>
+                <div x-show="fileContents[tab.filePath]?.error"
+                     class="error tab-content-padded"
+                     x-text="fileContents[tab.filePath]?.error"></div>
+                <div x-show="fileContents[tab.filePath]?.content" class="review-grid">
+                  <!-- Content area with line-tracked markdown -->
+                  <div class="review-content"
+                       x-html="window.HegelIDE.parseMarkdownWithLines(fileContents[tab.filePath]?.content, 'html')"></div>
+
+                  <!-- Comment margin (collapsed by default) -->
+                  <div class="comment-margin"
+                       :class="{ 'collapsed': tab.marginCollapsed }">
+                    <!-- Margin toggle button -->
+                    <button class="margin-toggle"
+                            @click="toggleCommentMargin(tab.id)"
+                            :title="tab.marginCollapsed ? 'Expand margin' : 'Collapse margin'">
+                      <span x-text="tab.marginCollapsed ? '◀' : '▶'"></span>
+                    </button>
+                    <!-- Placeholder for comment cards (Step 5) -->
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
       </div>
     </div>
 

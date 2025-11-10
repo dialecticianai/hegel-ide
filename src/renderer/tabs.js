@@ -155,6 +155,49 @@ export function createTabs() {
         }
       },
 
+      // Review tab operations
+      openReviewTab(absoluteFilePath, projectPath = null) {
+        // Check if review tab already exists for this file
+        const existingTab = this.leftTabs.find(t =>
+          t.type === 'review' && t.filePath === absoluteFilePath
+        );
+
+        if (existingTab) {
+          this.switchLeftTab(existingTab.id);
+          return;
+        }
+
+        // Create new review tab
+        const fileName = absoluteFilePath.split('/').pop();
+        const fileLabel = fileName.replace('.md', '');
+        const tabId = `review-${absoluteFilePath.replace(/\//g, '-')}`;
+        const newTab = {
+          id: tabId,
+          type: 'review',
+          label: fileLabel,
+          closeable: true,
+          filePath: absoluteFilePath,
+          projectPath: projectPath,
+          pendingComments: [],
+          marginCollapsed: true
+        };
+
+        this.leftTabs.push(newTab);
+        this.switchLeftTab(tabId);
+
+        // Fetch file content if not cached
+        if (!this.fileContents[absoluteFilePath]) {
+          this.fetchFileContent(absoluteFilePath);
+        }
+      },
+
+      toggleCommentMargin(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (tab && tab.type === 'review') {
+          tab.marginCollapsed = !tab.marginCollapsed;
+        }
+      },
+
       async fetchFileContent(absoluteFilePath) {
         try {
           this.fileContents[absoluteFilePath] = {
