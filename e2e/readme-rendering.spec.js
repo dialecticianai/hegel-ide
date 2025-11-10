@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectContent, waitForAutoOpenedProject, clickFirstProject } = require('./test-constants');
 const { ALPINE_INIT, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE } = require('./test-constants');
 
 test.describe('README Rendering', () => {
@@ -45,12 +45,9 @@ test.describe('README Rendering', () => {
     // Switch to Projects tab to access projects list
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await waitForProjectsList(mainWindow);
 
     // Click first project (may or may not have README)
-    const firstProject = await mainWindow.locator('.projects-list li').first();
-    const projectName = await firstProject.textContent();
-    await firstProject.click();
+    const projectName = await clickFirstProject(mainWindow);
 
     await mainWindow.waitForTimeout(TAB_CREATE);
     await waitForProjectContent(mainWindow);

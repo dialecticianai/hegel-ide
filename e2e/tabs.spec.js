@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
+const { launchTestElectron, waitForTab, waitForProjectsList, waitForProjectContent, waitForAutoOpenedProject, clickFirstProject } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Tab Management', () => {
@@ -161,12 +161,8 @@ test.describe('Tab Management', () => {
     await projectsTab.click();
 
     // Wait for projects list to be visible
-    await waitForProjectsList(mainWindow);
-
     // Click first project in list
-    const firstProject = await mainWindow.locator('.projects-list li').first();
-    const projectName = await firstProject.textContent();
-    await firstProject.click();
+    const projectName = await clickFirstProject(mainWindow);
 
     // Wait for project tab to appear
     await waitForTab(mainWindow, projectName);
@@ -215,12 +211,9 @@ test.describe('Tab Management', () => {
     // Switch to Projects tab to access projects list
     const projectsTab = await mainWindow.locator('.left-pane .tab').filter({ hasText: 'Projects' });
     await projectsTab.click();
-    await waitForProjectsList(mainWindow);
 
     // Open project tab
-    const firstProject = await mainWindow.locator('.projects-list li').first();
-    const projectName = await firstProject.textContent();
-    await firstProject.click();
+    const projectName = await clickFirstProject(mainWindow);
     await waitForTab(mainWindow, projectName, 'left');
 
     // Verify project tab exists
@@ -377,8 +370,7 @@ test.describe('Tab Management', () => {
     await mainWindow.waitForTimeout(TAB_CLOSE);
 
     // Open a project detail tab (should be at index 1)
-    const firstProject = await mainWindow.locator('.projects-list li').first();
-    await firstProject.click();
+    await clickFirstProject(mainWindow);
     await mainWindow.waitForTimeout(TAB_CREATE);
 
     // Switch back to Projects tab to access Settings icon

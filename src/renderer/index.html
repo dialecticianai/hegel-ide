@@ -52,13 +52,32 @@
             <p class="error" x-text="projectsError"></p>
           </template>
 
-          <ul class="projects-list" x-show="!projectsLoading && !projectsError">
-            <template x-for="project in projects" :key="project">
-              <li @click="openProjectTab(project)"
-                  style="cursor: pointer;"
-                  x-text="project"></li>
+          <div class="projects-list" x-show="!projectsLoading && !projectsError">
+            <template x-for="project in projects" :key="project.name">
+              <div class="project-card">
+                <div class="project-card-header">
+                  <h3 class="project-name" @click="openProjectTab(project.name)" x-text="project.name"></h3>
+                  <button class="collapse-toggle"
+                          @click="toggleProjectCollapse(project.name)"
+                          :title="isProjectCollapsed(project.name) ? 'Expand' : 'Collapse'">
+                    <span x-text="isProjectCollapsed(project.name) ? '▶' : '▼'"></span>
+                  </button>
+                </div>
+
+                <div x-show="!isProjectCollapsed(project.name)" class="project-card-content">
+                  <div class="project-info-row">
+                    <span class="info-value info-value-path"
+                          x-text="formatPath(project.project_path)"
+                          :title="'Path: ' + project.project_path"></span>
+                    <span class="metric-sep">|</span>
+                    <span class="info-value" title="Cache size" x-text="formatBytes(project.hegel_size_bytes)"></span>
+                    <span class="metric-sep">|</span>
+                    <span class="info-value" title="Last activity" x-text="formatTimeAgo(project.last_activity)"></span>
+                  </div>
+                </div>
+              </div>
             </template>
-          </ul>
+          </div>
         </div>
 
         <!-- Settings tab content -->

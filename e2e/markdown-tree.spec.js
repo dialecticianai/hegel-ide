@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
+const { launchTestElectron, waitForCondition, PROJECT_LOAD, PROJECT_DETAIL, TAB_CREATE, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 
 test.describe('Markdown Document Tree', () => {
   test('tree section visible above README', async () => {
@@ -14,6 +14,15 @@ test.describe('Markdown Document Tree', () => {
     // Wait for projects to load and hegel-ide to auto-open
     await waitForAutoOpenedProject(mainWindow);
     await waitForProjectContent(mainWindow);
+
+    // Wait for markdown tree to load
+    await waitForCondition(
+      mainWindow,
+      async () => await mainWindow.locator('.markdown-tree').isVisible(),
+      PROJECT_DETAIL,
+      50,
+      'Markdown tree did not load'
+    );
 
     // Verify tree section exists
     const treeSection = await mainWindow.locator('.markdown-tree');

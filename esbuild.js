@@ -27,6 +27,20 @@ async function build() {
     await fs.copyFile('src/renderer/index.html', 'dist/index.html');
     await fs.copyFile('src/renderer/styles.css', 'dist/styles.css');
 
+    // Copy fonts directory
+    await fs.mkdir('dist/fonts', { recursive: true });
+    const fonts = await fs.readdir('fonts');
+    for (const font of fonts) {
+      await fs.copyFile(`fonts/${font}`, `dist/fonts/${font}`);
+    }
+
+    // Copy xterm CSS
+    await fs.mkdir('dist/node_modules/@xterm/xterm/css', { recursive: true });
+    await fs.copyFile(
+      'node_modules/@xterm/xterm/css/xterm.css',
+      'dist/node_modules/@xterm/xterm/css/xterm.css'
+    );
+
     console.log('Build complete');
   } catch (error) {
     console.error('Build failed:', error);

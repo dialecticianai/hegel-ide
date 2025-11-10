@@ -90,7 +90,7 @@ async function waitForTab(page, tabText, pane = 'left', timeoutMs = TIMEOUTS.TAB
 async function waitForProjectsList(page, timeoutMs = TIMEOUTS.ALPINE_INIT) {
   await waitForCondition(
     page,
-    async () => await page.locator('.projects-list li').first().isVisible(),
+    async () => await page.locator('.project-card').first().isVisible(),
     timeoutMs,
     50,
     'Projects list did not appear'
@@ -137,6 +137,19 @@ async function waitForAutoOpenedProject(page, projectName = 'hegel-ide', timeout
   await waitForTab(page, projectName, 'left', timeoutMs);
 }
 
+/**
+ * Click the first project in the projects list and return its name
+ * @param {Page} page - Playwright page/window object
+ * @returns {Promise<string>} The project name that was clicked
+ */
+async function clickFirstProject(page) {
+  await waitForProjectsList(page);
+  const firstProjectName = await page.locator('.project-name').first();
+  const projectName = await firstProjectName.textContent();
+  await firstProjectName.click();
+  return projectName;
+}
+
 module.exports = {
   ...TIMEOUTS,
   launchTestElectron,
@@ -145,5 +158,6 @@ module.exports = {
   waitForProjectsList,
   waitForProjectContent,
   waitForAlpineInit,
-  waitForAutoOpenedProject
+  waitForAutoOpenedProject,
+  clickFirstProject
 };

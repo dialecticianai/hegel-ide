@@ -12,6 +12,7 @@ export function createProjects() {
       projectsError: null,
       projectDetails: {},
       fileContents: {},
+      collapsedProjects: {}, // Track collapsed state per project name
 
       async loadProjects() {
         try {
@@ -20,6 +21,12 @@ export function createProjects() {
 
           const projects = await ipcRenderer.invoke('get-projects');
           this.projects = projects;
+
+          // Initialize all projects as collapsed
+          projects.forEach(project => {
+            this.collapsedProjects[project.name] = true;
+          });
+
           this.projectsLoading = false;
 
           // Auto-open project if terminal cwd matches
@@ -30,6 +37,14 @@ export function createProjects() {
         }
       },
 
+      toggleProjectCollapse(projectName) {
+        this.collapsedProjects[projectName] = !this.collapsedProjects[projectName];
+      },
+
+      isProjectCollapsed(projectName) {
+        return this.collapsedProjects[projectName] !== false; // Default to collapsed
+      },
+
       async autoOpenProjectFromCwd() {
         try {
           // Get terminal cwd
@@ -37,13 +52,12 @@ export function createProjects() {
           if (!cwd) return;
 
           // Check each project to see if cwd matches
-          for (const projectName of this.projects) {
-            const data = await ipcRenderer.invoke('get-project-details', { projectName });
-            if (data && data.project_path) {
+          for (const project of this.projects) {
+            if (project.project_path) {
               // Check if cwd matches or is inside project path
-              if (cwd === data.project_path || cwd.startsWith(data.project_path + '/')) {
+              if (cwd === project.project_path || cwd.startsWith(project.project_path + '/')) {
                 // Found matching project - open it
-                this.openProjectTab(projectName);
+                this.openProjectTab(project.name);
                 return;
               }
             }

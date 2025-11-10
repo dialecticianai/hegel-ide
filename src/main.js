@@ -82,8 +82,7 @@ function createWindow() {
 
         try {
           const output = JSON.parse(stdout);
-          const projectNames = output.projects.map(p => p.name);
-          resolve(projectNames);
+          resolve(output.projects);
         } catch (error) {
           reject(new Error(`Failed to parse hegel output: ${error.message}`));
         }
