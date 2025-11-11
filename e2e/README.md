@@ -18,6 +18,7 @@ e2e/
 ├── markdown-tree-navigation.spec.js   Tree click navigation and file highlighting tests
 ├── markdown-line-tracking.spec.js     Line-tracking module integration (parsing, DOM attributes, block finding)
 ├── review-tabs.spec.js                Review tab infrastructure (selection, comments, cards, submit/cancel workflows)
+├── http-server.spec.js                HTTP server integration (env vars, POST /review endpoint, error handling)
 ├── themes.spec.js                     Theme system in Settings tab (dropdown, switching, persistence, auto mode)
 ├── image-rendering.spec.js            Image path resolution in markdown (inline HTML and markdown syntax)
 ├── quit-test.spec.js                  Quit confirmation dialog behavior in test mode
@@ -164,6 +165,7 @@ Test suite covers core application functionality:
 - **Tab operations**: Add, close, switch, overflow behavior, Settings tab positioning and deduplication
 - **File tabs**: Open with absolute paths, content loading, closeable, multiple tabs
 - **Review tabs**: Grid layout, line-tracked markdown, text selection, comment form, comment cards, stacking, submit/cancel workflows
+- **HTTP server**: Environment variable injection, POST /review endpoint, file validation, error responses, multi-file handling
 - **Markdown line tracking**: Block parsing with line ranges, DOM attribute generation, block finding from selection
 - **Terminal I/O**: Command execution, multi-terminal support
 - **Split-pane layout**: Panel structure, resize, project discovery

@@ -6,12 +6,12 @@ Frontend application code using ESM modules bundled with esbuild. Each module ex
 
 ```
 renderer/
-├── index.js                     Bundle entry point (imports all modules, initializes Alpine)
+├── index.js                     Bundle entry point (imports all modules, initializes Alpine and IPC listeners)
 ├── index.html                   Application HTML with split-pane layout and review tabs
 ├── styles.css                   All application CSS (includes review tab styles)
 │
 ├── split-pane.js                Split pane drag handlers and localStorage persistence
-├── tabs.js                      Tab management (file, review, project, settings tabs)
+├── tabs.js                      Tab management (file, review, project, settings tabs) and review IPC listener
 ├── terminals.js                 Terminal creation, initialization, and IPC handling
 ├── projects.js                  Project discovery, details fetching, file operations
 ├── markdown.js                  Markdown rendering and dev tools utilities
