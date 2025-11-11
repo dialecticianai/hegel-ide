@@ -6,18 +6,19 @@ Frontend application code using ESM modules bundled with esbuild. Each module ex
 
 ```
 renderer/
-├── index.js           Bundle entry point (imports all modules, initializes Alpine)
-├── index.html         Application HTML with split-pane layout
-├── styles.css         All application CSS
+├── index.js                     Bundle entry point (imports all modules, initializes Alpine)
+├── index.html                   Application HTML with split-pane layout and review tabs
+├── styles.css                   All application CSS (includes review tab styles)
 │
-├── split-pane.js      Split pane drag handlers and localStorage persistence
-├── tabs.js            Tab management for left and right panels
-├── terminals.js       Terminal creation, initialization, and IPC handling
-├── projects.js        Project discovery, details fetching, file operations
-├── markdown.js        Markdown rendering and dev tools utilities
-├── themes.js          Theme management with localStorage and system preference tracking
+├── split-pane.js                Split pane drag handlers and localStorage persistence
+├── tabs.js                      Tab management (file, review, project, settings tabs)
+├── terminals.js                 Terminal creation, initialization, and IPC handling
+├── projects.js                  Project discovery, details fetching, file operations
+├── markdown.js                  Markdown rendering and dev tools utilities
+├── markdown-line-tracking.js    Line-tracked markdown parsing for review mode
+├── themes.js                    Theme management with localStorage and system preference tracking
 │
-└── app.js             Legacy IIFE version (kept temporarily, not used)
+└── app.js                       Legacy IIFE version (kept temporarily, not used)
 ```
 
 ## Module Pattern

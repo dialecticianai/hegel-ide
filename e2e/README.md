@@ -11,10 +11,13 @@ e2e/
 ├── tabs.spec.js                       Tab management (add, close, switch, overflow, project tabs, Settings tab)
 ├── terminal.spec.js                   Terminal presence, rendering, and I/O command tests
 ├── split-pane.spec.js                 Split-pane layout, divider, and project list tests
+├── file-tabs.spec.js                  File tab operations with absolute paths (open, load, close, multiple tabs)
 ├── readme-rendering.spec.js           README markdown rendering and refresh functionality tests
 ├── markdown-links.spec.js             Markdown link navigation and tab behavior tests
 ├── markdown-tree.spec.js              Markdown document tree rendering and display tests
 ├── markdown-tree-navigation.spec.js   Tree click navigation and file highlighting tests
+├── markdown-line-tracking.spec.js     Line-tracking module integration (parsing, DOM attributes, block finding)
+├── review-tabs.spec.js                Review tab infrastructure (selection, comments, cards, submit/cancel workflows)
 ├── themes.spec.js                     Theme system in Settings tab (dropdown, switching, persistence, auto mode)
 ├── image-rendering.spec.js            Image path resolution in markdown (inline HTML and markdown syntax)
 ├── quit-test.spec.js                  Quit confirmation dialog behavior in test mode
@@ -159,6 +162,9 @@ await waitForCondition(
 
 Test suite covers core application functionality:
 - **Tab operations**: Add, close, switch, overflow behavior, Settings tab positioning and deduplication
+- **File tabs**: Open with absolute paths, content loading, closeable, multiple tabs
+- **Review tabs**: Grid layout, line-tracked markdown, text selection, comment form, comment cards, stacking, submit/cancel workflows
+- **Markdown line tracking**: Block parsing with line ranges, DOM attribute generation, block finding from selection
 - **Terminal I/O**: Command execution, multi-terminal support
 - **Split-pane layout**: Panel structure, resize, project discovery
 - **App launch**: Window initialization, title, content visibility
