@@ -4,12 +4,100 @@ const pty = require('node-pty');
 const os = require('os');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
+const http = require('http');
+const { buildTerminalEnv } = require('../lib/terminal-env.js');
+const { parseReviewRequest, checkFilesExist } = require('../lib/http-server.js');
 
 let mainWindow;
 let ptyProcesses = new Map(); // Map of terminalId -> ptyProcess
+let httpServer;
+let httpPort;
 
 // Use HEGEL_IDE_CWD env var if set, otherwise use process.cwd()
 const terminalCwd = process.env.HEGEL_IDE_CWD || process.cwd();
+
+// Unified terminal spawn function
+function spawnTerminal(terminalId, httpPort) {
+  const augmentedEnv = buildTerminalEnv(process.env, httpPort);
+  const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
+
+  const ptyProc = pty.spawn(shell, [], {
+    name: 'xterm-color',
+    cols: 80,
+    rows: 24,
+    cwd: terminalCwd,
+    env: augmentedEnv
+  });
+
+  ptyProc.onData((data) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('terminal-output', { terminalId, data });
+    }
+  });
+
+  ptyProcesses.set(terminalId, ptyProc);
+  return ptyProc;
+}
+
+// HTTP request handler
+async function handleRequest(req, res) {
+  // Only accept POST to /review
+  if (req.method !== 'POST') {
+    res.writeHead(405, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Method not allowed' }));
+    return;
+  }
+
+  if (req.url !== '/review') {
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Not found' }));
+    return;
+  }
+
+  // Collect request body
+  let body = '';
+  req.on('data', chunk => {
+    body += chunk;
+  });
+
+  req.on('end', async () => {
+    try {
+      // Parse and validate request
+      const { files } = parseReviewRequest(body);
+
+      // Check if all files exist
+      const validation = await checkFilesExist(files);
+      if (!validation.valid) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ missing: validation.missing }));
+        return;
+      }
+
+      // Send to renderer to open review tabs
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('open-review-tabs', { files });
+      }
+
+      // Return success
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+    } catch (error) {
+      // Determine status code based on error type
+      let statusCode = 500;
+
+      // JSON parse errors and validation errors are 400
+      if (error instanceof SyntaxError ||
+          error.message.includes('required field') ||
+          error.message.includes('must be') ||
+          error.message.includes('cannot be empty')) {
+        statusCode = 400;
+      }
+
+      res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: error.message }));
+    }
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -25,23 +113,7 @@ function createWindow() {
   mainWindow.loadFile('dist/index.html');
 
   // Spawn initial terminal (term-1)
-  const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
-  const term1 = pty.spawn(shell, [], {
-    name: 'xterm-color',
-    cols: 80,
-    rows: 24,
-    cwd: terminalCwd,
-    env: process.env
-  });
-
-  ptyProcesses.set('term-1', term1);
-
-  // Forward bash output to renderer via IPC (with terminalId)
-  term1.onData((data) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('terminal-output', { terminalId: 'term-1', data });
-    }
-  });
+  spawnTerminal('term-1', httpPort);
 
   // Handle terminal input from renderer (route by terminalId)
   ipcMain.on('terminal-input', (event, { terminalId, data }) => {
@@ -167,24 +239,7 @@ function createWindow() {
   // Handle create-terminal request
   ipcMain.handle('create-terminal', async (event, { terminalId }) => {
     try {
-      const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
-      const ptyProc = pty.spawn(shell, [], {
-        name: 'xterm-color',
-        cols: 80,
-        rows: 24,
-        cwd: terminalCwd,
-        env: process.env
-      });
-
-      ptyProcesses.set(terminalId, ptyProc);
-
-      // Forward output to renderer
-      ptyProc.onData((data) => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('terminal-output', { terminalId, data });
-        }
-      });
-
+      spawnTerminal(terminalId, httpPort);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -260,6 +315,11 @@ function createWindow() {
     return { cwd: terminalCwd };
   });
 
+  // Handle get-http-port request (for testing)
+  ipcMain.handle('get-http-port', async () => {
+    return httpPort;
+  });
+
   mainWindow.on('closed', function () {
     // Kill all pty processes
     for (const [_terminalId, ptyProc] of ptyProcesses) {
@@ -290,7 +350,14 @@ app.on('before-quit', (event) => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Create HTTP server before window
+  httpServer = http.createServer(handleRequest);
+  httpServer.listen(0, 'localhost', () => {
+    httpPort = httpServer.address().port;
+    createWindow();
+  });
+});
 
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
@@ -301,5 +368,11 @@ app.on('window-all-closed', function () {
 app.on('activate', function () {
   if (mainWindow === null) {
     createWindow();
+  }
+});
+
+app.on('quit', function () {
+  if (httpServer) {
+    httpServer.close();
   }
 });
