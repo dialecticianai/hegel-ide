@@ -45,7 +45,12 @@ npm run lint          # Check code with eslint
 - **Project details**: Click projects to open detail tabs showing metrics, document tree, and README.md content
 - **Markdown document tree**: Tree view of markdown files rendered with box-drawing characters, 3-line scrollable height
 - **Tree navigation**: Click files in tree to navigate (regular click replaces content, Cmd+click opens new tab), current file highlighted
-- **Markdown rendering**: README.md and other markdown files rendered with theme-aware styling
+- **Markdown rendering**: README.md and other markdown files rendered with theme-aware styling in file tabs
+- **Markdown review system**: Review tabs with grid layout (content + comment margin) for inline document commenting
+- **Line-tracked rendering**: Review tabs render markdown blocks with line number metadata for selection-to-comment mapping
+- **Selection-based commenting**: Select text in review tabs to add comments aligned to markdown blocks
+- **Comment stacking**: Multiple comments on same block stack visually with z-index reordering on click
+- **Review workflows**: Submit reviews (stubbed IPC ready for hegel CLI) or cancel with confirmation dialog
 - **Markdown link navigation**: Click markdown links to navigate between files in tab system (regular click navigates, Cmd+click opens new tab)
 - **Theme system**: Application-wide theming with auto/dark/light/synthwave modes, localStorage persistence, system preference tracking
 - **Multi-terminal**: Right panel supports multiple independent bash sessions in separate tabs
@@ -53,7 +58,7 @@ npm run lint          # Check code with eslint
 - **Data caching**: Project details cached with refresh button for fresh data
 - **State persistence**: Split position and theme preference saved to localStorage
 - **Multi-terminal IPC**: Renderer ↔ main process communication routes I/O by terminalId
-- **E2E test suite**: 63 tests covering tabs, terminals, projects, markdown rendering, markdown tree navigation, themes, settings, and layout
+- **E2E test suite**: 70 tests covering tabs, terminals, projects, markdown rendering, review tabs, line tracking, themes, settings, and layout
 
 ## Usage
 
@@ -72,6 +77,19 @@ npm run lint          # Check code with eslint
 - Project detail tabs include "Refresh" button to fetch fresh data (metrics, tree, and README)
 - Click "×" on project tabs to close them
 - Reopening a project uses cached data for instant display
+
+**Left Panel - Review Tabs:**
+- Review tabs provide inline commenting interface for markdown documents
+- Grid layout with markdown content on left, collapsible comment margin on right
+- Line numbers displayed for each markdown block (headings, paragraphs, code, lists, tables)
+- Select any text within a block to open comment form in margin
+- Comment form shows selected text preview and line range
+- Save comments to pending queue (displayed as stacked cards in margin)
+- Multiple comments on same block stack with visual offset, click to bring to front
+- Submit Review button sends all pending comments via IPC (stubbed, ready for hegel CLI integration)
+- Cancel Review button discards pending comments with confirmation dialog
+- Comment count badge shows number of pending comments
+- Submit button disabled when no comments exist
 
 **Settings Tab:**
 - Click ⚙️ button in Projects tab to open Settings
@@ -123,9 +141,10 @@ hegel-ide/
 │   └── lib/                Unit tests for renderer modules
 │
 ├── .ddd/                   Document-Driven Development artifacts
-│   ├── toys/               Discovery mode experiments (toy1: terminal, toy2: playwright)
+│   ├── toys/               Discovery mode experiments (toy1-3: terminal, playwright, line-tracking)
 │   └── feat/               Execution mode feature specs and plans
 │       ├── markdown_links/            Markdown link navigation with tab management
+│       ├── markdown_review/           Markdown review tabs with inline commenting
 │       ├── markdown_tree_nav/         Markdown document tree display and navigation
 │       ├── project_readme_render/     Markdown browser Phase 1
 │       ├── settings_tab/              Settings tab with theme selector and dev tools
@@ -142,11 +161,11 @@ hegel-ide/
 
 ## Testing
 
-- **Playwright E2E tests**: 63 tests covering tabs, terminals, projects, markdown rendering, markdown tree, themes, settings, split-pane, and app launch
-- **Vitest unit tests**: 41 tests covering frontend modules (split-pane, tabs, terminals, projects, markdown, themes)
+- **Playwright E2E tests**: 70 tests covering tabs, terminals, projects, file tabs, review tabs, line tracking, markdown rendering, markdown tree, themes, settings, split-pane, and app launch
+- **Vitest unit tests**: 21 tests for markdown-line-tracking module (pure functions, no framework dependencies)
 - **Test execution**: E2E via `npm test`, unit tests <1 second via `npm run test:unit`
 - **Test infrastructure**: launchTestElectron() helper in test-constants.js centralizes Electron launch with TESTING env var
-- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, README rendering, markdown tree navigation, theme system, Settings tab)
+- **Coverage**: ~90% of current functionality (tab operations, multi-terminal, project details, file tabs, review workflows, markdown rendering, line tracking, markdown tree navigation, theme system, Settings tab)
 
 ## Known Limitations
 

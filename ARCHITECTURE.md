@@ -20,8 +20,8 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - Perfect fit for Electron renderer process
 - Just enough magic to avoid manual DOM manipulation, not enough to move business logic into views
 
-**Markdown Rendering**: TBD (markdown-it, marked, or similar)
-**Rationale**: Need HTML output with proper formatting, syntax highlighting for code blocks (even though users don't edit code, specs/plans contain examples)
+**Markdown Rendering**: marked (~50kb)
+**Rationale**: GFM-compatible HTML output, extensible lexer/parser for line tracking, no dependencies, battle-tested
 
 **Key Dependencies** (minimal):
 - Electron (platform)
@@ -231,19 +231,25 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 
 ---
 
+## Resolved Decisions
+
+**Made during implementation:**
+
+- [x] **Markdown rendering library**: marked (extensible lexer for line tracking)
+- [x] **CSS framework**: Vanilla CSS with theme system (CSS variables for theming)
+- [x] **Review/commenting UX**: Grid layout with content area + collapsible comment margin, selection-based commenting, card stacking for multiple comments
+- [x] **CLI output parsing**: JSON output from hegel commands (`--json` flag)
+- [x] **Build system**: esbuild for fast bundling of renderer modules
+
 ## Open Questions
 
-**To investigate during Discovery phase:**
+**Still to investigate:**
 
-- [ ] Markdown rendering library choice (markdown-it vs marked vs remark)
 - [ ] Syntax highlighting for code blocks in markdown (even though no code editor)
-- [ ] CSS framework/approach (Tailwind, vanilla, utility-first, something else)
-- [ ] Review/commenting UX design (inspired by hegel-mirror)
 - [ ] Multi-project dashboard design
-- [ ] CLI output parsing strategy (structured JSON output vs text parsing)
-- [ ] Performance characteristics of Electron for this use case
 - [ ] Build/distribution strategy (electron-builder, forge, manual)
 - [ ] Auto-update mechanism (or manual updates acceptable)
+- [ ] Performance characteristics at scale (large documents, many projects)
 - [ ] Other technical unknowns TBD
 
 ---
