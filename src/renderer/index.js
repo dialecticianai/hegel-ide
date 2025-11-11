@@ -2,7 +2,7 @@
 
 import Alpine from 'alpinejs';
 import { createSplitPane } from './split-pane.js';
-import { createTabs } from './tabs.js';
+import { createTabs, initializeReviewIPC } from './tabs.js';
 import { createTerminals, initializeDefaultTerminal } from './terminals.js';
 import { createProjects } from './projects.js';
 import { createMarkdown } from './markdown.js';
@@ -47,3 +47,6 @@ Alpine.start();
 
 // Initialize default terminal
 initializeDefaultTerminal();
+
+// Initialize review IPC listener
+initializeReviewIPC();

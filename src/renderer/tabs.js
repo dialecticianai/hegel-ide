@@ -423,3 +423,27 @@ export function createTabs() {
       }
     };
 }
+
+// Initialize IPC listener for opening review tabs from HTTP server
+export function initializeReviewIPC() {
+  ipcRenderer.on('open-review-tabs', (event, { files }) => {
+    const alpineData = Alpine.$data(document.getElementById('app'));
+    const projects = alpineData.projects || [];
+
+    // For each file, find matching project and open review tab
+    files.forEach(filePath => {
+      let projectPath = null;
+
+      // Find matching project
+      for (const project of projects) {
+        if (project.project_path && filePath.startsWith(project.project_path + '/')) {
+          projectPath = project.project_path;
+          break;
+        }
+      }
+
+      // Open review tab with matched project path (or null)
+      alpineData.openReviewTab(filePath, projectPath);
+    });
+  });
+}
