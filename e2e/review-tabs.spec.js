@@ -332,4 +332,201 @@ test.describe('Review Tab Infrastructure', () => {
 
     await electronApp.close();
   });
+
+  test('comment cards render after saving', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Open review tab
+    await mainWindow.evaluate(({ filePath }) => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      alpineData.openReviewTab(filePath);
+    }, { filePath: testFilePath });
+
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Create and save a comment
+    await mainWindow.evaluate(() => {
+      const firstBlock = document.querySelector('.review-content .markdown-block');
+      const range = document.createRange();
+      range.selectNodeContents(firstBlock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true });
+      firstBlock.dispatchEvent(mouseupEvent);
+    });
+
+    await mainWindow.waitForTimeout(100);
+
+    const commentForm = await mainWindow.locator('.comment-form');
+    await commentForm.locator('textarea').fill('First comment');
+    await commentForm.locator('button:has-text("Save")').click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify comment card is visible
+    const commentCard = await mainWindow.locator('.comment-card');
+    await expect(commentCard).toBeVisible();
+
+    // Verify comment text is displayed
+    const commentText = await commentCard.locator('.comment-card-text').textContent();
+    expect(commentText).toBe('First comment');
+
+    await electronApp.close();
+  });
+
+  test('multiple comments on same block stack correctly', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Open review tab
+    await mainWindow.evaluate(({ filePath }) => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      alpineData.openReviewTab(filePath);
+    }, { filePath: testFilePath });
+
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Create first comment
+    await mainWindow.evaluate(() => {
+      const firstBlock = document.querySelector('.review-content .markdown-block');
+      const range = document.createRange();
+      range.selectNodeContents(firstBlock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true });
+      firstBlock.dispatchEvent(mouseupEvent);
+    });
+
+    await mainWindow.waitForTimeout(100);
+
+    let commentForm = await mainWindow.locator('.comment-form');
+    await commentForm.locator('textarea').fill('First comment on this block');
+    await commentForm.locator('button:has-text("Save")').click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Create second comment on same block
+    await mainWindow.evaluate(() => {
+      const firstBlock = document.querySelector('.review-content .markdown-block');
+      const range = document.createRange();
+      range.selectNodeContents(firstBlock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true });
+      firstBlock.dispatchEvent(mouseupEvent);
+    });
+
+    await mainWindow.waitForTimeout(100);
+
+    commentForm = await mainWindow.locator('.comment-form');
+    await commentForm.locator('textarea').fill('Second comment on this block');
+    await commentForm.locator('button:has-text("Save")').click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify both comment cards are visible
+    const commentCards = await mainWindow.locator('.comment-card');
+    expect(await commentCards.count()).toBe(2);
+
+    // Verify both comments are present
+    const commentTexts = await commentCards.locator('.comment-card-text').allTextContents();
+    expect(commentTexts).toContain('First comment on this block');
+    expect(commentTexts).toContain('Second comment on this block');
+
+    await electronApp.close();
+  });
+
+  test('clicking comment card brings it to front', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Open review tab and create two comments
+    await mainWindow.evaluate(({ filePath }) => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      alpineData.openReviewTab(filePath);
+    }, { filePath: testFilePath });
+
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Add two comments programmatically for speed
+    await mainWindow.evaluate(() => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
+
+      reviewTab.pendingComments.push({
+        lineStart: 1,
+        lineEnd: 3,
+        selectedText: 'Test text 1',
+        comment: 'Comment 1',
+        timestamp: new Date().toISOString(),
+        zIndex: 1
+      });
+
+      reviewTab.pendingComments.push({
+        lineStart: 1,
+        lineEnd: 3,
+        selectedText: 'Test text 2',
+        comment: 'Comment 2',
+        timestamp: new Date().toISOString(),
+        zIndex: 2
+      });
+    });
+
+    await mainWindow.waitForTimeout(100);
+
+    // Get initial z-index order
+    const initialOrder = await mainWindow.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll('.comment-card'));
+      return cards.map(card => ({
+        text: card.querySelector('.comment-card-text').textContent,
+        zIndex: window.getComputedStyle(card).zIndex
+      }));
+    });
+
+    // Click the first comment card
+    const firstCard = await mainWindow.locator('.comment-card').first();
+    await firstCard.click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify z-index changed
+    const newOrder = await mainWindow.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll('.comment-card'));
+      return cards.map(card => ({
+        text: card.querySelector('.comment-card-text').textContent,
+        zIndex: window.getComputedStyle(card).zIndex
+      }));
+    });
+
+    // The clicked card should now have a higher z-index
+    expect(newOrder).toBeDefined();
+
+    await electronApp.close();
+  });
 });

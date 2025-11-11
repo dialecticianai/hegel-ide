@@ -230,7 +230,21 @@
                       </div>
                     </div>
 
-                    <!-- Placeholder for comment cards (Step 5) -->
+                    <!-- Comment cards (stacked) -->
+                    <div class="comment-cards-container">
+                      <template x-for="(comment, index) in tab.pendingComments" :key="index">
+                        <div class="comment-card"
+                             :style="`z-index: ${comment.zIndex}; transform: translate(${index * 4}px, ${index * 4}px);`"
+                             @click="bringCommentToFront(tab.id, index)">
+                          <div class="comment-card-header">
+                            <span class="comment-card-lines" x-text="`Lines ${comment.lineStart}-${comment.lineEnd}`"></span>
+                            <span class="comment-card-time" x-text="new Date(comment.timestamp).toLocaleTimeString()"></span>
+                          </div>
+                          <div class="comment-card-selected" x-text="comment.selectedText"></div>
+                          <div class="comment-card-text" x-text="comment.comment"></div>
+                        </div>
+                      </template>
+                    </div>
                   </div>
                 </div>
               </div>

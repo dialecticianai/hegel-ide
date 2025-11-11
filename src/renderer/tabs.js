@@ -246,13 +246,17 @@ export function createTabs() {
           return;
         }
 
+        // Calculate next z-index (highest existing + 1)
+        const maxZIndex = tab.pendingComments.reduce((max, c) => Math.max(max, c.zIndex || 0), 0);
+
         // Add to pending comments
         tab.pendingComments.push({
           lineStart: form.lineStart,
           lineEnd: form.lineEnd,
           selectedText: form.selectedText,
           comment: form.commentText.trim(),
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          zIndex: maxZIndex + 1
         });
 
         // Clear form
@@ -268,6 +272,30 @@ export function createTabs() {
           tab.activeCommentForm = null;
           window.getSelection().removeAllRanges();
         }
+      },
+
+      bringCommentToFront(tabId, commentIndex) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (!tab || tab.type !== 'review') {
+          return;
+        }
+
+        // Find max z-index
+        const maxZIndex = tab.pendingComments.reduce((max, c) => Math.max(max, c.zIndex || 0), 0);
+
+        // Set clicked comment's z-index to max + 1
+        tab.pendingComments[commentIndex].zIndex = maxZIndex + 1;
+      },
+
+      getCommentsForBlock(tab, lineStart, lineEnd) {
+        if (!tab || !tab.pendingComments) {
+          return [];
+        }
+
+        // Return comments that overlap with this block's line range
+        return tab.pendingComments.filter(comment =>
+          comment.lineStart === lineStart && comment.lineEnd === lineEnd
+        );
       },
 
       async fetchFileContent(absoluteFilePath) {
