@@ -179,7 +179,8 @@ export function createTabs() {
           filePath: absoluteFilePath,
           projectPath: projectPath,
           pendingComments: [],
-          marginCollapsed: true
+          marginCollapsed: true,
+          activeCommentForm: null
         };
 
         this.leftTabs.push(newTab);
@@ -195,6 +196,77 @@ export function createTabs() {
         const tab = this.leftTabs.find(t => t.id === tabId);
         if (tab && tab.type === 'review') {
           tab.marginCollapsed = !tab.marginCollapsed;
+        }
+      },
+
+      // Review tab selection and commenting
+      handleReviewSelection(tabId) {
+        const selection = window.getSelection();
+        const selectedText = selection.toString().trim();
+
+        // Ignore empty selections
+        if (!selectedText) {
+          return;
+        }
+
+        // Find the containing markdown block
+        const blockInfo = window.HegelIDE.findMarkdownBlock(selection.anchorNode);
+        if (!blockInfo) {
+          return;
+        }
+
+        // Show comment form for this block
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (tab && tab.type === 'review') {
+          // Store active comment form state
+          tab.activeCommentForm = {
+            lineStart: blockInfo.lineStart,
+            lineEnd: blockInfo.lineEnd,
+            selectedText: selectedText,
+            commentText: ''
+          };
+
+          // Auto-expand margin if collapsed
+          if (tab.marginCollapsed) {
+            tab.marginCollapsed = false;
+          }
+        }
+      },
+
+      addComment(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (!tab || tab.type !== 'review' || !tab.activeCommentForm) {
+          return;
+        }
+
+        const form = tab.activeCommentForm;
+
+        // Validate comment text
+        if (!form.commentText || form.commentText.trim().length === 0) {
+          return;
+        }
+
+        // Add to pending comments
+        tab.pendingComments.push({
+          lineStart: form.lineStart,
+          lineEnd: form.lineEnd,
+          selectedText: form.selectedText,
+          comment: form.commentText.trim(),
+          timestamp: new Date().toISOString()
+        });
+
+        // Clear form
+        tab.activeCommentForm = null;
+
+        // Clear text selection
+        window.getSelection().removeAllRanges();
+      },
+
+      cancelCommentForm(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (tab && tab.type === 'review') {
+          tab.activeCommentForm = null;
+          window.getSelection().removeAllRanges();
         }
       },
 

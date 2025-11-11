@@ -192,4 +192,144 @@ test.describe('Review Tab Infrastructure', () => {
 
     await electronApp.close();
   });
+
+  test('can select text and create comment', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Open review tab
+    await mainWindow.evaluate(({ filePath }) => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      alpineData.openReviewTab(filePath);
+    }, { filePath: testFilePath });
+
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Simulate text selection in first markdown block
+    const selectionResult = await mainWindow.evaluate(() => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      const firstBlock = document.querySelector('.review-content .markdown-block');
+
+      if (!firstBlock) {
+        return { error: 'No markdown block found' };
+      }
+
+      // Create a selection
+      const range = document.createRange();
+      range.selectNodeContents(firstBlock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      // Simulate mouseup event to trigger selection handler
+      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true });
+      firstBlock.dispatchEvent(mouseupEvent);
+
+      // Get the block info using the exposed function
+      const blockInfo = window.HegelIDE.findMarkdownBlock(selection.anchorNode);
+
+      return {
+        selectedText: selection.toString().substring(0, 50), // First 50 chars
+        blockInfo: blockInfo
+      };
+    });
+
+    expect(selectionResult.error).toBeUndefined();
+    expect(selectionResult.blockInfo).toBeDefined();
+    expect(selectionResult.blockInfo.lineStart).toBeGreaterThan(0);
+
+    // Wait for comment form to appear
+    await mainWindow.waitForTimeout(100);
+
+    // Verify comment form is visible
+    const commentForm = await mainWindow.locator('.comment-form');
+    await expect(commentForm).toBeVisible();
+
+    // Fill in comment text
+    await commentForm.locator('textarea').fill('This is a test comment');
+
+    // Click save button
+    await commentForm.locator('button:has-text("Save")').click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify comment was added to pendingComments
+    const pendingComments = await mainWindow.evaluate(() => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
+      return reviewTab ? reviewTab.pendingComments : [];
+    });
+
+    expect(pendingComments.length).toBe(1);
+    expect(pendingComments[0].comment).toBe('This is a test comment');
+    expect(pendingComments[0].lineStart).toBeGreaterThan(0);
+    expect(pendingComments[0].selectedText).toBeDefined();
+
+    await electronApp.close();
+  });
+
+  test('can cancel comment form without saving', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    await mainWindow.waitForTimeout(ALPINE_INIT);
+
+    // Open review tab
+    await mainWindow.evaluate(({ filePath }) => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      alpineData.openReviewTab(filePath);
+    }, { filePath: testFilePath });
+
+    await mainWindow.waitForTimeout(TAB_CREATE);
+
+    // Simulate text selection
+    await mainWindow.evaluate(() => {
+      const firstBlock = document.querySelector('.review-content .markdown-block');
+      const range = document.createRange();
+      range.selectNodeContents(firstBlock);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      const mouseupEvent = new MouseEvent('mouseup', { bubbles: true });
+      firstBlock.dispatchEvent(mouseupEvent);
+    });
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify comment form appears
+    const commentForm = await mainWindow.locator('.comment-form');
+    await expect(commentForm).toBeVisible();
+
+    // Click cancel button
+    await commentForm.locator('button:has-text("Cancel")').click();
+
+    await mainWindow.waitForTimeout(100);
+
+    // Verify form is hidden
+    await expect(commentForm).not.toBeVisible();
+
+    // Verify no comments were added
+    const pendingComments = await mainWindow.evaluate(() => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
+      return reviewTab ? reviewTab.pendingComments : [];
+    });
+
+    expect(pendingComments.length).toBe(0);
+
+    await electronApp.close();
+  });
 });

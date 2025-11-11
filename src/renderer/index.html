@@ -201,7 +201,8 @@
                 <div x-show="fileContents[tab.filePath]?.content" class="review-grid">
                   <!-- Content area with line-tracked markdown -->
                   <div class="review-content"
-                       x-html="window.HegelIDE.parseMarkdownWithLines(fileContents[tab.filePath]?.content, 'html')"></div>
+                       x-html="window.HegelIDE.parseMarkdownWithLines(fileContents[tab.filePath]?.content, 'html')"
+                       @mouseup="handleReviewSelection(tab.id)"></div>
 
                   <!-- Comment margin (collapsed by default) -->
                   <div class="comment-margin"
@@ -212,6 +213,23 @@
                             :title="tab.marginCollapsed ? 'Expand margin' : 'Collapse margin'">
                       <span x-text="tab.marginCollapsed ? '◀' : '▶'"></span>
                     </button>
+
+                    <!-- Comment form (shown when selection is active) -->
+                    <div x-show="tab.activeCommentForm" class="comment-form">
+                      <div class="comment-form-header">
+                        <span class="comment-form-lines" x-text="tab.activeCommentForm ? `Lines ${tab.activeCommentForm.lineStart}-${tab.activeCommentForm.lineEnd}` : ''"></span>
+                      </div>
+                      <div class="comment-form-selected" x-text="tab.activeCommentForm?.selectedText"></div>
+                      <textarea class="comment-form-textarea"
+                                placeholder="Add your comment..."
+                                x-model="tab.activeCommentForm.commentText"
+                                rows="4"></textarea>
+                      <div class="comment-form-actions">
+                        <button @click="addComment(tab.id)" class="comment-form-save">Save</button>
+                        <button @click="cancelCommentForm(tab.id)" class="comment-form-cancel">Cancel</button>
+                      </div>
+                    </div>
+
                     <!-- Placeholder for comment cards (Step 5) -->
                   </div>
                 </div>
