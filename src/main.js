@@ -293,21 +293,67 @@ function createWindow() {
     }
   });
 
-  // Handle save-review request (STUBBED for MVP)
-  // TODO: Implement actual hegel CLI integration when command is available
+  // Handle save-review request
   ipcMain.handle('save-review', async (event, reviewData) => {
-    // Stub: Always return success for now
-    // Real implementation will:
-    // 1. Spawn hegel process with review command
-    // 2. Write reviewData as JSON to stdin
-    // 3. Parse stdout response
-    // 4. Return { success: true } or { success: false, error: message }
-    console.log('save-review called (stubbed):', {
-      file: reviewData.file,
-      commentCount: reviewData.comments.length
-    });
+    try {
+      const { file, projectPath, comments } = reviewData;
 
-    return { success: true };
+      if (!comments || comments.length === 0) {
+        return { success: false, error: 'No comments to save' };
+      }
+
+      // Convert comments to JSONL format expected by hegel
+      const jsonl = comments.map(c => JSON.stringify({
+        timestamp: c.timestamp,
+        file: file,
+        selection: {
+          start: { line: c.line_start, col: 0 },
+          end: { line: c.line_end, col: 0 }
+        },
+        text: c.selected_text,
+        comment: c.comment
+      })).join('\n');
+
+      // Use projectPath or fall back to terminalCwd
+      const cwd = projectPath || terminalCwd;
+
+      // Spawn hegel review process
+      return new Promise((resolve, reject) => {
+        const hegelProcess = spawn('hegel', ['review', file], {
+          cwd: cwd,
+          env: process.env
+        });
+
+        let stdout = '';
+        let stderr = '';
+
+        hegelProcess.stdout.on('data', (data) => {
+          stdout += data.toString();
+        });
+
+        hegelProcess.stderr.on('data', (data) => {
+          stderr += data.toString();
+        });
+
+        hegelProcess.on('error', (error) => {
+          resolve({ success: false, error: `Failed to spawn hegel: ${error.message}` });
+        });
+
+        hegelProcess.on('close', (code) => {
+          if (code === 0) {
+            resolve({ success: true });
+          } else {
+            resolve({ success: false, error: stderr || `hegel review exited with code ${code}` });
+          }
+        });
+
+        // Write JSONL to stdin and close
+        hegelProcess.stdin.write(jsonl + '\n');
+        hegelProcess.stdin.end();
+      });
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
   });
 
   // Handle get-terminal-cwd request
