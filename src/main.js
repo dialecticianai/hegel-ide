@@ -238,6 +238,23 @@ function createWindow() {
     }
   });
 
+  // Handle save-review request (STUBBED for MVP)
+  // TODO: Implement actual hegel CLI integration when command is available
+  ipcMain.handle('save-review', async (event, reviewData) => {
+    // Stub: Always return success for now
+    // Real implementation will:
+    // 1. Spawn hegel process with review command
+    // 2. Write reviewData as JSON to stdin
+    // 3. Parse stdout response
+    // 4. Return { success: true } or { success: false, error: message }
+    console.log('save-review called (stubbed):', {
+      file: reviewData.file,
+      commentCount: reviewData.comments.length
+    });
+
+    return { success: true };
+  });
+
   // Handle get-terminal-cwd request
   ipcMain.handle('get-terminal-cwd', async () => {
     return { cwd: terminalCwd };

@@ -645,6 +645,74 @@ body.theme-synthwave .open-terminal-button {
   flex-direction: column;
 }
 
+.review-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.review-toolbar-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.review-file-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.review-comment-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+}
+
+.review-toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.review-cancel-button,
+.review-submit-button {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.review-cancel-button {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.review-cancel-button:hover {
+  background: var(--bg-hover);
+}
+
+.review-submit-button {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.review-submit-button:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+.review-submit-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .review-grid {
   display: grid;
   grid-template-columns: 1fr auto;

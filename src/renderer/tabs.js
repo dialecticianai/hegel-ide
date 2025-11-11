@@ -298,6 +298,72 @@ export function createTabs() {
         );
       },
 
+      async submitReview(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (!tab || tab.type !== 'review' || tab.pendingComments.length === 0) {
+          return;
+        }
+
+        try {
+          // Format review data for hegel CLI
+          const reviewData = {
+            file: tab.filePath,
+            projectPath: tab.projectPath,
+            comments: tab.pendingComments.map(c => ({
+              line_start: c.lineStart,
+              line_end: c.lineEnd,
+              selected_text: c.selectedText,
+              comment: c.comment,
+              timestamp: c.timestamp
+            }))
+          };
+
+          // Call IPC handler (stubbed for MVP)
+          const result = await ipcRenderer.invoke('save-review', reviewData);
+
+          if (result.success) {
+            // Clear pending comments
+            tab.pendingComments = [];
+            // Collapse margin
+            tab.marginCollapsed = true;
+            // Clear active form if present
+            tab.activeCommentForm = null;
+          } else {
+            // Show error message (preserve comments)
+            console.error('Failed to save review:', result.error);
+            alert('Failed to save review: ' + (result.error || 'Unknown error'));
+          }
+        } catch (error) {
+          console.error('Error submitting review:', error);
+          alert('Error submitting review: ' + error.message);
+        }
+      },
+
+      cancelReview(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (!tab || tab.type !== 'review') {
+          return;
+        }
+
+        // If there are pending comments, show confirmation
+        if (tab.pendingComments.length > 0) {
+          const confirmed = confirm(
+            `Discard ${tab.pendingComments.length} pending comment${tab.pendingComments.length !== 1 ? 's' : ''}?`
+          );
+
+          if (!confirmed) {
+            return;
+          }
+        }
+
+        // Clear all pending comments
+        tab.pendingComments = [];
+        // Collapse margin
+        tab.marginCollapsed = true;
+        // Clear active form if present
+        tab.activeCommentForm = null;
+      },
+
       async fetchFileContent(absoluteFilePath) {
         try {
           this.fileContents[absoluteFilePath] = {
