@@ -95,6 +95,8 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - Spawn hegel CLI processes (child_process)
 - File system access (read JSON/markdown files)
 - IPC handlers (expose file/CLI operations to renderer)
+- HTTP server for hegel CLI integration (local only)
+- Terminal environment injection (HEGEL_IDE_URL)
 - Window management
 
 **Renderer Process Responsibilities**:
@@ -102,6 +104,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - Markdown rendering (HTML output)
 - Review/commenting interface
 - Display logic and user interaction
+- IPC listeners for programmatic tab opening
 
 **Rationale**: Standard Electron architecture, clear security boundaries
 
@@ -157,6 +160,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - File system: Read `.hegel/` directories, markdown files
 - CLI: Spawn `hegel` processes, parse output
 - User projects: Discover/navigate projects with `.hegel/` directories
+- HTTP server: Local HTTP API for hegel CLI to trigger review tab opening (POST /review)
 
 ---
 
@@ -240,6 +244,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - [x] **Review/commenting UX**: Grid layout with content area + collapsible comment margin, selection-based commenting, card stacking for multiple comments
 - [x] **CLI output parsing**: JSON output from hegel commands (`--json` flag)
 - [x] **Build system**: esbuild for fast bundling of renderer modules
+- [x] **CLI-to-IDE communication**: HTTP server in main process (port 0, OS-assigned) with HEGEL_IDE_URL env var injection for bidirectional integration
 
 ## Open Questions
 
