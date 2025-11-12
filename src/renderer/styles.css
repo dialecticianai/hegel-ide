@@ -285,6 +285,15 @@ h2 {
   white-space: nowrap;
 }
 
+.tab[title]:not([title=""]) {
+  cursor: help;
+}
+
+.tab-file-path {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
 .tab.active {
   background: var(--bg-primary);
   border-bottom: 2px solid var(--border-active);

@@ -141,7 +141,8 @@ export function createProjects() {
 
       async refreshProjectDetails(projectName) {
         await this.fetchProjectDetails(projectName);
-        await this.fetchProjectReadme(projectName);
+        const currentFile = this.projectDetails[projectName]?.currentFile || 'README.md';
+        await this.loadFileInline(projectName, currentFile);
       },
 
       buildTreeFromPaths(files) {
@@ -305,6 +306,34 @@ export function createProjects() {
         if (!path) return '';
         const homeDir = require('os').homedir();
         return path.replace(homeDir, '$HOME');
+      },
+
+      compressFilePath(filePath) {
+        if (!filePath) return '';
+
+        // Remove .md extension for display
+        const withoutExt = filePath.replace(/\.md$/, '');
+
+        // Split into parts
+        const parts = withoutExt.split('/');
+
+        // If 3 or fewer parts, no compression needed
+        if (parts.length <= 3) {
+          return withoutExt;
+        }
+
+        // Compress: first..second-to-last/last
+        const first = parts[0];
+        const secondToLast = parts[parts.length - 2];
+        const last = parts[parts.length - 1];
+        const compressed = `${first}..${secondToLast}/${last}`;
+
+        // Only use compression if it saves at least 3 characters
+        if (withoutExt.length - compressed.length >= 3) {
+          return compressed;
+        }
+
+        return withoutExt;
       },
 
       formatWorkflowState(state) {

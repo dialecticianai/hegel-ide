@@ -18,8 +18,18 @@
           <template x-for="tab in leftTabs" :key="tab.id">
             <div class="tab"
                  :class="{ 'active': activeLeftTab === tab.id }"
-                 @click="switchLeftTab(tab.id)">
-              <span x-text="tab.label"></span>
+                 @click="switchLeftTab(tab.id)"
+                 :title="tab.type === 'project-detail' && projectDetails[tab.projectName]?.currentFile
+                   ? projectDetails[tab.projectName].currentFile
+                   : ''">
+              <template x-if="tab.type === 'project-detail' && projectDetails[tab.projectName]?.currentFile">
+                <span>
+                  <span x-text="tab.projectName"></span><span class="tab-separator">: </span><span class="tab-file-path" x-text="compressFilePath(projectDetails[tab.projectName].currentFile)"></span>
+                </span>
+              </template>
+              <template x-if="!(tab.type === 'project-detail' && projectDetails[tab.projectName]?.currentFile)">
+                <span x-text="tab.label"></span>
+              </template>
               <button x-show="tab.type === 'project-detail'"
                       class="refresh-tab"
                       :class="{ 'spinning': projectDetails[tab.projectName]?.loading }"
