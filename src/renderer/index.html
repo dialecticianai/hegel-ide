@@ -313,9 +313,14 @@
         </div>
 
         <template x-for="tab in rightTabs" :key="tab.id">
-          <div x-show="activeRightTab === tab.id"
-               :id="'terminal-container-' + tab.terminalId"
-               class="terminal-container"></div>
+          <div x-show="activeRightTab === tab.id" class="terminal-wrapper">
+            <div class="terminal-macros">
+              <button class="terminal-macro-button" @click="sendMacro(tab.terminalId, 'LGTM')">LGTM</button>
+              <button class="terminal-macro-button" @click="sendMacro(tab.terminalId, 'Proceed')">Proceed</button>
+            </div>
+            <div :id="'terminal-container-' + tab.terminalId"
+                 class="terminal-container"></div>
+          </div>
         </template>
       </div>
     </div>

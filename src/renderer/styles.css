@@ -383,11 +383,43 @@ body.theme-synthwave .tab.active::after {
   padding: 20px;
 }
 
-.terminal-container {
+.terminal-wrapper {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
   background: var(--bg-terminal);
   border-radius: 4px;
+}
+
+.terminal-macros {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--bg-terminal);
+}
+
+.terminal-macro-button {
+  background: var(--bg-terminal);
+  border: none;
+  color: var(--text-primary);
+  padding: 4px 12px;
+  font-family: '"DejaVuSansM Nerd Font Mono", "Courier New", Courier, monospace';
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.terminal-macro-button:hover {
+  opacity: 1;
+}
+
+.terminal-container {
+  width: 100%;
+  flex: 1;
+  background: var(--bg-terminal);
 }
 
 .empty-terminal-state {

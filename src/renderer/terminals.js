@@ -9,6 +9,13 @@ export function createTerminals() {
       terminals: {},
       nextTerminalNumber: 2,
 
+      sendMacro(terminalId, text) {
+        if (this.terminals[terminalId]) {
+          // Send the text followed by Enter (\r) to the terminal
+          ipcRenderer.send('terminal-input', { terminalId, data: text + '\r' });
+        }
+      },
+
       async addTerminalTab() {
         const terminalId = 'term-' + this.nextTerminalNumber;
         const tabId = terminalId;
