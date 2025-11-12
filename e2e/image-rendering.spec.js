@@ -1,6 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron } = require('./test-constants');
-const { PROJECT_LOAD, TAB_CREATE, ALPINE_INIT } = require('./test-constants');
+const { launchTestElectron, PROJECT_LOAD, TAB_CREATE, ALPINE_INIT, waitForProjectContent, waitForAutoOpenedProject } = require('./test-constants');
 const path = require('path');
 
 test.describe('Image Rendering', () => {
@@ -112,6 +111,38 @@ test.describe('Image Rendering', () => {
     const src = await image.getAttribute('src');
     expect(src).toBeTruthy();
     expect(src).not.toBe('test-pixel.png'); // Should be transformed to absolute path
+
+    await electronApp.close();
+  });
+
+  test('renders images in project README with correct file:// URLs', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    // Wait for hegel-ide to auto-open (happens when terminal CWD matches project path)
+    await waitForAutoOpenedProject(mainWindow);
+
+    // Wait for project README to load
+    await waitForProjectContent(mainWindow);
+
+    // Check if the hegel.jpg image is rendered
+    const image = await mainWindow.locator('.markdown-content img[alt="Hegel"]');
+    expect(await image.count()).toBe(1);
+
+    // Verify src is transformed to file:// URL
+    const src = await image.getAttribute('src');
+    expect(src).toBeTruthy();
+    expect(src).toContain('file://');
+    expect(src).toContain('hegel.jpg');
+
+    // Verify image actually loaded by checking naturalWidth
+    const imageLoaded = await image.evaluate(img => img.naturalWidth > 0);
+    expect(imageLoaded).toBe(true);
 
     await electronApp.close();
   });

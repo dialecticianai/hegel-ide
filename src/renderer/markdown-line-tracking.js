@@ -8,15 +8,17 @@
  */
 
 import { marked } from 'marked';
+import { transformImagePaths } from './markdown-utils.js';
 
 /**
  * Parse markdown with block-level line tracking
  *
  * @param {string} markdown - Source markdown content
  * @param {string} outputFormat - 'html' for wrapped HTML string, 'array' for block objects
+ * @param {string} absoluteFilePath - Optional absolute path for resolving relative image paths
  * @returns {string|Array} - Wrapped HTML or array of block objects
  */
-export function parseMarkdownWithLines(markdown, outputFormat = 'html') {
+export function parseMarkdownWithLines(markdown, outputFormat = 'html', absoluteFilePath = null) {
   // Handle empty or invalid input
   if (!markdown || markdown.trim().length === 0) {
     return outputFormat === 'html' ? '' : [];
@@ -75,9 +77,14 @@ export function parseMarkdownWithLines(markdown, outputFormat = 'html') {
   }
 
   // Generate HTML with wrapper divs
-  return blocks.map(block =>
+  let html = blocks.map(block =>
     `<div class="markdown-block" data-line-start="${block.lineStart}" data-line-end="${block.lineEnd}" data-type="${block.type}">\n${block.html}\n</div>`
   ).join('\n');
+
+  // Transform relative image paths to absolute file:// URLs
+  html = transformImagePaths(html, absoluteFilePath);
+
+  return html;
 }
 
 /**

@@ -2,6 +2,7 @@
 
 const { ipcRenderer } = require('electron');
 const { marked } = require('marked');
+import { resolveRelativePath, transformImagePaths } from './markdown-utils.js';
 
 export function createMarkdown() {
     return {
@@ -11,24 +12,7 @@ export function createMarkdown() {
         let html = marked.parse(content);
 
         // Transform relative image paths to absolute file:// URLs
-        if (absoluteFilePath) {
-          // Get the directory of the current file
-          const fileDir = absoluteFilePath.substring(0, absoluteFilePath.lastIndexOf('/'));
-
-          // Transform both <img src="..."> and markdown images
-          html = html.replace(
-            /(<img[^>]+src=["'])([^"':]+)(["'])/g,
-            (match, prefix, src, suffix) => {
-              // Skip absolute URLs (http://, https://, file://, data:)
-              if (src.match(/^([a-z]+:|\/)/i)) {
-                return match;
-              }
-              // Convert relative path to file:// URL
-              const absolutePath = `file://${fileDir}/${src}`;
-              return `${prefix}${absolutePath}${suffix}`;
-            }
-          );
-        }
+        html = transformImagePaths(html, absoluteFilePath);
 
         return html;
       },
@@ -67,8 +51,7 @@ export function createMarkdown() {
         if (!currentTab || !currentTab.filePath) return;
 
         // Resolve relative path to absolute path
-        const currentFileDir = currentTab.filePath.substring(0, currentTab.filePath.lastIndexOf('/'));
-        const absoluteFilePath = `${currentFileDir}/${relativeFilePath}`;
+        const absoluteFilePath = resolveRelativePath(currentTab.filePath, relativeFilePath);
 
         // Determine if we should open in a new tab based on modifier keys
         const openInNewTab = event.metaKey || event.ctrlKey || event.shiftKey || event.button === 1;

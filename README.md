@@ -1,5 +1,7 @@
 # Hegel IDE
 
+![Hegel](hegel.jpg)
+
 Electron-based no-code IDE for AI-first development. No code editor by design - work at the orchestration level.
 
 ## Vision

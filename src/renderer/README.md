@@ -16,6 +16,7 @@ renderer/
 ├── projects.js                  Project discovery, details fetching, file operations
 ├── markdown.js                  Markdown rendering and dev tools utilities
 ├── markdown-line-tracking.js    Line-tracked markdown parsing for review mode
+├── markdown-utils.js            Shared markdown path resolution and URL transformation helpers
 ├── themes.js                    Theme management with localStorage and system preference tracking
 │
 └── app.js                       Legacy IIFE version (kept temporarily, not used)
