@@ -10,7 +10,7 @@ Electron-based no-code IDE for AI-first development. No code editor by design - 
 - **Right panel**: Integrated terminal running Claude Code (AI pair programming)
 - **Left panel**: Markdown browser/viewer with no-code review system (document-driven workflow)
 
-The terminal work is foundational but "off-vision" - the left panel (Markdown + review) is the primary differentiator.
+Hegel IDE focuses on orchestrating AI-first development workflows through visual document management. The left panel provides document browsing, navigation, and review capabilities, while the right panel provides terminal access for command execution.
 
 Split-pane Electron application with tab-based interface. Left panel supports Projects list tab, closeable Settings tab, and closeable project detail tabs with markdown rendering, document tree navigation, and link navigation. Right panel supports multiple independent terminal sessions in tabs. Alpine.js handles reactive state and localStorage persistence. Markdown browser features README.md rendering with theme support, document tree display for quick navigation, and link-based browsing between files with tab management. Application-wide theming system with auto/dark/light/synthwave modes accessible via Settings tab.
 

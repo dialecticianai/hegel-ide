@@ -1,6 +1,6 @@
 # Hegel IDE Architecture
 
-The cathedral: Electron-based, polished, accessible. For the masses leaving the IDE wastelands.
+Electron-based no-code IDE for AI-first development with visual workflow management and document-driven development interface.
 
 ---
 
@@ -10,7 +10,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 **Rationale**: Cross-platform GUI with web technologies, mature ecosystem, familiar development model
 
 **Language**: Plain JavaScript (ES6+)
-**Rationale**: No TypeScript. We don't need training wheels on our JavaScript. Keep it simple and direct.
+**Rationale**: Keep it simple and direct. No build-time type checking needed for this codebase size.
 
 **UI Framework**: Alpine.js (~15kb)
 **Rationale**:
@@ -26,8 +26,8 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 **Key Dependencies** (minimal):
 - Electron (platform)
 - Alpine.js (UI reactivity)
-- Markdown renderer (TBD during Discovery)
-- CSS framework/approach (TBD - possibly vanilla or lightweight utility CSS)
+- marked (markdown to HTML conversion)
+- Vanilla CSS with theme system (CSS variables)
 
 ---
 
@@ -54,7 +54,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - No offline operation without hegel binary
 
 **Alternatives considered**:
-- Reimplement hegel logic in JavaScript: Insane maintenance burden, rejected
+- Reimplement hegel logic in JavaScript: Significant maintenance burden keeping two implementations in sync, rejected
 - Embed Rust as native module: Complexity not worth it for this use case
 - HTTP API wrapper around hegel: Over-engineered, deferred
 
@@ -73,7 +73,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - ✅ JSON files (`.hegel/state.json`, `.hegel/config.toml`, reviews, etc.)
 - ✅ JSONL files (`.hegel/hooks.jsonl`, `.hegel/states.jsonl`) for display
 - ✅ Markdown files (SPEC.md, PLAN.md, VISION.md, ARCHITECTURE.md, README.md, etc.)
-- ✅ Review data (format TBD, likely `.hegel/reviews.json`)
+- ✅ Review data (`.hegel/reviews.json`)
 
 **What we shell out for**:
 - ✅ Workflow commands (`hegel start`, `hegel next`, `hegel abort`)
@@ -164,18 +164,14 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 
 ---
 
-## Core Features (Cathedral vs Monastery)
+## Core Features
 
-**Monastery** (hegel-cli + hegel-pm + hegel-mirror):
-- Terminal-based, lean Rust tools
-- For terminal monks who love the command line
-
-**Cathedral** (hegel-ide):
-- Same functionality, Electron-wrapped for accessibility
-- hegel-pm: Cross-project management GUI
-- hegel-mirror: Markdown review/commenting GUI
-- glow-like: Beautiful markdown rendering
-- Polished, with bells and whistles
+**hegel-ide** provides a graphical interface for Hegel's workflow orchestration:
+- Visual project management across multiple Hegel projects
+- Interactive markdown document browser and review interface
+- Beautiful markdown rendering with syntax highlighting
+- No-code approach - work at the orchestration level, not the implementation level
+- Full-featured GUI alternative to terminal-based hegel CLI tools
 
 ---
 
@@ -188,7 +184,7 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - Node.js/npm for Electron development
 
 **Performance**:
-- Electron startup overhead acceptable (cathedral, not monastery)
+- Electron startup time is acceptable for a desktop GUI application
 - Markdown rendering must be smooth for large documents
 - CLI spawning overhead negligible for human-initiated operations
 
@@ -205,18 +201,17 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 
 ## Non-Functional Requirements
 
-**Usability**: Accessible for non-terminal users (the whole point of the cathedral)
+**Usability**: Accessible for users who prefer graphical interfaces over terminal-based tools
 
 **Reliability**: Graceful handling of CLI errors, file parsing failures
 
 **Maintainability**:
 - Simple codebase (plain JS, minimal dependencies)
 - No business logic duplication (shell out to hegel)
-- File size limits TBD during Discovery
 
 **Portability**: Cross-platform via Electron
 
-**Performance**: "Good enough" - this is the cathedral, not the lean monastery
+**Performance**: Optimized for usability and developer experience over minimal resource usage
 
 ---
 
@@ -255,7 +250,6 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 - [ ] Build/distribution strategy (electron-builder, forge, manual)
 - [ ] Auto-update mechanism (or manual updates acceptable)
 - [ ] Performance characteristics at scale (large documents, many projects)
-- [ ] Other technical unknowns TBD
 
 ---
 
@@ -263,5 +257,4 @@ The cathedral: Electron-based, polished, accessible. For the masses leaving the 
 
 **Dialectic-Driven Development (DDD)**: The programming paradigm powering hegel
 
-Hegel orchestrates workflows. DDD is the philosophy.
-The cathedral brings both to the masses.
+Hegel orchestrates AI-first development workflows through document-driven development, spec-first design, and structured iteration cycles. The IDE provides an accessible graphical interface to this methodology.
