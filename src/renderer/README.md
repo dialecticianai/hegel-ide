@@ -11,8 +11,8 @@ renderer/
 ├── styles.css                   All application CSS (includes review tab styles)
 │
 ├── split-pane.js                Split pane drag handlers and localStorage persistence
-├── tabs.js                      Tab management (file, review, project, settings tabs) and review IPC listener
-├── terminals.js                 Terminal creation, initialization, and IPC handling
+├── tabs.js                      Tab management (file, review, project, settings tabs), review IPC listener, and keyboard shortcuts
+├── terminals.js                 Terminal creation, initialization, macro buttons, title change support, and IPC handling
 ├── projects.js                  Project discovery, details fetching, file operations
 ├── markdown.js                  Markdown rendering and dev tools utilities
 ├── markdown-line-tracking.js    Line-tracked markdown parsing for review mode

@@ -21,6 +21,7 @@ e2e/
 ├── http-server.spec.js                HTTP server integration (env vars, POST /review endpoint, error handling)
 ├── themes.spec.js                     Theme system in Settings tab (dropdown, switching, persistence, auto mode)
 ├── image-rendering.spec.js            Image path resolution in markdown (inline HTML and markdown syntax)
+├── keyboard-shortcuts.spec.js         Keyboard shortcuts (Cmd+1-9 tab switching per pane)
 ├── quit-test.spec.js                  Quit confirmation dialog behavior in test mode
 │
 └── fixtures/                          Test fixture data
@@ -177,4 +178,5 @@ Test suite covers core application functionality:
 - **Markdown tree**: Document tree rendering, box-drawing characters, scrolling, loading states
 - **Tree navigation**: Click to replace content, Cmd+Click for new tabs, file highlighting, link styling
 - **Image rendering**: Inline HTML images and markdown image syntax with correct path resolution
+- **Keyboard shortcuts**: Cmd+1-9 (Mac) / Ctrl+1-9 (Win/Linux) tab switching per pane based on interaction tracking
 - **Quit behavior**: Confirmation dialog skipped in test mode via TESTING env var
