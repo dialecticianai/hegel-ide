@@ -4,6 +4,51 @@ const { Terminal } = require('@xterm/xterm');
 const { FitAddon } = require('@xterm/addon-fit');
 const { ipcRenderer } = require('electron');
 
+function setupTerminal(container, terminalId, terminalNumber, alpineDataGetter) {
+  const term = new Terminal({
+    cursorBlink: true,
+    fontFamily: '"DejaVuSansM Nerd Font Mono", "Courier New", Courier, monospace',
+    theme: {
+      background: '#000000',
+      foreground: '#ffffff'
+    }
+  });
+
+  const fitAddon = new FitAddon();
+  term.loadAddon(fitAddon);
+
+  term.open(container);
+  fitAddon.fit();
+
+  term.onData(data => {
+    ipcRenderer.send('terminal-input', { terminalId, data });
+  });
+
+  term.onTitleChange(title => {
+    const alpineData = alpineDataGetter();
+    if (alpineData) {
+      const tab = alpineData.rightTabs.find(t => t.terminalId === terminalId);
+      if (tab) {
+        tab.label = title ? `[${terminalNumber}] ${title}` : `Terminal ${terminalNumber}`;
+      }
+    }
+  });
+
+  const notifyResize = () => {
+    const { cols, rows } = term;
+    ipcRenderer.send('terminal-resize', { terminalId, cols, rows });
+  };
+
+  window.addEventListener('resize', () => {
+    fitAddon.fit();
+    notifyResize();
+  });
+
+  notifyResize();
+
+  return { term, fitAddon };
+}
+
 export function createTerminals() {
     return {
       terminals: {},
@@ -17,9 +62,10 @@ export function createTerminals() {
       },
 
       async addTerminalTab() {
-        const terminalId = 'term-' + this.nextTerminalNumber;
+        const terminalNumber = this.nextTerminalNumber;
+        const terminalId = 'term-' + terminalNumber;
         const tabId = terminalId;
-        const label = 'Terminal ' + this.nextTerminalNumber;
+        const label = 'Terminal ' + terminalNumber;
 
         this.nextTerminalNumber++;
 
@@ -38,41 +84,14 @@ export function createTerminals() {
           await ipcRenderer.invoke('create-terminal', { terminalId });
           await this.$nextTick();
 
-          const term = new Terminal({
-            cursorBlink: true,
-            fontFamily: '"DejaVuSansM Nerd Font Mono", "Courier New", Courier, monospace',
-            theme: {
-              background: '#000000',
-              foreground: '#ffffff'
-            }
-          });
-
-          const fitAddon = new FitAddon();
-          term.loadAddon(fitAddon);
-
           const container = document.getElementById('terminal-container-' + terminalId);
           if (container) {
-            term.open(container);
-            fitAddon.fit();
-
-            this.terminals[terminalId] = { term, fitAddon };
-
-            term.onData(data => {
-              ipcRenderer.send('terminal-input', { terminalId, data });
-            });
-
-            const notifyResize = () => {
-              const { cols, rows } = term;
-              ipcRenderer.send('terminal-resize', { terminalId, cols, rows });
-            };
-
-            // Handle window resize
-            window.addEventListener('resize', () => {
-              fitAddon.fit();
-              notifyResize();
-            });
-
-            notifyResize();
+            this.terminals[terminalId] = setupTerminal(
+              container,
+              terminalId,
+              terminalNumber,
+              () => this
+            );
           }
         } catch (error) {
           console.error('Failed to create terminal:', error);
@@ -87,44 +106,21 @@ export function initializeDefaultTerminal() {
   window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const terminalId = 'term-1';
-
-        const term = new Terminal({
-          cursorBlink: true,
-          fontFamily: '"DejaVuSansM Nerd Font Mono", "Courier New", Courier, monospace',
-          theme: {
-            background: '#000000',
-            foreground: '#ffffff'
-          }
-        });
-
-        const fitAddon = new FitAddon();
-        term.loadAddon(fitAddon);
+        const terminalNumber = 1;
 
         const terminalContainer = document.getElementById('terminal-container-' + terminalId);
         if (terminalContainer) {
-          term.open(terminalContainer);
-          fitAddon.fit();
+          const terminal = setupTerminal(
+            terminalContainer,
+            terminalId,
+            terminalNumber,
+            () => Alpine.$data(document.getElementById('app'))
+          );
 
           const alpineData = Alpine.$data(document.getElementById('app'));
           if (alpineData) {
-            alpineData.terminals[terminalId] = { term, fitAddon };
+            alpineData.terminals[terminalId] = terminal;
           }
-
-          term.onData(data => {
-            ipcRenderer.send('terminal-input', { terminalId, data });
-          });
-
-          const notifyResize = () => {
-            const { cols, rows } = term;
-            ipcRenderer.send('terminal-resize', { terminalId, cols, rows });
-          };
-
-          window.addEventListener('resize', () => {
-            fitAddon.fit();
-            notifyResize();
-          });
-
-          notifyResize();
         }
       }, 100);
   });
