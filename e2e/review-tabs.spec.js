@@ -530,7 +530,7 @@ test.describe('Review Tab Infrastructure', () => {
     await electronApp.close();
   });
 
-  test('submit review clears comments and collapses margin', async () => {
+  test('submit review clears comments, collapses margin, and closes tab', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -593,23 +593,19 @@ test.describe('Review Tab Infrastructure', () => {
 
     await mainWindow.waitForTimeout(500);
 
-    // Verify comments cleared
-    const result = await mainWindow.evaluate(() => {
+    // Verify tab is closed
+    const tabExists = await mainWindow.evaluate(() => {
       const alpineData = Alpine.$data(document.getElementById('app'));
       const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
-      return {
-        commentsCount: reviewTab.pendingComments.length,
-        marginCollapsed: reviewTab.marginCollapsed
-      };
+      return reviewTab !== undefined;
     });
 
-    expect(result.commentsCount).toBe(0);
-    expect(result.marginCollapsed).toBe(true);
+    expect(tabExists).toBe(false);
 
     await electronApp.close();
   });
 
-  test('cancel review shows confirmation and clears comments', async () => {
+  test('LGTM button auto-submits with preset comment and closes tab', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -628,54 +624,25 @@ test.describe('Review Tab Infrastructure', () => {
 
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Add a comment
-    await mainWindow.evaluate(() => {
+    // Click LGTM button
+    const lgtmButton = await mainWindow.locator('.review-lgtm-button');
+    await lgtmButton.click();
+
+    await mainWindow.waitForTimeout(500);
+
+    // Verify tab is closed
+    const tabExists = await mainWindow.evaluate(() => {
       const alpineData = Alpine.$data(document.getElementById('app'));
       const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
-
-      reviewTab.pendingComments.push({
-        lineStart: 1,
-        lineEnd: 3,
-        selectedText: 'Test selection',
-        comment: 'Test comment',
-        timestamp: new Date().toISOString(),
-        zIndex: 1
-      });
-
-      reviewTab.marginCollapsed = false;
+      return reviewTab !== undefined;
     });
 
-    await mainWindow.waitForTimeout(100);
-
-    // Setup dialog handler to accept confirmation
-    mainWindow.on('dialog', async dialog => {
-      expect(dialog.type()).toBe('confirm');
-      await dialog.accept();
-    });
-
-    // Click cancel button
-    const cancelButton = await mainWindow.locator('.review-cancel-button');
-    await cancelButton.click();
-
-    await mainWindow.waitForTimeout(100);
-
-    // Verify comments cleared and margin collapsed
-    const result = await mainWindow.evaluate(() => {
-      const alpineData = Alpine.$data(document.getElementById('app'));
-      const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
-      return {
-        commentsCount: reviewTab.pendingComments.length,
-        marginCollapsed: reviewTab.marginCollapsed
-      };
-    });
-
-    expect(result.commentsCount).toBe(0);
-    expect(result.marginCollapsed).toBe(true);
+    expect(tabExists).toBe(false);
 
     await electronApp.close();
   });
 
-  test('cancel review with no comments does not show confirmation', async () => {
+  test('Nope button auto-submits with preset comment and closes tab', async () => {
     const electronApp = await launchTestElectron();
 
     const firstPage = await electronApp.firstWindow();
@@ -686,7 +653,7 @@ test.describe('Review Tab Infrastructure', () => {
 
     await mainWindow.waitForTimeout(ALPINE_INIT);
 
-    // Open review tab with no comments
+    // Open review tab
     await mainWindow.evaluate(({ filePath }) => {
       const alpineData = Alpine.$data(document.getElementById('app'));
       alpineData.openReviewTab(filePath);
@@ -694,21 +661,20 @@ test.describe('Review Tab Infrastructure', () => {
 
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Setup dialog handler (should not be called)
-    let dialogCalled = false;
-    mainWindow.on('dialog', async dialog => {
-      dialogCalled = true;
-      await dialog.dismiss();
+    // Click Nope button
+    const nopeButton = await mainWindow.locator('.review-nope-button');
+    await nopeButton.click();
+
+    await mainWindow.waitForTimeout(500);
+
+    // Verify tab is closed
+    const tabExists = await mainWindow.evaluate(() => {
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      const reviewTab = alpineData.leftTabs.find(t => t.type === 'review');
+      return reviewTab !== undefined;
     });
 
-    // Click cancel button
-    const cancelButton = await mainWindow.locator('.review-cancel-button');
-    await cancelButton.click();
-
-    await mainWindow.waitForTimeout(100);
-
-    // Verify no dialog was shown
-    expect(dialogCalled).toBe(false);
+    expect(tabExists).toBe(false);
 
     await electronApp.close();
   });

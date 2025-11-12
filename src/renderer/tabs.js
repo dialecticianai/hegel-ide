@@ -32,9 +32,9 @@ export function createTabs() {
       },
 
       // Tab closing
-      closeLeftTab(tabId) {
+      closeLeftTab(tabId, force = false) {
         const tab = this.leftTabs.find(t => t.id === tabId);
-        if (!tab || !tab.closeable) return;
+        if (!tab || (!force && !tab.closeable)) return;
 
         this.leftTabs = this.leftTabs.filter(t => t.id !== tabId);
 
@@ -175,7 +175,7 @@ export function createTabs() {
           id: tabId,
           type: 'review',
           label: fileLabel,
-          closeable: true,
+          closeable: false,
           filePath: absoluteFilePath,
           projectPath: projectPath,
           pendingComments: [],
@@ -328,6 +328,8 @@ export function createTabs() {
             tab.marginCollapsed = true;
             // Clear active form if present
             tab.activeCommentForm = null;
+            // Close the review tab (force close even though closeable is false)
+            this.closeLeftTab(tabId, true);
           } else {
             // Show error message (preserve comments)
             console.error('Failed to save review:', result.error);
@@ -339,29 +341,50 @@ export function createTabs() {
         }
       },
 
-      cancelReview(tabId) {
+      async submitLGTM(tabId) {
         const tab = this.leftTabs.find(t => t.id === tabId);
         if (!tab || tab.type !== 'review') {
           return;
         }
 
-        // If there are pending comments, show confirmation
-        if (tab.pendingComments.length > 0) {
-          const confirmed = confirm(
-            `Discard ${tab.pendingComments.length} pending comment${tab.pendingComments.length !== 1 ? 's' : ''}?`
-          );
+        // Clear any existing comments
+        tab.pendingComments = [];
 
-          if (!confirmed) {
-            return;
-          }
+        // Add LGTM comment
+        tab.pendingComments.push({
+          lineStart: 1,
+          lineEnd: 1,
+          selectedText: '',
+          comment: 'User says LGTM, no discussion needed.',
+          timestamp: new Date().toISOString(),
+          zIndex: 1
+        });
+
+        // Auto-submit
+        await this.submitReview(tabId);
+      },
+
+      async submitNope(tabId) {
+        const tab = this.leftTabs.find(t => t.id === tabId);
+        if (!tab || tab.type !== 'review') {
+          return;
         }
 
-        // Clear all pending comments
+        // Clear any existing comments
         tab.pendingComments = [];
-        // Collapse margin
-        tab.marginCollapsed = true;
-        // Clear active form if present
-        tab.activeCommentForm = null;
+
+        // Add Nope comment
+        tab.pendingComments.push({
+          lineStart: 1,
+          lineEnd: 1,
+          selectedText: '',
+          comment: 'User says more discussion is required.',
+          timestamp: new Date().toISOString(),
+          zIndex: 1
+        });
+
+        // Auto-submit
+        await this.submitReview(tabId);
       },
 
       async fetchFileContent(absoluteFilePath) {

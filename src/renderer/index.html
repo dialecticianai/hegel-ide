@@ -206,7 +206,8 @@
                     <span x-show="tab.pendingComments.length > 0" class="review-comment-count" x-text="`${tab.pendingComments.length} comment${tab.pendingComments.length !== 1 ? 's' : ''}`"></span>
                   </div>
                   <div class="review-toolbar-actions">
-                    <button class="review-cancel-button" @click="cancelReview(tab.id)">Cancel</button>
+                    <button class="review-lgtm-button" @click="submitLGTM(tab.id)">LGTM</button>
+                    <button class="review-nope-button" @click="submitNope(tab.id)">Nope</button>
                     <button class="review-submit-button" @click="submitReview(tab.id)" :disabled="tab.pendingComments.length === 0">Submit Review</button>
                   </div>
                 </div>
