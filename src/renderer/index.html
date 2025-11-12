@@ -11,7 +11,7 @@
   <!-- Split-pane layout -->
   <div id="app" x-data="splitPane" class="split-container">
     <!-- Left Panel: Markdown Browser -->
-    <div class="split-pane left-pane" :style="{ width: leftPanelPercent + '%' }">
+    <div class="split-pane left-pane" :style="{ width: leftPanelPercent + '%' }" @click="lastInteractedPane = 'left'">
       <!-- Tab Bar -->
       <div class="tab-bar">
         <div class="tabs-list">
@@ -285,7 +285,7 @@
     </div>
 
     <!-- Right Panel: Terminal -->
-    <div class="split-pane right-pane" :style="{ width: (100 - leftPanelPercent) + '%' }">
+    <div class="split-pane right-pane" :style="{ width: (100 - leftPanelPercent) + '%' }" @click="lastInteractedPane = 'right'">
       <!-- Tab Bar -->
       <div class="tab-bar">
         <div class="tabs-list">

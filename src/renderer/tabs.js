@@ -14,6 +14,7 @@ export function createTabs() {
       ],
       activeRightTab: 'term-1',
       fileContents: {}, // Store file contents by key: projectName:filePath
+      lastInteractedPane: 'right', // Track which pane was last clicked (default to right/terminal)
 
       // Tab switching
       switchLeftTab(tabId) {
@@ -28,6 +29,30 @@ export function createTabs() {
           setTimeout(() => {
             this.terminals[tab.terminalId].fitAddon.fit();
           }, 0);
+        }
+      },
+
+      // Handle keyboard shortcuts for tab switching (Cmd+1 through Cmd+9)
+      handleTabShortcut(n) {
+        // Check which pane currently contains DOM focus
+        const focusedElement = document.activeElement;
+        const inLeftPane = focusedElement.closest('.left-pane') !== null;
+        const inRightPane = focusedElement.closest('.right-pane') !== null;
+
+        // Use focus if available, otherwise use last interacted pane
+        let targetPane = null;
+        if (inLeftPane) {
+          targetPane = 'left';
+        } else if (inRightPane) {
+          targetPane = 'right';
+        } else {
+          targetPane = this.lastInteractedPane;
+        }
+
+        if (targetPane === 'left' && this.leftTabs[n - 1]) {
+          this.switchLeftTab(this.leftTabs[n - 1].id);
+        } else if (targetPane === 'right' && this.rightTabs[n - 1]) {
+          this.switchRightTab(this.rightTabs[n - 1].id);
         }
       },
 
@@ -468,5 +493,23 @@ export function initializeReviewIPC() {
       // Open review tab with matched project path (or null)
       alpineData.openReviewTab(filePath, projectPath);
     });
+  });
+}
+
+// Initialize keyboard shortcuts for tab switching
+export function initializeTabShortcuts() {
+  window.addEventListener('keydown', (event) => {
+    // Check for Cmd (Mac) or Ctrl (Win/Linux) + number key (1-9)
+    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const modifierPressed = isMac ? event.metaKey : event.ctrlKey;
+
+    if (modifierPressed && event.key >= '1' && event.key <= '9') {
+      event.preventDefault();
+      const n = parseInt(event.key, 10);
+      const alpineData = Alpine.$data(document.getElementById('app'));
+      if (alpineData) {
+        alpineData.handleTabShortcut(n);
+      }
+    }
   });
 }
