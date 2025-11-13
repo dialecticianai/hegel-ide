@@ -86,6 +86,9 @@
                     <span class="info-value info-value-path"
                           x-text="formatPath(project.project_path)"
                           :title="'Path: ' + project.project_path"></span>
+                    <span class="project-remove-icon"
+                          @click="removeProject(project.name)"
+                          title="Remove project from tracking"></span>
                     <span class="metric-sep">|</span>
                     <span class="info-value" title="Cache size" x-text="formatBytes(project.hegel_size_bytes)"></span>
                   </div>

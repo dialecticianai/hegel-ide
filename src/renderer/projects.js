@@ -145,6 +145,34 @@ export function createProjects() {
         await this.loadFileInline(projectName, currentFile);
       },
 
+      async removeProject(projectName) {
+        // Show confirmation dialog
+        const confirmed = confirm(
+          `Remove project "${projectName}" from tracking?\n\nThis will clear cached data but will not delete any files.`
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          await ipcRenderer.invoke('remove-project', { projectName });
+
+          // Reload projects list
+          await this.loadProjects();
+
+          // Close any open tabs for this project
+          const projectTab = this.leftTabs.find(
+            tab => tab.type === 'project-detail' && tab.projectName === projectName
+          );
+          if (projectTab) {
+            this.closeLeftTab(projectTab.id);
+          }
+        } catch (error) {
+          alert(`Failed to remove project: ${error.message}`);
+        }
+      },
+
       buildTreeFromPaths(files) {
         if (!files || files.length === 0) return [];
 

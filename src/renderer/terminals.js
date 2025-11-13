@@ -9,6 +9,7 @@ function setupTerminal(container, terminalId, terminalNumber, alpineDataGetter) 
   const term = new Terminal({
     cursorBlink: true,
     fontFamily: '"DejaVuSansM Nerd Font Mono", "Courier New", Courier, monospace',
+    smoothScrollDuration: 0,
     theme: {
       background: '#000000',
       foreground: '#ffffff'

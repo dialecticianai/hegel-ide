@@ -227,6 +227,22 @@ h2 {
   color: var(--text-primary);
 }
 
+.project-remove-icon {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color 0.2s;
+  margin-left: 8px;
+}
+
+.project-remove-icon::before {
+  content: '\f1f8';
+}
+
+.project-remove-icon:hover {
+  color: var(--error-color);
+}
+
 .project-card-content {
   padding: 0 12px 12px 12px;
 }
