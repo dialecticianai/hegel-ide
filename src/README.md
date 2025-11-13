@@ -6,7 +6,9 @@ Source code directory containing main process and renderer process code.
 
 ```
 src/
-├── main.js              Electron main process (window, IPC, terminals, file I/O, HTTP server)
+├── main.js              Electron main process entry point (delegates to main/)
+├── main/                Main process modules (window, terminals, IPC, HTTP server)
+│   └── See main/README.md
 │
 └── renderer/            Frontend application code (Alpine.js + ESM modules)
     └── See renderer/README.md
