@@ -9,7 +9,7 @@ const testFilePath = path.join(fixturesDir, 'index.md');
 
 test.describe('Review Tab Infrastructure', () => {
   test('can open review tab with absolute path', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -48,7 +48,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('review tab renders markdown with line tracking', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -81,7 +81,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('review tab has grid layout with comment margin', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -115,7 +115,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('comment margin is initially collapsed', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -152,7 +152,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('review tab can toggle margin visibility', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -194,7 +194,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('can select text and create comment', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -276,7 +276,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('can cancel comment form without saving', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -334,7 +334,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('comment cards render after saving', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -385,7 +385,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('multiple comments on same block stack correctly', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -456,7 +456,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('clicking comment card brings it to front', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -531,7 +531,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('submit review clears comments, collapses margin, and closes tab', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -606,7 +606,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('LGTM button auto-submits with preset comment and closes tab', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -643,7 +643,7 @@ test.describe('Review Tab Infrastructure', () => {
   });
 
   test('Nope button auto-submits with preset comment and closes tab', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

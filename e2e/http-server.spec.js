@@ -54,7 +54,7 @@ function makePostRequest(port, path, body) {
 
 test.describe('HTTP Server Integration', () => {
   test('terminal has HEGEL_IDE_URL environment variable set', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -83,7 +83,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST /review with valid file opens review tab', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -126,7 +126,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST /review with missing file returns 404', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -157,7 +157,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST /review with invalid JSON returns 400', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -197,7 +197,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST /review with missing files field returns 400', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -220,7 +220,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST /review with multiple files opens multiple tabs', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -255,7 +255,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('GET request returns 405 Method Not Allowed', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -286,7 +286,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('POST to unknown path returns 404', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');
@@ -308,7 +308,7 @@ test.describe('HTTP Server Integration', () => {
   });
 
   test('multiple terminals all have HEGEL_IDE_URL set', async () => {
-    const electronApp = await launchTestElectron();
+    const electronApp = await launchTestElectron({ isolatedState: true });
 
     const firstPage = await electronApp.firstWindow();
     await firstPage.waitForLoadState('domcontentloaded');

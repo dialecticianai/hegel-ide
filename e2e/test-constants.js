@@ -1,3 +1,7 @@
+const os = require('os');
+const path = require('path');
+const fs = require('fs');
+
 // Shared E2E test timeout constants
 const TIMEOUTS = {
   ALPINE_INIT: 300,        // Wait for Alpine.js to initialize
@@ -12,15 +16,37 @@ const TIMEOUTS = {
   HEGEL_CMD: 2000,         // Wait for hegel command to execute
 };
 
-// Launch Electron for tests with proper env vars (disables quit confirmation)
-async function launchTestElectron() {
+/**
+ * Launch Electron for tests with proper env vars (disables quit confirmation)
+ * @param {Object} options - Launch options
+ * @param {boolean} options.isolatedState - If true, use isolated temp directory for hegel state (default: false)
+ * @returns {Promise<ElectronApplication>}
+ */
+async function launchTestElectron(options = {}) {
   const { _electron: electron } = require('@playwright/test');
+  const { isolatedState = false } = options;
+
+  const env = {
+    ...process.env,
+    TESTING: 'true'
+  };
+
+  // Use isolated temp directory for hegel state if requested
+  // This prevents test-generated reviews from polluting the project's .hegel/reviews.json
+  if (isolatedState) {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(7);
+    const stateDir = path.join(os.tmpdir(), `hegel-test-${timestamp}-${random}`);
+
+    // Create the state directory so hegel commands can write to it
+    fs.mkdirSync(stateDir, { recursive: true });
+
+    env.HEGEL_STATE_DIR = stateDir;
+  }
+
   return await electron.launch({
     args: ['.'],
-    env: {
-      ...process.env,
-      TESTING: 'true'
-    }
+    env
   });
 }
 
