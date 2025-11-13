@@ -13,8 +13,11 @@ export function createProjects() {
       projectDetails: {},
       fileContents: {},
       collapsedProjects: {}, // Track collapsed state per project name
+      projectRefreshing: {}, // Track refresh state per project name
 
-      async loadProjects() {
+      async loadProjects(options = {}) {
+        const { skipAutoOpen = false } = options;
+
         try {
           this.projectsLoading = true;
           this.projectsError = null;
@@ -25,12 +28,15 @@ export function createProjects() {
           // Initialize all projects as collapsed
           projects.forEach(project => {
             this.collapsedProjects[project.name] = true;
+            this.projectRefreshing[project.name] = false;
           });
 
           this.projectsLoading = false;
 
-          // Auto-open project if terminal cwd matches
-          await this.autoOpenProjectFromCwd();
+          // Auto-open project if terminal cwd matches (skip during refresh)
+          if (!skipAutoOpen) {
+            await this.autoOpenProjectFromCwd();
+          }
         } catch (error) {
           this.projectsError = error.message || 'Failed to load projects';
           this.projectsLoading = false;
@@ -158,8 +164,8 @@ export function createProjects() {
         try {
           await ipcRenderer.invoke('remove-project', { projectName });
 
-          // Reload projects list
-          await this.loadProjects();
+          // Reload projects list (skip auto-open)
+          await this.loadProjects({ skipAutoOpen: true });
 
           // Close any open tabs for this project
           const projectTab = this.leftTabs.find(
@@ -170,6 +176,29 @@ export function createProjects() {
           }
         } catch (error) {
           alert(`Failed to remove project: ${error.message}`);
+        }
+      },
+
+      async refreshProjectInList(projectName) {
+        try {
+          this.projectRefreshing[projectName] = true;
+          await ipcRenderer.invoke('refresh-project', { projectName });
+          await this.loadProjects({ skipAutoOpen: true });
+          this.projectRefreshing[projectName] = false;
+        } catch (error) {
+          this.projectRefreshing[projectName] = false;
+          alert(`Failed to refresh project: ${error.message}`);
+        }
+      },
+
+      async refreshAllProjects() {
+        try {
+          this.projectsLoading = true;
+          await ipcRenderer.invoke('refresh-all-projects');
+          await this.loadProjects({ skipAutoOpen: true });
+        } catch (error) {
+          this.projectsLoading = false;
+          alert(`Failed to refresh projects: ${error.message}`);
         }
       },
 

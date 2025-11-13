@@ -283,6 +283,64 @@ function createWindow() {
     });
   });
 
+  // Handle single project refresh
+  ipcMain.handle('refresh-project', async (event, { projectName }) => {
+    return new Promise((resolve, reject) => {
+      const hegel = spawn('hegel', ['pm', 'refresh', projectName]);
+      let stdout = '';
+      let stderr = '';
+
+      hegel.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      hegel.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      hegel.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Failed to refresh project: ${stderr}`));
+          return;
+        }
+        resolve({ success: true });
+      });
+
+      hegel.on('error', (error) => {
+        reject(new Error(`Failed to spawn hegel: ${error.message}`));
+      });
+    });
+  });
+
+  // Handle refresh all projects
+  ipcMain.handle('refresh-all-projects', async () => {
+    return new Promise((resolve, reject) => {
+      const hegel = spawn('hegel', ['pm', 'refresh']);
+      let stdout = '';
+      let stderr = '';
+
+      hegel.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      hegel.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      hegel.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`Failed to refresh all projects: ${stderr}`));
+          return;
+        }
+        resolve({ success: true });
+      });
+
+      hegel.on('error', (error) => {
+        reject(new Error(`Failed to spawn hegel: ${error.message}`));
+      });
+    });
+  });
+
   // Handle markdown tree request
   ipcMain.handle('get-markdown-tree', async (event, { projectPath }) => {
     return new Promise((resolve, reject) => {

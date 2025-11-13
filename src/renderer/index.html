@@ -56,7 +56,14 @@
         <!-- Projects tab content -->
         <div x-show="activeLeftTab === 'projects'" class="tab-content-padded">
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-            <h2 style="margin: 0;">Projects</h2>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 style="margin: 0;">Projects</h2>
+              <button class="refresh-tab"
+                      :class="{ 'spinning': projectsLoading }"
+                      @click="refreshAllProjects()"
+                      :disabled="projectsLoading"
+                      title="Refresh all projects">⟳</button>
+            </div>
             <span @click="openSettingsTab" class="settings-icon" title="Settings"></span>
           </div>
 
@@ -73,6 +80,11 @@
               <div class="project-card">
                 <div class="project-card-header">
                   <h3 class="project-name" @click="openProjectTab(project.name)" x-text="project.name"></h3>
+                  <button class="refresh-tab"
+                          :class="{ 'spinning': projectRefreshing[project.name] }"
+                          @click="refreshProjectInList(project.name)"
+                          :disabled="projectRefreshing[project.name]"
+                          title="Refresh project">⟳</button>
                   <span class="info-value" title="Last activity" x-text="formatTimeAgo(project.last_activity)"></span>
                   <button class="collapse-toggle"
                           @click="toggleProjectCollapse(project.name)"
