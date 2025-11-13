@@ -32,6 +32,16 @@ function spawnTerminal(terminalId, httpPort) {
   ptyProc.onData((data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('terminal-output', { terminalId, data });
+
+      // Check if foreground process changed (event-driven, not polling)
+      const currentProcess = ptyProc.process;
+      if (currentProcess !== ptyProc._lastProcess) {
+        ptyProc._lastProcess = currentProcess;
+        mainWindow.webContents.send('terminal-process-change', {
+          terminalId,
+          processName: currentProcess
+        });
+      }
     }
   });
 

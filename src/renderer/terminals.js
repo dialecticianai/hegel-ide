@@ -29,6 +29,8 @@ function setupTerminal(container, terminalId, terminalNumber, alpineDataGetter) 
     if (alpineData) {
       const tab = alpineData.rightTabs.find(t => t.terminalId === terminalId);
       if (tab) {
+        // Store custom title for fallback when no process is running
+        tab.customTitle = title;
         tab.label = title ? `[${terminalNumber}] ${title}` : `Terminal ${terminalNumber}`;
       }
     }
@@ -56,8 +58,8 @@ export function createTerminals() {
 
       sendMacro(terminalId, text) {
         if (this.terminals[terminalId]) {
-          // Send the text followed by Enter (\r) to the terminal
-          ipcRenderer.send('terminal-input', { terminalId, data: text + '\r' });
+          // Send the text followed by Enter (\r\n) to execute the command
+          ipcRenderer.send('terminal-input', { terminalId, data: text + '\r\n' });
         }
       },
 
@@ -129,6 +131,27 @@ export function initializeDefaultTerminal() {
     const alpineData = Alpine.$data(document.getElementById('app'));
     if (alpineData && alpineData.terminals[terminalId]) {
       alpineData.terminals[terminalId].term.write(data);
+    }
+  });
+
+  ipcRenderer.on('terminal-process-change', (event, { terminalId, processName }) => {
+    const alpineData = Alpine.$data(document.getElementById('app'));
+    if (alpineData) {
+      const tab = alpineData.rightTabs.find(t => t.terminalId === terminalId);
+      if (tab) {
+        // Extract terminal number from terminalId (e.g., 'term-1' -> '1')
+        const terminalNumber = terminalId.split('-')[1];
+
+        // Show process name if available
+        if (processName) {
+          tab.label = `[${terminalNumber}] ${processName}`;
+        } else if (tab.customTitle) {
+          // Fall back to custom title if we had one
+          tab.label = `[${terminalNumber}] ${tab.customTitle}`;
+        } else {
+          tab.label = `Terminal ${terminalNumber}`;
+        }
+      }
     }
   });
 }
