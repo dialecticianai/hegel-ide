@@ -36,6 +36,12 @@
                       @click.stop="refreshProjectDetails(tab.projectName)"
                       :disabled="projectDetails[tab.projectName]?.loading"
                       title="Refresh project details">⟳</button>
+              <button x-show="tab.type === 'file'"
+                      class="refresh-tab"
+                      :class="{ 'spinning': fileContents[tab.filePath]?.loading }"
+                      @click.stop="refreshFileContent(tab.filePath)"
+                      :disabled="fileContents[tab.filePath]?.loading"
+                      title="Refresh file">⟳</button>
               <button x-show="tab.closeable"
                       class="close-tab"
                       @click.stop="closeLeftTab(tab.id)">×</button>
@@ -67,6 +73,7 @@
               <div class="project-card">
                 <div class="project-card-header">
                   <h3 class="project-name" @click="openProjectTab(project.name)" x-text="project.name"></h3>
+                  <span class="info-value" title="Last activity" x-text="formatTimeAgo(project.last_activity)"></span>
                   <button class="collapse-toggle"
                           @click="toggleProjectCollapse(project.name)"
                           :title="isProjectCollapsed(project.name) ? 'Expand' : 'Collapse'">
@@ -81,8 +88,6 @@
                           :title="'Path: ' + project.project_path"></span>
                     <span class="metric-sep">|</span>
                     <span class="info-value" title="Cache size" x-text="formatBytes(project.hegel_size_bytes)"></span>
-                    <span class="metric-sep">|</span>
-                    <span class="info-value" title="Last activity" x-text="formatTimeAgo(project.last_activity)"></span>
                   </div>
                 </div>
               </div>
@@ -183,7 +188,9 @@
         <!-- File tabs content -->
         <template x-for="tab in leftTabs.filter(t => t.type === 'file')" :key="tab.id">
           <div x-show="activeLeftTab === tab.id" class="tab-content-padded">
-            <h2 x-text="tab.filePath"></h2>
+            <span class="info-value info-value-path"
+                  x-text="formatPath(tab.filePath)"
+                  :title="'Path: ' + tab.filePath"></span>
             <template x-if="fileContents[tab.filePath]">
               <div>
                 <div x-show="fileContents[tab.filePath]?.loading">Loading file...</div>

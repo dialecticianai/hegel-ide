@@ -412,6 +412,10 @@ export function createTabs() {
         await this.submitReview(tabId);
       },
 
+      async refreshFileContent(absoluteFilePath) {
+        await this.fetchFileContent(absoluteFilePath);
+      },
+
       async fetchFileContent(absoluteFilePath) {
         try {
           this.fileContents[absoluteFilePath] = {
