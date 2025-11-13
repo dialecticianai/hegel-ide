@@ -51,17 +51,8 @@ function setupTerminal(container, terminalId, terminalNumber, alpineDataGetter) 
   };
 
   window.addEventListener('resize', () => {
-    // Check if user was at bottom before resize
-    const wasAtBottom = term.buffer.active.viewportY === term.buffer.active.baseY + term.rows - 1
-                     || term.buffer.active.viewportY >= term.buffer.active.baseY + term.buffer.active.length - term.rows;
-
     fitAddon.fit();
     notifyResize();
-
-    // Restore scroll to bottom if user was there before resize
-    if (wasAtBottom) {
-      term.scrollToBottom();
-    }
   });
 
   notifyResize();
@@ -154,34 +145,7 @@ export function initializeDefaultTerminal() {
     const alpineData = Alpine.$data(document.getElementById('app'));
     if (alpineData && alpineData.terminals[terminalId]) {
       const term = alpineData.terminals[terminalId].term;
-
-      // Check if user is scrolled to the bottom before writing
-      // buffer.baseY is the first visible row, buffer.viewportY is the viewport scroll position
-      const beforeScroll = term.buffer.active.viewportY;
-      const wasAtBottom = term.buffer.active.viewportY === term.buffer.active.baseY + term.rows - 1
-                       || term.buffer.active.viewportY >= term.buffer.active.baseY + term.buffer.active.length - term.rows;
-
       term.write(data);
-
-      const afterScroll = term.buffer.active.viewportY;
-
-      // Debug: log if scroll position changed unexpectedly
-      if (!wasAtBottom && afterScroll !== beforeScroll) {
-        console.log('[Unexpected scroll]', {
-          terminalId,
-          beforeScroll,
-          afterScroll,
-          wasAtBottom,
-          dataLength: data.length,
-          baseY: term.buffer.active.baseY,
-          bufferLength: term.buffer.active.length
-        });
-      }
-
-      // If user was at the bottom, keep them there
-      if (wasAtBottom) {
-        term.scrollToBottom();
-      }
     }
   });
 

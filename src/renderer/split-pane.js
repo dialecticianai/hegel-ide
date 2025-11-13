@@ -45,6 +45,12 @@ export function createSplitPane() {
             leftPanelPercent: this.leftPanelPercent
           }));
 
+          // Resize active terminal after drag completes
+          const activeTab = this.rightTabs.find(t => t.id === this.activeRightTab);
+          if (activeTab && this.terminals[activeTab.terminalId]) {
+            this.terminals[activeTab.terminalId].fitAddon.fit();
+          }
+
           // Clean up listeners
           window.removeEventListener('mousemove', handleMouseMove);
           window.removeEventListener('mouseup', handleMouseUp);

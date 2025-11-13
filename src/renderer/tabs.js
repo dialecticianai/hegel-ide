@@ -27,18 +27,7 @@ export function createTabs() {
         const tab = this.rightTabs.find(t => t.id === tabId);
         if (tab && this.terminals[tab.terminalId]) {
           setTimeout(() => {
-            const term = this.terminals[tab.terminalId].term;
-
-            // Check if user was at bottom before fit
-            const wasAtBottom = term.buffer.active.viewportY === term.buffer.active.baseY + term.rows - 1
-                             || term.buffer.active.viewportY >= term.buffer.active.baseY + term.buffer.active.length - term.rows;
-
             this.terminals[tab.terminalId].fitAddon.fit();
-
-            // Restore scroll to bottom if user was there before fit
-            if (wasAtBottom) {
-              term.scrollToBottom();
-            }
           }, 0);
         }
       },

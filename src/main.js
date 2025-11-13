@@ -61,7 +61,8 @@ function spawnTerminal(terminalId, httpPort) {
     cols: 80,
     rows: 24,
     cwd: terminalCwd,
-    env: augmentedEnv
+    env: augmentedEnv,
+    handleFlowControl: true
   });
 
   ptyProc.onData((data) => {
