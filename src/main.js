@@ -7,6 +7,7 @@ const fs = require('fs').promises;
 const http = require('http');
 const { buildTerminalEnv } = require('../lib/terminal-env.js');
 const { parseReviewRequest, checkFilesExist } = require('../lib/http-server.js');
+const { runHegelCommand } = require('./main/hegel.js');
 
 let mainWindow;
 let ptyProcesses = new Map(); // Map of terminalId -> ptyProcess
@@ -186,194 +187,33 @@ function createWindow() {
 
   // Handle project discovery request
   ipcMain.handle('get-projects', async () => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['pm', 'discover', 'list', '--json']);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`hegel command failed: ${stderr}`));
-          return;
-        }
-
-        try {
-          const output = JSON.parse(stdout);
-          resolve(output.projects);
-        } catch (error) {
-          reject(new Error(`Failed to parse hegel output: ${error.message}`));
-        }
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    const output = await runHegelCommand(['pm', 'discover', 'list', '--json'], { parseJson: true });
+    return output.projects;
   });
 
   // Handle project detail request
   ipcMain.handle('get-project-details', async (event, { projectName }) => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['pm', 'discover', 'show', projectName, '--json']);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`hegel command failed: ${stderr}`));
-          return;
-        }
-
-        try {
-          const output = JSON.parse(stdout);
-          resolve(output);
-        } catch (error) {
-          reject(new Error(`Failed to parse hegel output: ${error.message}`));
-        }
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    return await runHegelCommand(['pm', 'discover', 'show', projectName, '--json'], { parseJson: true });
   });
 
   // Handle project removal
   ipcMain.handle('remove-project', async (event, { projectName }) => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['pm', 'remove', projectName]);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`Failed to remove project: ${stderr}`));
-          return;
-        }
-        resolve({ success: true });
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    return await runHegelCommand(['pm', 'remove', projectName], { errorPrefix: 'Failed to remove project' });
   });
 
   // Handle single project refresh
   ipcMain.handle('refresh-project', async (event, { projectName }) => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['pm', 'refresh', projectName]);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`Failed to refresh project: ${stderr}`));
-          return;
-        }
-        resolve({ success: true });
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    return await runHegelCommand(['pm', 'refresh', projectName], { errorPrefix: 'Failed to refresh project' });
   });
 
   // Handle refresh all projects
   ipcMain.handle('refresh-all-projects', async () => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['pm', 'refresh']);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`Failed to refresh all projects: ${stderr}`));
-          return;
-        }
-        resolve({ success: true });
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    return await runHegelCommand(['pm', 'refresh'], { errorPrefix: 'Failed to refresh all projects' });
   });
 
   // Handle markdown tree request
   ipcMain.handle('get-markdown-tree', async (event, { projectPath }) => {
-    return new Promise((resolve, reject) => {
-      const hegel = spawn('hegel', ['md', '--no-ddd', '--json', '--state-dir', projectPath]);
-      let stdout = '';
-      let stderr = '';
-
-      hegel.stdout.on('data', (data) => {
-        stdout += data.toString();
-      });
-
-      hegel.stderr.on('data', (data) => {
-        stderr += data.toString();
-      });
-
-      hegel.on('close', (code) => {
-        if (code !== 0) {
-          reject(new Error(`hegel command failed: ${stderr}`));
-          return;
-        }
-
-        try {
-          const output = JSON.parse(stdout);
-          resolve(output);
-        } catch (error) {
-          reject(new Error(`Failed to parse hegel output: ${error.message}`));
-        }
-      });
-
-      hegel.on('error', (error) => {
-        reject(new Error(`Failed to spawn hegel: ${error.message}`));
-      });
-    });
+    return await runHegelCommand(['md', '--no-ddd', '--json', '--state-dir', projectPath], { parseJson: true });
   });
 
   // Handle create-terminal request
@@ -452,45 +292,13 @@ function createWindow() {
         },
         text: c.selected_text,
         comment: c.comment
-      })).join('\n');
+      })).join('\n') + '\n';
 
       // Use projectPath or fall back to terminalCwd
       const cwd = projectPath || terminalCwd;
 
-      // Spawn hegel review process
-      return new Promise((resolve, reject) => {
-        const hegelProcess = spawn('hegel', ['review', file], {
-          cwd: cwd,
-          env: process.env
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        hegelProcess.stdout.on('data', (data) => {
-          stdout += data.toString();
-        });
-
-        hegelProcess.stderr.on('data', (data) => {
-          stderr += data.toString();
-        });
-
-        hegelProcess.on('error', (error) => {
-          resolve({ success: false, error: `Failed to spawn hegel: ${error.message}` });
-        });
-
-        hegelProcess.on('close', (code) => {
-          if (code === 0) {
-            resolve({ success: true });
-          } else {
-            resolve({ success: false, error: stderr || `hegel review exited with code ${code}` });
-          }
-        });
-
-        // Write JSONL to stdin and close
-        hegelProcess.stdin.write(jsonl + '\n');
-        hegelProcess.stdin.end();
-      });
+      await runHegelCommand(['review', file], { stdin: jsonl, cwd });
+      return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
     }
