@@ -1,5 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const { launchTestElectron } = require('./test-constants');
+const { launchTestElectron, waitForCondition } = require('./test-constants');
 const { ALPINE_INIT, TERMINAL_READY, TERMINAL_EXEC, TERMINAL_EXEC_FAST, TAB_CLOSE } = require('./test-constants');
 
 test.describe('Terminal Presence', () => {
@@ -263,6 +263,77 @@ test.describe('Terminal Tab Management', () => {
     const xtermScreen = await mainWindow.locator('.xterm-screen');
     const content = await xtermScreen.textContent();
     expect(content).toContain('reopened works');
+
+    await electronApp.close();
+  });
+});
+
+test.describe('Terminal Process Detection', () => {
+  test('detects and displays foreground process in tab label', async () => {
+    const electronApp = await launchTestElectron();
+
+    const firstPage = await electronApp.firstWindow();
+    await firstPage.waitForLoadState('domcontentloaded');
+
+    const windows = electronApp.windows();
+    const mainWindow = windows.find(w => w.url().includes('index.html'));
+
+    // Wait for terminal to be ready - check for prompt
+    await waitForCondition(
+      mainWindow,
+      async () => {
+        const xtermScreen = await mainWindow.locator('.xterm-screen');
+        const content = await xtermScreen.textContent();
+        return content.includes('❯') || content.includes('$') || content.includes('%');
+      },
+      TERMINAL_READY,
+      50,
+      'Terminal prompt did not appear'
+    );
+
+    const terminal1Tab = await mainWindow.locator('.right-pane .tab').first();
+
+    // Assertion 1: Initial label shows shell process name (not path)
+    const initialTabText = await terminal1Tab.textContent();
+    const hasShellName = /\[1\]\s+(zsh|bash|sh|fish)/.test(initialTabText) || initialTabText.includes('Terminal 1');
+    expect(hasShellName).toBe(true);
+    expect(initialTabText).not.toContain('/bin/');
+    expect(initialTabText).not.toContain('/usr/');
+
+    // Focus terminal
+    const terminalContainer = await mainWindow.locator('#terminal-container-term-1');
+    await terminalContainer.click();
+
+    // Run top
+    await mainWindow.keyboard.type('top');
+    await mainWindow.keyboard.press('Enter');
+
+    // Assertion 2: Label updates to show foreground process
+    await waitForCondition(
+      mainWindow,
+      async () => {
+        const tabText = await terminal1Tab.textContent();
+        return tabText.includes('[1] top');
+      },
+      1000,
+      50,
+      'Terminal label did not update to show top'
+    );
+
+    // Quit top with 'q'
+    await mainWindow.keyboard.type('q');
+
+    // Assertion 3: Label reverts to shell when foreground process exits
+    await waitForCondition(
+      mainWindow,
+      async () => {
+        const tabText = await terminal1Tab.textContent();
+        return /\[1\]\s+(zsh|bash|sh|fish)/.test(tabText) || tabText.includes('Terminal 1');
+      },
+      1000,
+      50,
+      'Terminal label did not revert to shell'
+    );
 
     await electronApp.close();
   });

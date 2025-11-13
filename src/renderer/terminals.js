@@ -58,8 +58,11 @@ export function createTerminals() {
 
       sendMacro(terminalId, text) {
         if (this.terminals[terminalId]) {
-          // Send the text followed by Enter (\r\n) to execute the command
-          ipcRenderer.send('terminal-input', { terminalId, data: text + '\r\n' });
+          const term = this.terminals[terminalId].term;
+          // Simulate typing the text, then pressing Enter
+          // Must send separately - combining doesn't work in TUIs
+          term.input(text, false);
+          term.input('\r', false);  // \r simulates Enter key press
         }
       },
 
@@ -94,6 +97,8 @@ export function createTerminals() {
               terminalNumber,
               () => this
             );
+            // Focus the newly created terminal
+            this.terminals[terminalId].term.focus();
           }
         } catch (error) {
           console.error('Failed to create terminal:', error);
@@ -137,22 +142,11 @@ export function initializeDefaultTerminal() {
       const wasAtBottom = term.buffer.active.viewportY === term.buffer.active.baseY + term.rows - 1
                        || term.buffer.active.viewportY >= term.buffer.active.baseY + term.buffer.active.length - term.rows;
 
-      console.log('[Terminal Scroll] terminalId:', terminalId,
-                  'wasAtBottom:', wasAtBottom,
-                  'viewportY:', term.buffer.active.viewportY,
-                  'baseY:', term.buffer.active.baseY,
-                  'rows:', term.rows,
-                  'bufferLength:', term.buffer.active.length,
-                  'dataLength:', data.length);
-
       term.write(data);
 
       // If user was at the bottom, keep them there
       if (wasAtBottom) {
-        console.log('[Terminal Scroll] Scrolling to bottom after write');
         term.scrollToBottom();
-      } else {
-        console.log('[Terminal Scroll] User scrolled up, preserving position');
       }
     }
   });

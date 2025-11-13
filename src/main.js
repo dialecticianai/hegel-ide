@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const pty = require('node-pty');
 const os = require('os');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const fs = require('fs').promises;
 const http = require('http');
 const { buildTerminalEnv } = require('../lib/terminal-env.js');
@@ -15,6 +15,41 @@ let httpPort;
 
 // Use HEGEL_IDE_CWD env var if set, otherwise use process.cwd()
 const terminalCwd = process.env.HEGEL_IDE_CWD || process.cwd();
+
+// Get foreground process for a PTY
+function getForegroundProcess(pid) {
+  try {
+    if (os.platform() === 'darwin' || os.platform() === 'linux') {
+      // Use pgrep to efficiently find direct children
+      // -P <pid> finds children of specific parent
+      const childPids = execSync(`pgrep -P ${pid}`, { encoding: 'utf-8' }).trim();
+
+      if (!childPids) {
+        // No children, shell is idle
+        return null;
+      }
+
+      // Get the first child PID (foreground process)
+      const firstChildPid = childPids.split('\n')[0];
+
+      // Get the process name for this PID
+      const psOutput = execSync(`ps -o comm= -p ${firstChildPid}`, { encoding: 'utf-8' }).trim();
+
+      let processName = psOutput;
+
+      // Strip path to get just the program name (e.g., /bin/zsh -> zsh)
+      if (processName && processName.includes('/')) {
+        processName = processName.split('/').pop();
+      }
+
+      return processName;
+    }
+  } catch (error) {
+    // Silently fail - process may have exited or no children
+    return null;
+  }
+  return null;
+}
 
 // Unified terminal spawn function
 function spawnTerminal(terminalId, httpPort) {
@@ -34,7 +69,7 @@ function spawnTerminal(terminalId, httpPort) {
       mainWindow.webContents.send('terminal-output', { terminalId, data });
 
       // Check if foreground process changed (event-driven, not polling)
-      const currentProcess = ptyProc.process;
+      const currentProcess = getForegroundProcess(ptyProc.pid);
       if (currentProcess !== ptyProc._lastProcess) {
         ptyProc._lastProcess = currentProcess;
         mainWindow.webContents.send('terminal-process-change', {

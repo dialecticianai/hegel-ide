@@ -90,9 +90,15 @@ test.describe('Tab Management', () => {
     // Wait for terminal to be created
     await mainWindow.waitForTimeout(TAB_CREATE);
 
-    // Verify Terminal 2 tab appears
-    const terminal2Tab = await mainWindow.locator('.right-pane .tab').filter({ hasText: 'Terminal 2' });
+    // Verify we now have 2 tabs
+    const allRightTabs = await mainWindow.locator('.right-pane .tab');
+    expect(await allRightTabs.count()).toBe(2);
+
+    // Verify second tab (term-2) exists and is active
+    const terminal2Tab = await mainWindow.locator('.right-pane .tab').nth(1);
     expect(await terminal2Tab.isVisible()).toBe(true);
+    const hasActiveClass = await terminal2Tab.evaluate(el => el.classList.contains('active'));
+    expect(hasActiveClass).toBe(true);
 
     // Verify Terminal 2 has close button (closeable)
     const terminal2CloseBtn = terminal2Tab.locator('.close-tab');
@@ -101,6 +107,21 @@ test.describe('Tab Management', () => {
     // Verify Terminal 2 container exists
     const terminal2Container = await mainWindow.locator('#terminal-container-term-2');
     expect(await terminal2Container.isVisible()).toBe(true);
+
+    // Verify focus is automatically set on the new terminal (can type without clicking)
+    await mainWindow.waitForTimeout(TERMINAL_READY);
+
+    // Type command without clicking terminal first
+    await mainWindow.keyboard.type('echo "auto-focused"');
+    await mainWindow.keyboard.press('Enter');
+
+    // Wait for command execution
+    await mainWindow.waitForTimeout(TERMINAL_READY);
+
+    // Verify command output appears in Terminal 2
+    const xtermScreen = await mainWindow.locator('#terminal-container-term-2 .xterm-screen');
+    const content = await xtermScreen.textContent();
+    expect(content).toContain('auto-focused');
 
     await electronApp.close();
   });

@@ -4,6 +4,8 @@ This project is **hegel-ide**, a subproject of the Hegel ecosystem. See [README.
 
 **What is hegel-ide?** An Electron-based no-code IDE for AI-first development. No code editor by design - work at the orchestration level.
 
+**Code navigation:** Always start with code maps in `src/**/README.md` files, then read files in a targeted manner. Never grep randomly for "likely" phrases.
+
 ## UI Design Principles
 
 **Core aesthetic:** Minimal and unobtrusive, but maximally informative.
