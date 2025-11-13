@@ -56,14 +56,21 @@ function spawnTerminal(terminalId, httpPort) {
   const augmentedEnv = buildTerminalEnv(process.env, httpPort);
   const shell = os.platform() === 'win32' ? 'powershell.exe' : (process.env.SHELL || 'bash');
 
-  const ptyProc = pty.spawn(shell, [], {
+  const spawnOptions = {
     name: 'xterm-color',
     cols: 80,
     rows: 24,
     cwd: terminalCwd,
-    env: augmentedEnv,
-    handleFlowControl: true
-  });
+    env: augmentedEnv
+  };
+
+  // Enable flow control in production (helps reduce TUI flicker)
+  // Disabled in tests as it may interfere with terminal I/O testing
+  if (!process.env.TESTING) {
+    spawnOptions.handleFlowControl = true;
+  }
+
+  const ptyProc = pty.spawn(shell, [], spawnOptions);
 
   ptyProc.onData((data) => {
     if (mainWindow && !mainWindow.isDestroyed()) {

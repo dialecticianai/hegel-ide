@@ -196,8 +196,8 @@ test.describe('Tab Management', () => {
     const closeBtn = projectTab.locator('.close-tab');
     expect(await closeBtn.isVisible()).toBe(true);
 
-    // Verify refresh button exists (in active tab)
-    const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab');
+    // Verify refresh button exists (in active tab) - specifically for project-detail type
+    const refreshBtn = await mainWindow.locator('.tab.active .refresh-tab[title="Refresh project details"]');
     expect(await refreshBtn.isVisible()).toBe(true);
 
     // Wait for project content to load

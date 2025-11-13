@@ -20,11 +20,13 @@ function setupTerminal(container, terminalId, terminalNumber, alpineDataGetter) 
 
   term.open(container);
 
-  // Load WebGL renderer for better performance
-  try {
-    term.loadAddon(new WebglAddon());
-  } catch (e) {
-    console.warn('WebGL addon failed, falling back to canvas renderer:', e);
+  // Load WebGL renderer for better performance (disabled in tests)
+  if (!process.env.TESTING) {
+    try {
+      term.loadAddon(new WebglAddon());
+    } catch (e) {
+      console.warn('WebGL addon failed, falling back to canvas renderer:', e);
+    }
   }
 
   fitAddon.fit();
