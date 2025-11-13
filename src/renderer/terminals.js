@@ -130,7 +130,30 @@ export function initializeDefaultTerminal() {
   ipcRenderer.on('terminal-output', (event, { terminalId, data }) => {
     const alpineData = Alpine.$data(document.getElementById('app'));
     if (alpineData && alpineData.terminals[terminalId]) {
-      alpineData.terminals[terminalId].term.write(data);
+      const term = alpineData.terminals[terminalId].term;
+
+      // Check if user is scrolled to the bottom before writing
+      // buffer.baseY is the first visible row, buffer.viewportY is the viewport scroll position
+      const wasAtBottom = term.buffer.active.viewportY === term.buffer.active.baseY + term.rows - 1
+                       || term.buffer.active.viewportY >= term.buffer.active.baseY + term.buffer.active.length - term.rows;
+
+      console.log('[Terminal Scroll] terminalId:', terminalId,
+                  'wasAtBottom:', wasAtBottom,
+                  'viewportY:', term.buffer.active.viewportY,
+                  'baseY:', term.buffer.active.baseY,
+                  'rows:', term.rows,
+                  'bufferLength:', term.buffer.active.length,
+                  'dataLength:', data.length);
+
+      term.write(data);
+
+      // If user was at the bottom, keep them there
+      if (wasAtBottom) {
+        console.log('[Terminal Scroll] Scrolling to bottom after write');
+        term.scrollToBottom();
+      } else {
+        console.log('[Terminal Scroll] User scrolled up, preserving position');
+      }
     }
   });
 
