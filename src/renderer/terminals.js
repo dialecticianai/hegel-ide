@@ -144,11 +144,36 @@ export function initializeDefaultTerminal() {
       }, 100);
   });
 
+  // Buffer for batching terminal output writes (reduces TUI flicker/scroll issues)
+  const terminalBuffers = new Map(); // terminalId -> { data: string, timer: number }
+  const BUFFER_INTERVAL_MS = 10;
+
   ipcRenderer.on('terminal-output', (event, { terminalId, data }) => {
     const alpineData = Alpine.$data(document.getElementById('app'));
     if (alpineData && alpineData.terminals[terminalId]) {
       const term = alpineData.terminals[terminalId].term;
-      term.write(data);
+
+      // Get or create buffer for this terminal
+      let buffer = terminalBuffers.get(terminalId);
+      if (!buffer) {
+        buffer = { data: '', timer: null };
+        terminalBuffers.set(terminalId, buffer);
+      }
+
+      // Append incoming data to buffer
+      buffer.data += data;
+
+      // Clear existing timer if any
+      if (buffer.timer !== null) {
+        clearTimeout(buffer.timer);
+      }
+
+      // Schedule flush after 10ms
+      buffer.timer = setTimeout(() => {
+        term.write(buffer.data);
+        buffer.data = '';
+        buffer.timer = null;
+      }, BUFFER_INTERVAL_MS);
     }
   });
 
